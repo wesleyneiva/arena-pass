@@ -1,10 +1,12 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
 import { ConviteService } from '../../../core/services/convite.service';
 import { Agendamento } from '../../../core/models/agendamento.models';
 import { ConviteResumo } from '../../../core/models/convite.models';
+
+type FiltroStatus = 'Todos' | 'PendentePagamento' | 'Confirmado' | 'Realizado' | 'Cancelado';
 
 @Component({
   selector: 'app-meus-agendamentos',
@@ -19,8 +21,33 @@ export class MeusAgendamentos implements OnInit {
   readonly emitindo = signal(false);
   readonly carregando = signal(true);
 
+  readonly filtroStatus = signal<FiltroStatus>('Todos');
+  readonly filtroQuadra = signal('Todas');
+  readonly filtroDataDe = signal('');
+  readonly filtroDataAte = signal('');
+
   alunoNome = '';
   alunoCpf = '';
+
+  readonly quadrasDisponiveis = computed(() => {
+    const nomes = new Set(this.agendamentos().map((a) => a.quadraNome));
+    return ['Todas', ...Array.from(nomes).sort()];
+  });
+
+  readonly agendamentosFiltrados = computed(() => {
+    const status = this.filtroStatus();
+    const quadra = this.filtroQuadra();
+    const dataDe = this.filtroDataDe();
+    const dataAte = this.filtroDataAte();
+
+    return this.agendamentos().filter((a) => {
+      const bateStatus = status === 'Todos' || a.status === status;
+      const bateQuadra = quadra === 'Todas' || a.quadraNome === quadra;
+      const bateDataDe = dataDe === '' || a.data >= dataDe;
+      const bateDataAte = dataAte === '' || a.data <= dataAte;
+      return bateStatus && bateQuadra && bateDataDe && bateDataAte;
+    });
+  });
 
   constructor(
     private readonly agendamentoService: AgendamentoService,

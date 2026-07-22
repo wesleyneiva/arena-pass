@@ -3,26 +3,12 @@
     <button
       type="button"
       (click)="selecionar(slot)"
-      [disabled]="!slot.livre"
+      [disabled]="!slot.livre || bloqueada()"
       class="rounded-xl border px-3 py-2.5 text-sm font-medium transition-all duration-150"
-      [class.bg-blue-50]="slot.livre && !estaSelecionado(i)"
-      [class.border-blue-200]="slot.livre && !estaSelecionado(i)"
-      [class.text-blue-700]="slot.livre && !estaSelecionado(i)"
-      [class.hover:border-blue-400]="slot.livre && !estaSelecionado(i)"
-      [class.hover:shadow-sm]="slot.livre && !estaSelecionado(i)"
-      [class.cursor-pointer]="slot.livre"
-      [class.bg-blue-600]="estaSelecionado(i)"
-      [class.border-blue-600]="estaSelecionado(i)"
-      [class.text-white]="estaSelecionado(i)"
-      [class.shadow-md]="estaSelecionado(i)"
-      [class.scale-[1.03]]="estaSelecionado(i)"
-      [class.bg-slate-50]="!slot.livre"
-      [class.border-slate-200]="!slot.livre"
-      [class.text-slate-400]="!slot.livre"
-      [class.cursor-not-allowed]="!slot.livre"
+      [class]="classesSlot(slot, i)"
     >
       {{ slot.horaInicio.slice(0, 5) }}
-      <span class="mt-0.5 block text-xs opacity-75">{{ slot.livre ? 'Livre' : 'Ocupado' }}</span>
+      <span class="mt-0.5 block text-xs opacity-75">{{ rotulo(slot) }}</span>
     </button>
   }
 </div>

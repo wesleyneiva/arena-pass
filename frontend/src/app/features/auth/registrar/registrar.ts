@@ -16,7 +16,6 @@ export class Registrar {
 
   readonly carregando = signal(false);
   readonly erro = signal<string | null>(null);
-  readonly sucesso = signal(false);
 
   constructor(
     private readonly auth: AuthService,
@@ -32,8 +31,7 @@ export class Registrar {
       .subscribe({
         next: () => {
           this.carregando.set(false);
-          this.sucesso.set(true);
-          setTimeout(() => this.router.navigateByUrl('/login'), 2500);
+          this.router.navigateByUrl('/login');
         },
         error: (err) => {
           this.carregando.set(false);

@@ -1,7 +1,9 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { QuadraService } from '../../../core/services/quadra.service';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Quadra, HorarioSlot } from '../../../core/models/quadra.models';
 import { GradeHorarios } from '../../../shared/grade-horarios/grade-horarios';
 
@@ -12,6 +14,8 @@ function hoje(): string {
   return `${agora.getFullYear()}-${mes}-${dia}`;
 }
 
+const ATRASO_REDIRECIONAMENTO_MS = 1800;
+
 @Component({
   selector: 'app-agendar',
   imports: [FormsModule, GradeHorarios],
@@ -21,14 +25,17 @@ export class Agendar implements OnInit {
   readonly quadras = signal<Quadra[]>([]);
   readonly slots = signal<HorarioSlot[]>([]);
   readonly erro = signal<string | null>(null);
-  readonly sucesso = signal<string | null>(null);
   readonly carregandoSlots = signal(false);
   readonly salvando = signal(false);
   readonly horaInicioSelecionada = signal<string | null>(null);
   readonly quantidadeHoras = signal(1);
+  readonly modalConfirmacaoAberto = signal(false);
+  readonly mensagemConfirmacao = signal('');
 
   quadraId = '';
   data = hoje();
+
+  readonly bloqueadaPorAprovacao = computed(() => this.auth.professorAprovado() === false);
 
   readonly quadraSelecionada = computed<Quadra | null>(
     () => this.quadras().find((q) => q.id === this.quadraId) ?? null
@@ -52,7 +59,9 @@ export class Agendar implements OnInit {
 
   constructor(
     private readonly quadraService: QuadraService,
-    private readonly agendamentoService: AgendamentoService
+    private readonly agendamentoService: AgendamentoService,
+    private readonly auth: AuthService,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -74,7 +83,6 @@ export class Agendar implements OnInit {
     }
 
     this.erro.set(null);
-    this.sucesso.set(null);
     this.horaInicioSelecionada.set(null);
     this.carregandoSlots.set(true);
 
@@ -114,7 +122,6 @@ export class Agendar implements OnInit {
     }
 
     this.erro.set(null);
-    this.sucesso.set(null);
     this.salvando.set(true);
 
     this.agendamentoService
@@ -127,9 +134,10 @@ export class Agendar implements OnInit {
       .subscribe({
         next: () => {
           this.salvando.set(false);
-          this.sucesso.set(`Aula agendada às ${horaInicio.slice(0, 5)}!`);
+          this.mensagemConfirmacao.set(`Aula agendada às ${horaInicio.slice(0, 5)}!`);
+          this.modalConfirmacaoAberto.set(true);
           this.cancelarSelecao();
-          this.buscarHorarios();
+          setTimeout(() => this.irParaMeusAgendamentos(), ATRASO_REDIRECIONAMENTO_MS);
         },
         error: (err) => {
           this.salvando.set(false);
@@ -137,5 +145,9 @@ export class Agendar implements OnInit {
           this.buscarHorarios();
         }
       });
+  }
+
+  irParaMeusAgendamentos(): void {
+    this.router.navigateByUrl('/professor/meus-agendamentos');
   }
 }

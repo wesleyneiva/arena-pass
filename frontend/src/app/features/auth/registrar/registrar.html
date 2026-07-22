@@ -11,11 +11,6 @@
         Seu cadastro fica pendente até a aprovação do clube.
       </p>
 
-      @if (sucesso()) {
-        <p class="animate-scale-in rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
-          Cadastro enviado! Assim que o clube aprovar, você já pode fazer login.
-        </p>
-      } @else {
         <form (ngSubmit)="registrar()" class="space-y-4">
           <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
@@ -50,7 +45,6 @@
             {{ carregando() ? 'Enviando...' : 'Cadastrar' }}
           </button>
         </form>
-      }
     </div>
 
     <p class="mt-6 text-center text-sm text-slate-500">

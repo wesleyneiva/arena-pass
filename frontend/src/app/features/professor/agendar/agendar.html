@@ -34,9 +34,6 @@
 @if (erro()) {
   <p class="mb-4 animate-fade-in rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ erro() }}</p>
 }
-@if (sucesso()) {
-  <p class="mb-4 animate-fade-in rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700">{{ sucesso() }}</p>
-}
 
 @if (carregandoSlots()) {
   <div class="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
@@ -49,6 +46,7 @@
     [slots]="slots()"
     [horaInicioSelecionada]="horaInicioSelecionada()"
     [quantidadeHorasSelecionada]="quantidadeHoras()"
+    [bloqueada]="bloqueadaPorAprovacao()"
     (slotSelecionado)="selecionarSlot($event)"
   />
 }
@@ -105,6 +103,24 @@
           {{ salvando() ? 'Agendando...' : 'Confirmar agendamento' }}
         </button>
       </div>
+    </div>
+  </div>
+}
+
+@if (modalConfirmacaoAberto()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in">
+    <div class="w-full max-w-sm animate-scale-in rounded-2xl bg-white p-6 text-center shadow-xl">
+      <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12.5l5 5L20 6" />
+        </svg>
+      </div>
+      <h2 class="text-lg font-semibold text-slate-900">Agendado com sucesso!</h2>
+      <p class="mt-1 text-sm text-slate-500">{{ mensagemConfirmacao() }}</p>
+      <button (click)="irParaMeusAgendamentos()"
+        class="mt-5 w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700">
+        Ver meus agendamentos
+      </button>
     </div>
   </div>
 }
