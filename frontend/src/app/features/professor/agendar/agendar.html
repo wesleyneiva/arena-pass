@@ -1,0 +1,45 @@
+<h2 class="text-lg font-semibold text-slate-900 mb-4">Agendar aula</h2>
+
+<div class="bg-white border border-slate-200 rounded-lg p-4 mb-6 grid sm:grid-cols-4 gap-3 items-end">
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Quadra</label>
+    <select [(ngModel)]="quadraId" (ngModelChange)="buscarHorarios()"
+      class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      @for (quadra of quadras(); track quadra.id) {
+        <option [value]="quadra.id">{{ quadra.nome }}</option>
+      }
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Data</label>
+    <input type="date" [(ngModel)]="data" (ngModelChange)="buscarHorarios()"
+      class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Taxa da aula (R$)</label>
+    <input type="number" [(ngModel)]="taxaValor" min="0" step="0.01"
+      class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+  </div>
+
+  <div>
+    <button (click)="buscarHorarios()"
+      class="w-full rounded-lg bg-slate-800 text-white py-2 text-sm font-medium hover:bg-slate-900 transition">
+      Atualizar horários
+    </button>
+  </div>
+</div>
+
+@if (erro()) {
+  <p class="text-sm text-red-600 mb-3">{{ erro() }}</p>
+}
+@if (sucesso()) {
+  <p class="text-sm text-emerald-700 mb-3">{{ sucesso() }}</p>
+}
+
+@if (carregandoSlots()) {
+  <p class="text-sm text-slate-500">Carregando horários...</p>
+} @else {
+  <app-grade-horarios [slots]="slots()" (slotSelecionado)="agendar($event)" />
+}

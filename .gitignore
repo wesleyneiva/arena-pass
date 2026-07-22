@@ -1,0 +1,22 @@
+# .NET
+backend/**/bin/
+backend/**/obj/
+*.user
+
+# Angular / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# Segredos — nunca commitar
+**/appsettings.Development.json
+**/appsettings.*.local.json
+.env
+.env.*
+
+# Editor / OS
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

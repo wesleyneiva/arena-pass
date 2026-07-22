@@ -1,0 +1,67 @@
+<div class="grid md:grid-cols-2 gap-8">
+  <section>
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">Quadras cadastradas</h2>
+    <div class="space-y-2">
+      @for (quadra of quadras(); track quadra.id) {
+        <div class="bg-white border border-slate-200 rounded-lg p-4">
+          <p class="font-medium text-slate-900">{{ quadra.nome }}</p>
+          <p class="text-sm text-slate-500">
+            {{ quadra.modalidadeNome }} · {{ quadra.horaAbertura.slice(0,5) }} às {{ quadra.horaFechamento.slice(0,5) }}
+            · slots de {{ quadra.duracaoSlotMinutos }} min
+          </p>
+        </div>
+      } @empty {
+        <p class="text-sm text-slate-500">Nenhuma quadra cadastrada ainda.</p>
+      }
+    </div>
+  </section>
+
+  <section>
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">Nova quadra</h2>
+    <form (ngSubmit)="criar()" class="bg-white border border-slate-200 rounded-lg p-4 space-y-3">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Nome</label>
+        <input required name="nome" [(ngModel)]="nome" placeholder="Quadra 4"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Modalidade</label>
+        <select required name="modalidadeId" [(ngModel)]="modalidadeId"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          @for (modalidade of modalidades(); track modalidade.id) {
+            <option [value]="modalidade.id">{{ modalidade.nome }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Abertura</label>
+          <input required type="time" name="horaAbertura" [(ngModel)]="horaAbertura"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Fechamento</label>
+          <input required type="time" name="horaFechamento" [(ngModel)]="horaFechamento"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Duração do slot (minutos)</label>
+        <input required type="number" name="duracaoSlotMinutos" [(ngModel)]="duracaoSlotMinutos"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+      </div>
+
+      @if (erro()) {
+        <p class="text-sm text-red-600">{{ erro() }}</p>
+      }
+
+      <button type="submit" [disabled]="salvando()"
+        class="w-full rounded-lg bg-emerald-600 text-white py-2 text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-60">
+        {{ salvando() ? 'Salvando...' : 'Criar quadra' }}
+      </button>
+    </form>
+  </section>
+</div>

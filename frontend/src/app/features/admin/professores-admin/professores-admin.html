@@ -1,0 +1,35 @@
+<h2 class="text-lg font-semibold text-slate-900 mb-4">Professores</h2>
+
+<div class="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
+  @for (professor of professores(); track professor.id) {
+    <div class="p-4 flex items-center justify-between">
+      <div>
+        <p class="font-medium text-slate-900">{{ professor.nome }}</p>
+        <p class="text-sm text-slate-500">{{ professor.email }} · CPF {{ professor.cpf }}</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span
+          class="text-xs font-medium px-2 py-1 rounded-full"
+          [class.bg-amber-50]="professor.statusAprovacao === 'Pendente'"
+          [class.text-amber-700]="professor.statusAprovacao === 'Pendente'"
+          [class.bg-emerald-50]="professor.statusAprovacao === 'Aprovado'"
+          [class.text-emerald-700]="professor.statusAprovacao === 'Aprovado'"
+          [class.bg-red-50]="professor.statusAprovacao === 'Suspenso'"
+          [class.text-red-700]="professor.statusAprovacao === 'Suspenso'"
+        >
+          {{ professor.statusAprovacao }}
+        </span>
+
+        @if (professor.statusAprovacao === 'Pendente') {
+          <button (click)="aprovar(professor.id)"
+            class="text-sm bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition">
+            Aprovar
+          </button>
+        }
+      </div>
+    </div>
+  } @empty {
+    <p class="p-4 text-sm text-slate-500">Nenhum professor cadastrado ainda.</p>
+  }
+</div>

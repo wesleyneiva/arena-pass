@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ArenaPass.Api/ArenaPass.Api.csproj" />
+    <Project Path="src/ArenaPass.Application/ArenaPass.Application.csproj" />
+    <Project Path="src/ArenaPass.Domain/ArenaPass.Domain.csproj" />
+    <Project Path="src/ArenaPass.Infrastructure/ArenaPass.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ArenaPass.Application.Tests/ArenaPass.Application.Tests.csproj" />
+  </Folder>
+</Solution>

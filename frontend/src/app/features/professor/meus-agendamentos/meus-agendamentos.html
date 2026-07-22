@@ -1,0 +1,20 @@
+<h2 class="text-lg font-semibold text-slate-900 mb-4">Meus agendamentos</h2>
+
+<div class="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
+  @for (agendamento of agendamentos(); track agendamento.id) {
+    <div class="p-4 flex items-center justify-between">
+      <div>
+        <p class="font-medium text-slate-900">
+          {{ agendamento.quadraNome }} · {{ agendamento.data }} · {{ agendamento.horaInicio.slice(0,5) }}-{{ agendamento.horaFim.slice(0,5) }}
+        </p>
+        <p class="text-sm text-slate-500">Taxa R$ {{ agendamento.taxaValor }}</p>
+      </div>
+
+      <span class="text-xs font-medium px-2 py-1 rounded-full bg-slate-100 text-slate-700">
+        {{ agendamento.status }}
+      </span>
+    </div>
+  } @empty {
+    <p class="p-4 text-sm text-slate-500">Você ainda não tem agendamentos.</p>
+  }
+</div>

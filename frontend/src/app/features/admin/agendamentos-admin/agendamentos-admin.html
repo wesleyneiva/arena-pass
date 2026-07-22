@@ -1,0 +1,31 @@
+<h2 class="text-lg font-semibold text-slate-900 mb-4">Agendamentos</h2>
+
+<div class="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
+  @for (agendamento of agendamentos(); track agendamento.id) {
+    <div class="p-4 flex items-center justify-between">
+      <div>
+        <p class="font-medium text-slate-900">
+          {{ agendamento.quadraNome }} · {{ agendamento.data }} · {{ agendamento.horaInicio.slice(0,5) }}-{{ agendamento.horaFim.slice(0,5) }}
+        </p>
+        <p class="text-sm text-slate-500">
+          Prof. {{ agendamento.professorNome }} · Taxa R$ {{ agendamento.taxaValor }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium px-2 py-1 rounded-full bg-slate-100 text-slate-700">
+          {{ agendamento.status }}
+        </span>
+
+        @if (agendamento.status === 'PendentePagamento') {
+          <button (click)="confirmarPagamento(agendamento.id)"
+            class="text-sm bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition">
+            Confirmar pagamento
+          </button>
+        }
+      </div>
+    </div>
+  } @empty {
+    <p class="p-4 text-sm text-slate-500">Nenhum agendamento ainda.</p>
+  }
+</div>

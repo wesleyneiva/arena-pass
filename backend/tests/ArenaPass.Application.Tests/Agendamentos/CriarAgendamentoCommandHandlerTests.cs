@@ -1,0 +1,147 @@
+using ArenaPass.Application.Agendamentos.Commands.CriarAgendamento;
+using ArenaPass.Application.Common.Exceptions;
+using ArenaPass.Application.Tests.Common;
+using ArenaPass.Domain.Entities;
+using ArenaPass.Domain.Enums;
+using ArenaPass.Domain.Exceptions;
+using Xunit;
+
+namespace ArenaPass.Application.Tests.Agendamentos;
+
+public class CriarAgendamentoCommandHandlerTests
+{
+    private static (Professor professor, Quadra quadra) CriarProfessorEQuadraAprovados(InMemoryDbContext context)
+    {
+        var usuario = new Usuario { Nome = "Professor Teste", Email = "prof@teste.com", Role = RoleUsuario.Professor };
+        var professor = new Professor
+        {
+            UsuarioId = usuario.Id,
+            Cpf = "12345678900",
+            StatusAprovacao = StatusAprovacaoProfessor.Aprovado
+        };
+
+        var modalidade = new Modalidade { Nome = "Beach Tennis" };
+        var quadra = new Quadra
+        {
+            Nome = "Quadra 4",
+            ModalidadeId = modalidade.Id,
+            HoraAbertura = new TimeOnly(7, 0),
+            HoraFechamento = new TimeOnly(23, 0),
+            DuracaoSlotMinutos = 60,
+            Ativa = true
+        };
+
+        context.Usuarios.Add(usuario);
+        context.Professores.Add(professor);
+        context.Modalidades.Add(modalidade);
+        context.Quadras.Add(quadra);
+        context.SaveChangesAsync().Wait();
+
+        return (professor, quadra);
+    }
+
+    [Fact]
+    public async Task Handle_DeveCriarAgendamento_QuandoProfessorAprovadoEHorarioLivre()
+    {
+        var context = TestDbContextFactory.Create();
+        var (professor, quadra) = CriarProfessorEQuadraAprovados(context);
+        var handler = new CriarAgendamentoCommandHandler(context);
+
+        var command = new CriarAgendamentoCommand(
+            professor.Id,
+            quadra.Id,
+            new DateOnly(2026, 8, 1),
+            new TimeOnly(18, 0),
+            80m);
+
+        var id = await handler.Handle(command, CancellationToken.None);
+
+        Assert.NotEqual(Guid.Empty, id);
+        Assert.Single(context.Agendamentos);
+    }
+
+    [Fact]
+    public async Task Handle_DeveLancarConflito_QuandoJaExisteAgendamentoNaoCanceladoNoMesmoSlot()
+    {
+        var context = TestDbContextFactory.Create();
+        var (professor, quadra) = CriarProfessorEQuadraAprovados(context);
+        var handler = new CriarAgendamentoCommandHandler(context);
+
+        var data = new DateOnly(2026, 8, 1);
+        var horaInicio = new TimeOnly(18, 0);
+
+        // primeiro professor já reservou esse slot
+        context.Agendamentos.Add(new Agendamento
+        {
+            QuadraId = quadra.Id,
+            ProfessorId = professor.Id,
+            Data = data,
+            HoraInicio = horaInicio,
+            HoraFim = horaInicio.AddHours(1),
+            TaxaValor = 80m,
+            Status = StatusAgendamento.PendentePagamento
+        });
+        await context.SaveChangesAsync();
+
+        var command = new CriarAgendamentoCommand(professor.Id, quadra.Id, data, horaInicio, 80m);
+
+        await Assert.ThrowsAsync<ConflitoDeAgendamentoException>(
+            () => handler.Handle(command, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_DevePermitirNovoAgendamento_QuandoAgendamentoAnteriorFoiCancelado()
+    {
+        var context = TestDbContextFactory.Create();
+        var (professor, quadra) = CriarProfessorEQuadraAprovados(context);
+        var handler = new CriarAgendamentoCommandHandler(context);
+
+        var data = new DateOnly(2026, 8, 1);
+        var horaInicio = new TimeOnly(18, 0);
+
+        context.Agendamentos.Add(new Agendamento
+        {
+            QuadraId = quadra.Id,
+            ProfessorId = professor.Id,
+            Data = data,
+            HoraInicio = horaInicio,
+            HoraFim = horaInicio.AddHours(1),
+            TaxaValor = 80m,
+            Status = StatusAgendamento.Cancelado
+        });
+        await context.SaveChangesAsync();
+
+        var command = new CriarAgendamentoCommand(professor.Id, quadra.Id, data, horaInicio, 80m);
+        var id = await handler.Handle(command, CancellationToken.None);
+
+        Assert.NotEqual(Guid.Empty, id);
+    }
+
+    [Fact]
+    public async Task Handle_DeveLancarDomainException_QuandoProfessorNaoFoiAprovado()
+    {
+        var context = TestDbContextFactory.Create();
+        var (professor, quadra) = CriarProfessorEQuadraAprovados(context);
+        professor.StatusAprovacao = StatusAprovacaoProfessor.Pendente;
+        await context.SaveChangesAsync();
+
+        var handler = new CriarAgendamentoCommandHandler(context);
+        var command = new CriarAgendamentoCommand(
+            professor.Id, quadra.Id, new DateOnly(2026, 8, 1), new TimeOnly(18, 0), 80m);
+
+        await Assert.ThrowsAsync<DomainException>(() => handler.Handle(command, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_DeveLancarNotFound_QuandoQuadraNaoExiste()
+    {
+        var context = TestDbContextFactory.Create();
+        var (professor, _) = CriarProfessorEQuadraAprovados(context);
+
+        var handler = new CriarAgendamentoCommandHandler(context);
+        var command = new CriarAgendamentoCommand(
+            professor.Id, Guid.NewGuid(), new DateOnly(2026, 8, 1), new TimeOnly(18, 0), 80m);
+
+        await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, CancellationToken.None));
+    }
+}
