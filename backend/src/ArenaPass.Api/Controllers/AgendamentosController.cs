@@ -5,7 +5,6 @@ using ArenaPass.Application.Agendamentos.Commands.ConfirmarPagamento;
 using ArenaPass.Application.Agendamentos.Commands.MarcarRealizado;
 using ArenaPass.Application.Agendamentos.Queries.ListarMeusAgendamentos;
 using ArenaPass.Application.Agendamentos.Queries.ListarTodosAgendamentos;
-using ArenaPass.Application.Agendamentos.Queries.ObterFaturamentoMensal;
 using ArenaPass.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

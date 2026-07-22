@@ -1,4 +1,4 @@
-using ArenaPass.Application.Agendamentos.Queries.ObterFaturamentoMensal;
+using ArenaPass.Application.Agendamentos.Queries.ObterFaturamentoPeriodo;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +17,13 @@ public class FinanceiroController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("faturamento-mensal")]
-    public async Task<IActionResult> FaturamentoMensal(
-        [FromQuery] int ano,
-        [FromQuery] int mes,
+    [HttpGet("faturamento")]
+    public async Task<IActionResult> Faturamento(
+        [FromQuery] DateOnly dataInicio,
+        [FromQuery] DateOnly dataFim,
         CancellationToken cancellationToken)
     {
-        var faturamento = await _mediator.Send(new ObterFaturamentoMensalQuery(ano, mes), cancellationToken);
+        var faturamento = await _mediator.Send(new ObterFaturamentoPeriodoQuery(dataInicio, dataFim), cancellationToken);
         return Ok(faturamento);
     }
 }

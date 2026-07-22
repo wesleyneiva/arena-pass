@@ -5,9 +5,16 @@ export interface FaturamentoProfessor {
   valorTotal: number;
 }
 
-export interface FaturamentoMensal {
+export interface FaturamentoMes {
   ano: number;
   mes: number;
+  total: number;
+}
+
+export interface FaturamentoPeriodo {
+  dataInicio: string;
+  dataFim: string;
   totalGeral: number;
   porProfessor: FaturamentoProfessor[];
+  porMes: FaturamentoMes[];
 }

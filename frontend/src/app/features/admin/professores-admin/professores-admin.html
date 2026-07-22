@@ -1,7 +1,25 @@
 <h2 class="text-lg font-semibold text-slate-900 mb-4">Professores</h2>
 
+<div class="bg-white border border-slate-200 rounded-lg p-4 mb-4 flex flex-wrap gap-3 items-end">
+  <div class="flex-1 min-w-48">
+    <label class="block text-xs font-medium text-slate-700 mb-1">Buscar (nome, e-mail ou CPF)</label>
+    <input [ngModel]="busca()" (ngModelChange)="atualizarBusca($event)"
+      class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm" />
+  </div>
+  <div>
+    <label class="block text-xs font-medium text-slate-700 mb-1">Status</label>
+    <select [ngModel]="filtroStatus()" (ngModelChange)="filtroStatus.set($event)"
+      class="rounded-lg border border-slate-300 px-2 py-1.5 text-sm">
+      <option value="Todos">Todos</option>
+      <option value="Pendente">Pendente</option>
+      <option value="Aprovado">Aprovado</option>
+      <option value="Suspenso">Suspenso</option>
+    </select>
+  </div>
+</div>
+
 <div class="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
-  @for (professor of professores(); track professor.id) {
+  @for (professor of professoresFiltrados(); track professor.id) {
     <div class="p-4 flex items-center justify-between">
       <div>
         <p class="font-medium text-slate-900">{{ professor.nome }}</p>
@@ -30,6 +48,6 @@
       </div>
     </div>
   } @empty {
-    <p class="p-4 text-sm text-slate-500">Nenhum professor cadastrado ainda.</p>
+    <p class="p-4 text-sm text-slate-500">Nenhum professor encontrado com esses filtros.</p>
   }
 </div>

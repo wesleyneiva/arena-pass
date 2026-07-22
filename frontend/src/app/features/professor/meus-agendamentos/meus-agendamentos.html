@@ -25,11 +25,16 @@
             {{ agendamento.status }}
           </span>
 
-          @if (agendamento.status !== 'Cancelado' && agendamento.status !== 'Realizado') {
+          @if (agendamento.status === 'Confirmado' || agendamento.status === 'Realizado') {
             <button (click)="toggleConvites(agendamento.id)"
               class="text-sm bg-slate-800 text-white px-3 py-1.5 rounded-lg hover:bg-slate-900 transition">
               {{ agendamentoExpandidoId() === agendamento.id ? 'Fechar' : 'Convites' }}
             </button>
+          } @else if (agendamento.status === 'PendentePagamento') {
+            <span class="text-xs text-slate-400">Convite disponível após confirmação do pagamento</span>
+          }
+
+          @if (agendamento.status === 'PendentePagamento' || agendamento.status === 'Confirmado') {
             <button (click)="cancelar(agendamento.id)"
               class="text-sm text-red-600 hover:text-red-800 px-2">
               Cancelar

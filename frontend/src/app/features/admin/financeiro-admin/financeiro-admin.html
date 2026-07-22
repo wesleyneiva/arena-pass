@@ -1,25 +1,42 @@
 <h2 class="text-lg font-semibold text-slate-900 mb-4">Financeiro</h2>
 
-<div class="bg-white border border-slate-200 rounded-lg p-4 mb-6 flex items-end gap-3">
-  <div>
-    <label class="block text-sm font-medium text-slate-700 mb-1">Mês</label>
-    <input type="number" min="1" max="12" [(ngModel)]="mes" class="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm" />
+<div class="bg-white border border-slate-200 rounded-lg p-4 mb-6 space-y-3">
+  <div class="flex flex-wrap gap-2">
+    @for (opcao of presets; track opcao.valor) {
+      <button (click)="aplicarPreset(opcao.valor)"
+        class="text-sm px-3 py-1.5 rounded-lg border transition"
+        [class.bg-emerald-600]="presetAtivo() === opcao.valor"
+        [class.text-white]="presetAtivo() === opcao.valor"
+        [class.border-emerald-600]="presetAtivo() === opcao.valor"
+        [class.border-slate-300]="presetAtivo() !== opcao.valor"
+        [class.text-slate-700]="presetAtivo() !== opcao.valor">
+        {{ opcao.rotulo }}
+      </button>
+    }
   </div>
-  <div>
-    <label class="block text-sm font-medium text-slate-700 mb-1">Ano</label>
-    <input type="number" [(ngModel)]="ano" class="w-24 rounded-lg border border-slate-300 px-2 py-1.5 text-sm" />
+
+  <div class="flex items-end gap-3 pt-2 border-t border-slate-200">
+    <div>
+      <label class="block text-xs font-medium text-slate-700 mb-1">De</label>
+      <input type="date" [(ngModel)]="dataInicio" class="rounded-lg border border-slate-300 px-2 py-1.5 text-sm" />
+    </div>
+    <div>
+      <label class="block text-xs font-medium text-slate-700 mb-1">Até</label>
+      <input type="date" [(ngModel)]="dataFim" class="rounded-lg border border-slate-300 px-2 py-1.5 text-sm" />
+    </div>
+    <button (click)="buscar()" class="rounded-lg bg-slate-800 text-white px-4 py-1.5 text-sm font-medium hover:bg-slate-900 transition">
+      Consultar
+    </button>
   </div>
-  <button (click)="buscar()" class="rounded-lg bg-slate-800 text-white px-4 py-1.5 text-sm font-medium hover:bg-slate-900 transition">
-    Consultar
-  </button>
 </div>
 
 @if (carregando()) {
   <p class="text-sm text-slate-500">Carregando...</p>
 } @else if (faturamento(); as f) {
   <div class="bg-white border border-slate-200 rounded-lg p-4 mb-4">
-    <p class="text-sm text-slate-500">Faturamento total do clube em {{ f.mes }}/{{ f.ano }}</p>
-    <p class="text-2xl font-semibold text-emerald-700">R$ {{ f.totalGeral }}</p>
+    <p class="text-sm text-slate-500">Faturamento total do clube no período</p>
+    <p class="text-2xl font-semibold text-emerald-700 mb-4">R$ {{ f.totalGeral }}</p>
+    <app-faturamento-chart [dados]="f.porMes" />
   </div>
 
   <div class="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
@@ -29,7 +46,7 @@
         <p class="text-sm text-slate-600">{{ item.totalAulas }} aula(s) · R$ {{ item.valorTotal }}</p>
       </div>
     } @empty {
-      <p class="p-4 text-sm text-slate-500">Nenhum agendamento pago nesse mês.</p>
+      <p class="p-4 text-sm text-slate-500">Nenhum agendamento pago nesse período.</p>
     }
   </div>
 }

@@ -11,7 +11,7 @@ public class EmitirConviteCommandHandlerTests
 {
     private static (Agendamento agendamento, Guid outroProfessorId) CriarAgendamento(
         InMemoryDbContext context,
-        StatusAgendamento status = StatusAgendamento.PendentePagamento)
+        StatusAgendamento status = StatusAgendamento.Confirmado)
     {
         var usuario = new Usuario { Nome = "Professor Teste", Email = "prof@teste.com", Role = RoleUsuario.Professor };
         var professor = new Professor
@@ -80,5 +80,30 @@ public class EmitirConviteCommandHandlerTests
         var command = new EmitirConviteCommand(agendamento.Id, agendamento.ProfessorId, "Aluno Teste", "98765432100");
 
         await Assert.ThrowsAsync<DomainException>(() => handler.Handle(command, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_DeveLancarDomainException_QuandoPagamentoAindaNaoConfirmado()
+    {
+        var context = TestDbContextFactory.Create();
+        var (agendamento, _) = CriarAgendamento(context, StatusAgendamento.PendentePagamento);
+        var handler = new EmitirConviteCommandHandler(context);
+
+        var command = new EmitirConviteCommand(agendamento.Id, agendamento.ProfessorId, "Aluno Teste", "98765432100");
+
+        await Assert.ThrowsAsync<DomainException>(() => handler.Handle(command, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_DevePermitir_QuandoAgendamentoRealizado()
+    {
+        var context = TestDbContextFactory.Create();
+        var (agendamento, _) = CriarAgendamento(context, StatusAgendamento.Realizado);
+        var handler = new EmitirConviteCommandHandler(context);
+
+        var command = new EmitirConviteCommand(agendamento.Id, agendamento.ProfessorId, "Aluno Teste", "98765432100");
+        var id = await handler.Handle(command, CancellationToken.None);
+
+        Assert.NotEqual(Guid.Empty, id);
     }
 }

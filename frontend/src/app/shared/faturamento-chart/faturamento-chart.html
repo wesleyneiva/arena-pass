@@ -1,0 +1,38 @@
+<div class="w-full" [style.aspect-ratio]="larguraVirtual + ' / ' + alturaVirtual">
+  <svg [attr.viewBox]="'0 0 ' + larguraVirtual + ' ' + alturaVirtual" class="w-full h-full" role="img" aria-label="Gráfico de receita mensal">
+    <!-- gridlines -->
+    @for (linha of linhasGrade(); track linha.rotulo) {
+      <line
+        [attr.x1]="margemEsquerda" [attr.x2]="larguraVirtual"
+        [attr.y1]="linha.y" [attr.y2]="linha.y"
+        stroke="#e1e0d9" stroke-width="1" />
+      <text [attr.x]="margemEsquerda - 8" [attr.y]="linha.y + 3"
+        text-anchor="end" font-size="9" fill="#898781">{{ linha.rotulo }}</text>
+    }
+
+    <!-- baseline -->
+    <line [attr.x1]="margemEsquerda" [attr.x2]="larguraVirtual"
+      [attr.y1]="areaUtilAltura" [attr.y2]="areaUtilAltura"
+      stroke="#c3c2b7" stroke-width="1" />
+
+    <!-- bars -->
+    @for (barra of barras(); track barra.rotuloMes; let i = $index) {
+      <path [attr.d]="barra.path" [attr.fill]="indiceHover() === i ? '#047857' : '#059669'" />
+
+      <text [attr.x]="barra.rotuloCentroX" [attr.y]="areaUtilAltura + 14"
+        text-anchor="middle" font-size="9" fill="#898781">{{ barra.rotuloMes }}</text>
+
+      @if (indiceHover() === i) {
+        <text [attr.x]="barra.rotuloCentroX" [attr.y]="barra.y - 6"
+          text-anchor="middle" font-size="10" font-weight="600" fill="#0b0b0b">
+          {{ formatarMoeda(barra.valor) }}
+        </text>
+      }
+
+      <!-- hit area maior que a barra pra facilitar o hover -->
+      <rect [attr.x]="barra.slotX" [attr.y]="0" [attr.width]="barra.slotLargura" [attr.height]="areaUtilAltura"
+        fill="transparent"
+        (mouseenter)="indiceHover.set(i)" (mouseleave)="indiceHover.set(null)" />
+    }
+  </svg>
+</div>

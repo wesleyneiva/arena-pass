@@ -28,9 +28,10 @@ public class EmitirConviteCommandHandler : IRequestHandler<EmitirConviteCommand,
             throw new UnauthorizedAccessException("Esse agendamento não pertence a você.");
         }
 
-        if (agendamento.Status == StatusAgendamento.Cancelado)
+        if (agendamento.Status != StatusAgendamento.Confirmado && agendamento.Status != StatusAgendamento.Realizado)
         {
-            throw new DomainException("Não é possível emitir convite para um agendamento cancelado.");
+            throw new DomainException(
+                "Só é possível emitir convite para aulas com pagamento confirmado pelo clube.");
         }
 
         var convite = new Convite
