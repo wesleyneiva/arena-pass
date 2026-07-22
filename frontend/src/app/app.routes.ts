@@ -37,6 +37,13 @@ export const routes: Routes = [
           import('./features/admin/agendamentos-admin/agendamentos-admin').then(
             (m) => m.AgendamentosAdmin
           )
+      },
+      {
+        path: 'financeiro',
+        loadComponent: () =>
+          import('./features/admin/financeiro-admin/financeiro-admin').then(
+            (m) => m.FinanceiroAdmin
+          )
       }
     ]
   },
@@ -58,6 +65,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/professor/meus-agendamentos/meus-agendamentos').then(
             (m) => m.MeusAgendamentos
+          )
+      },
+      {
+        path: 'convites/:id',
+        loadComponent: () =>
+          import('./features/professor/convite-detalhe/convite-detalhe').then(
+            (m) => m.ConviteDetalhe
           )
       }
     ]

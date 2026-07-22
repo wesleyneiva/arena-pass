@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using ArenaPass.Api.Middleware;
 using ArenaPass.Application;
 using ArenaPass.Infrastructure;
@@ -13,7 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string CorsPolicyName = "ArenaPassFrontend";
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);

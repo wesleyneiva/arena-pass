@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Agendamento, CriarAgendamentoRequest } from '../models/agendamento.models';
+import { Agendamento, CriarAgendamentoRequest, FormaPagamento } from '../models/agendamento.models';
 
 @Injectable({ providedIn: 'root' })
 export class AgendamentoService {
@@ -20,7 +20,17 @@ export class AgendamentoService {
     return this.http.get<Agendamento[]>(`${environment.apiUrl}/agendamentos`);
   }
 
-  confirmarPagamento(id: string): Observable<void> {
-    return this.http.post<void>(`${environment.apiUrl}/agendamentos/${id}/confirmar-pagamento`, {});
+  confirmarPagamento(id: string, formaPagamento: FormaPagamento): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/agendamentos/${id}/confirmar-pagamento`, {
+      formaPagamento
+    });
+  }
+
+  marcarRealizado(id: string): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/agendamentos/${id}/marcar-realizado`, {});
+  }
+
+  cancelar(id: string): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/agendamentos/${id}/cancelar`, {});
   }
 }

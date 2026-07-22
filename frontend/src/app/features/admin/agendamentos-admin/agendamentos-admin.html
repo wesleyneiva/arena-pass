@@ -1,5 +1,9 @@
 <h2 class="text-lg font-semibold text-slate-900 mb-4">Agendamentos</h2>
 
+@if (erro()) {
+  <p class="text-sm text-red-600 mb-3">{{ erro() }}</p>
+}
+
 <div class="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
   @for (agendamento of agendamentos(); track agendamento.id) {
     <div class="p-4 flex items-center justify-between">
@@ -9,18 +13,40 @@
         </p>
         <p class="text-sm text-slate-500">
           Prof. {{ agendamento.professorNome }} · Taxa R$ {{ agendamento.taxaValor }}
+          @if (agendamento.formaPagamento) {
+            · {{ agendamento.formaPagamento }}
+          }
         </p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
         <span class="text-xs font-medium px-2 py-1 rounded-full bg-slate-100 text-slate-700">
           {{ agendamento.status }}
         </span>
 
         @if (agendamento.status === 'PendentePagamento') {
+          <select [(ngModel)]="formaPagamentoPorAgendamento[agendamento.id]"
+            class="text-sm rounded-lg border border-slate-300 px-2 py-1.5">
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartao">Cartão</option>
+          </select>
           <button (click)="confirmarPagamento(agendamento.id)"
             class="text-sm bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition">
             Confirmar pagamento
+          </button>
+        }
+
+        @if (agendamento.status === 'Confirmado') {
+          <button (click)="marcarRealizado(agendamento.id)"
+            class="text-sm bg-slate-800 text-white px-3 py-1.5 rounded-lg hover:bg-slate-900 transition">
+            Marcar realizada
+          </button>
+        }
+
+        @if (agendamento.status !== 'Cancelado' && agendamento.status !== 'Realizado') {
+          <button (click)="cancelar(agendamento.id)" class="text-sm text-red-600 hover:text-red-800 px-2">
+            Cancelar
           </button>
         }
       </div>

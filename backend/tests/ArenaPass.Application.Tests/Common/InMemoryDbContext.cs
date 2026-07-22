@@ -15,6 +15,7 @@ public class InMemoryDbContext : DbContext, IApplicationDbContext
     public DbSet<Modalidade> Modalidades => Set<Modalidade>();
     public DbSet<Quadra> Quadras => Set<Quadra>();
     public DbSet<Agendamento> Agendamentos => Set<Agendamento>();
+    public DbSet<Convite> Convites => Set<Convite>();
 }
 
 public static class TestDbContextFactory

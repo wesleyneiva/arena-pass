@@ -1,18 +1,75 @@
 <h2 class="text-lg font-semibold text-slate-900 mb-4">Meus agendamentos</h2>
 
+@if (erro()) {
+  <p class="text-sm text-red-600 mb-3">{{ erro() }}</p>
+}
+
 <div class="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
   @for (agendamento of agendamentos(); track agendamento.id) {
-    <div class="p-4 flex items-center justify-between">
-      <div>
-        <p class="font-medium text-slate-900">
-          {{ agendamento.quadraNome }} · {{ agendamento.data }} · {{ agendamento.horaInicio.slice(0,5) }}-{{ agendamento.horaFim.slice(0,5) }}
-        </p>
-        <p class="text-sm text-slate-500">Taxa R$ {{ agendamento.taxaValor }}</p>
+    <div class="p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="font-medium text-slate-900">
+            {{ agendamento.quadraNome }} · {{ agendamento.data }} · {{ agendamento.horaInicio.slice(0,5) }}-{{ agendamento.horaFim.slice(0,5) }}
+          </p>
+          <p class="text-sm text-slate-500">
+            Taxa R$ {{ agendamento.taxaValor }}
+            @if (agendamento.formaPagamento) {
+              · {{ agendamento.formaPagamento }}
+            }
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-medium px-2 py-1 rounded-full bg-slate-100 text-slate-700">
+            {{ agendamento.status }}
+          </span>
+
+          @if (agendamento.status !== 'Cancelado' && agendamento.status !== 'Realizado') {
+            <button (click)="toggleConvites(agendamento.id)"
+              class="text-sm bg-slate-800 text-white px-3 py-1.5 rounded-lg hover:bg-slate-900 transition">
+              {{ agendamentoExpandidoId() === agendamento.id ? 'Fechar' : 'Convites' }}
+            </button>
+            <button (click)="cancelar(agendamento.id)"
+              class="text-sm text-red-600 hover:text-red-800 px-2">
+              Cancelar
+            </button>
+          }
+        </div>
       </div>
 
-      <span class="text-xs font-medium px-2 py-1 rounded-full bg-slate-100 text-slate-700">
-        {{ agendamento.status }}
-      </span>
+      @if (agendamentoExpandidoId() === agendamento.id) {
+        <div class="mt-4 bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
+          <div>
+            <p class="text-sm font-medium text-slate-700 mb-2">Convites emitidos</p>
+            @for (convite of convitesDe(agendamento.id); track convite.id) {
+              <div class="flex items-center justify-between text-sm py-1">
+                <span>{{ convite.alunoNome }} · {{ convite.status }}</span>
+                <a [routerLink]="['/professor/convites', convite.id]" class="text-emerald-700 hover:underline">Ver convite</a>
+              </div>
+            } @empty {
+              <p class="text-sm text-slate-500">Nenhum convite emitido pra essa aula ainda.</p>
+            }
+          </div>
+
+          <form (ngSubmit)="emitirConvite(agendamento.id)" class="grid sm:grid-cols-3 gap-2 items-end pt-2 border-t border-slate-200">
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">Nome do aluno</label>
+              <input required name="alunoNome" [(ngModel)]="alunoNome"
+                class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">CPF do aluno</label>
+              <input required name="alunoCpf" [(ngModel)]="alunoCpf" maxlength="11"
+                class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm" />
+            </div>
+            <button type="submit" [disabled]="emitindo()"
+              class="rounded-lg bg-emerald-600 text-white py-1.5 text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-60">
+              {{ emitindo() ? 'Emitindo...' : 'Emitir convite' }}
+            </button>
+          </form>
+        </div>
+      }
     </div>
   } @empty {
     <p class="p-4 text-sm text-slate-500">Você ainda não tem agendamentos.</p>

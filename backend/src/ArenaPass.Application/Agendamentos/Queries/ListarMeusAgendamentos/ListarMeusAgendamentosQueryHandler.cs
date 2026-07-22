@@ -34,7 +34,8 @@ public class ListarMeusAgendamentosQueryHandler
                 a.HoraInicio,
                 a.HoraFim,
                 a.Status.ToString(),
-                a.TaxaValor))
+                a.TaxaValor,
+                a.FormaPagamento == null ? null : a.FormaPagamento.ToString()))
             .ToListAsync(cancellationToken);
     }
 }

@@ -34,6 +34,10 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                     b.Property<DateOnly>("Data")
                         .HasColumnType("date");
 
+                    b.Property<string>("FormaPagamento")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
                     b.Property<TimeOnly>("HoraFim")
                         .HasColumnType("time without time zone");
 
@@ -69,6 +73,46 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                         .HasFilter("\"Status\" <> 'Cancelado'");
 
                     b.ToTable("Agendamentos");
+                });
+
+            modelBuilder.Entity("ArenaPass.Domain.Entities.Convite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AgendamentoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AlunoCpf")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)");
+
+                    b.Property<string>("AlunoNome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<Guid>("Token")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgendamentoId");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("Convites");
                 });
 
             modelBuilder.Entity("ArenaPass.Domain.Entities.Modalidade", b =>
@@ -217,6 +261,17 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                     b.Navigation("Quadra");
                 });
 
+            modelBuilder.Entity("ArenaPass.Domain.Entities.Convite", b =>
+                {
+                    b.HasOne("ArenaPass.Domain.Entities.Agendamento", "Agendamento")
+                        .WithMany("Convites")
+                        .HasForeignKey("AgendamentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agendamento");
+                });
+
             modelBuilder.Entity("ArenaPass.Domain.Entities.Professor", b =>
                 {
                     b.HasOne("ArenaPass.Domain.Entities.Usuario", "Usuario")
@@ -237,6 +292,11 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Modalidade");
+                });
+
+            modelBuilder.Entity("ArenaPass.Domain.Entities.Agendamento", b =>
+                {
+                    b.Navigation("Convites");
                 });
 
             modelBuilder.Entity("ArenaPass.Domain.Entities.Modalidade", b =>

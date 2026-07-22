@@ -10,4 +10,5 @@ public record AgendamentoDto(
     TimeOnly HoraInicio,
     TimeOnly HoraFim,
     string Status,
-    decimal TaxaValor);
+    decimal TaxaValor,
+    string? FormaPagamento);

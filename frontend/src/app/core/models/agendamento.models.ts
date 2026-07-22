@@ -1,3 +1,5 @@
+export type FormaPagamento = 'Pix' | 'Dinheiro' | 'Cartao';
+
 export interface Agendamento {
   id: string;
   quadraId: string;
@@ -9,6 +11,7 @@ export interface Agendamento {
   horaFim: string;
   status: 'PendentePagamento' | 'Confirmado' | 'Realizado' | 'Cancelado';
   taxaValor: number;
+  formaPagamento: FormaPagamento | null;
 }
 
 export interface CriarAgendamentoRequest {

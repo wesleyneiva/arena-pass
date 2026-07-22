@@ -10,6 +10,7 @@ public interface IApplicationDbContext
     DbSet<Modalidade> Modalidades { get; }
     DbSet<Quadra> Quadras { get; }
     DbSet<Agendamento> Agendamentos { get; }
+    DbSet<Convite> Convites { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

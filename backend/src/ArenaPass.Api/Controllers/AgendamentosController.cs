@@ -1,8 +1,12 @@
 using System.Security.Claims;
+using ArenaPass.Application.Agendamentos.Commands.CancelarAgendamento;
 using ArenaPass.Application.Agendamentos.Commands.CriarAgendamento;
 using ArenaPass.Application.Agendamentos.Commands.ConfirmarPagamento;
+using ArenaPass.Application.Agendamentos.Commands.MarcarRealizado;
 using ArenaPass.Application.Agendamentos.Queries.ListarMeusAgendamentos;
 using ArenaPass.Application.Agendamentos.Queries.ListarTodosAgendamentos;
+using ArenaPass.Application.Agendamentos.Queries.ObterFaturamentoMensal;
+using ArenaPass.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +14,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace ArenaPass.Api.Controllers;
 
 public record CriarAgendamentoRequest(Guid QuadraId, DateOnly Data, TimeOnly HoraInicio, decimal TaxaValor);
+
+public record ConfirmarPagamentoRequest(FormaPagamento FormaPagamento);
 
 [ApiController]
 [Route("api/agendamentos")]
@@ -67,9 +73,29 @@ public class AgendamentosController : ControllerBase
 
     [HttpPost("{id:guid}/confirmar-pagamento")]
     [Authorize(Roles = "AdminClube")]
-    public async Task<IActionResult> ConfirmarPagamento(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> ConfirmarPagamento(
+        Guid id,
+        ConfirmarPagamentoRequest request,
+        CancellationToken cancellationToken)
     {
-        await _mediator.Send(new ConfirmarPagamentoCommand(id), cancellationToken);
+        await _mediator.Send(new ConfirmarPagamentoCommand(id, request.FormaPagamento), cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/marcar-realizado")]
+    [Authorize(Roles = "AdminClube")]
+    public async Task<IActionResult> MarcarRealizado(Guid id, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new MarcarAgendamentoRealizadoCommand(id), cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/cancelar")]
+    [Authorize(Roles = "AdminClube,Professor")]
+    public async Task<IActionResult> Cancelar(Guid id, CancellationToken cancellationToken)
+    {
+        var solicitanteProfessorId = User.IsInRole("Professor") ? ProfessorIdDoToken() : (Guid?)null;
+        await _mediator.Send(new CancelarAgendamentoCommand(id, solicitanteProfessorId), cancellationToken);
         return NoContent();
     }
 }

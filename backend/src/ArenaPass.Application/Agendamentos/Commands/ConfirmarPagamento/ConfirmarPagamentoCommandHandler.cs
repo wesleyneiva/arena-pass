@@ -30,6 +30,7 @@ public class ConfirmarPagamentoCommandHandler : IRequestHandler<ConfirmarPagamen
         }
 
         agendamento.Status = StatusAgendamento.Confirmado;
+        agendamento.FormaPagamento = request.FormaPagamento;
 
         await _context.SaveChangesAsync(cancellationToken);
     }

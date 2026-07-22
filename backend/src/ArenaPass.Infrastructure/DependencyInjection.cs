@@ -23,6 +23,7 @@ public static class DependencyInjection
 
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IQrCodeGenerator, QrCodeGenerator>();
 
         return services;
     }

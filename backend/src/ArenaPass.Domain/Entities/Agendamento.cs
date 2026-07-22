@@ -17,7 +17,10 @@ public class Agendamento : BaseEntity
 
     public StatusAgendamento Status { get; set; } = StatusAgendamento.PendentePagamento;
     public decimal TaxaValor { get; set; }
+    public FormaPagamento? FormaPagamento { get; set; }
 
     // Optimistic concurrency (mapeado para xmin no Postgres)
     public uint RowVersion { get; set; }
+
+    public ICollection<Convite> Convites { get; set; } = new List<Convite>();
 }

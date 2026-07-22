@@ -1,0 +1,30 @@
+@if (erro()) {
+  <p class="text-sm text-red-600">{{ erro() }}</p>
+  <a routerLink="/professor/meus-agendamentos" class="text-emerald-700 hover:underline text-sm">Voltar</a>
+}
+
+@if (convite(); as c) {
+  <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-2xl p-8 text-center">
+    <h2 class="text-lg font-semibold text-slate-900 mb-1">Pass da aula — ArenaPass</h2>
+    <p class="text-sm text-slate-500 mb-6">Válido exclusivamente para a data e horário abaixo</p>
+
+    <img [src]="'data:image/png;base64,' + c.qrCodeBase64" alt="QR Code do convite" class="mx-auto mb-6 w-56 h-56" />
+
+    <div class="text-left space-y-1 text-sm border-t border-slate-200 pt-4">
+      <p><span class="font-medium text-slate-700">Aluno:</span> {{ c.alunoNome }}</p>
+      <p><span class="font-medium text-slate-700">Quadra:</span> {{ c.quadraNome }}</p>
+      <p><span class="font-medium text-slate-700">Data:</span> {{ c.data }}</p>
+      <p><span class="font-medium text-slate-700">Horário:</span> {{ c.horaInicio.slice(0,5) }} - {{ c.horaFim.slice(0,5) }}</p>
+      <p><span class="font-medium text-slate-700">Status:</span> {{ c.status }}</p>
+    </div>
+
+    <div class="no-print mt-6 flex gap-2 justify-center">
+      <button (click)="imprimir()" class="rounded-lg bg-emerald-600 text-white px-4 py-2 text-sm font-medium hover:bg-emerald-700 transition">
+        Imprimir / Compartilhar
+      </button>
+      <a routerLink="/professor/meus-agendamentos" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+        Voltar
+      </a>
+    </div>
+  </div>
+}

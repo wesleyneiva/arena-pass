@@ -12,6 +12,7 @@ public class AgendamentoConfiguration : IEntityTypeConfiguration<Agendamento>
 
         builder.Property(a => a.Status).HasConversion<string>().HasMaxLength(30);
         builder.Property(a => a.TaxaValor).HasColumnType("decimal(10,2)");
+        builder.Property(a => a.FormaPagamento).HasConversion<string>().HasMaxLength(30);
 
         // Mapeia a coluna de sistema xmin do Postgres como concurrency token otimista,
         // usada para evitar lost updates em atualizações concorrentes de status.
