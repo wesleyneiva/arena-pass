@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { HorarioSlot } from '../../core/models/quadra.models';
 
 @Component({
@@ -8,31 +8,12 @@ import { HorarioSlot } from '../../core/models/quadra.models';
 })
 export class GradeHorarios {
   readonly slots = input.required<HorarioSlot[]>();
-  readonly horaInicioSelecionada = input<string | null>(null);
-  readonly quantidadeHorasSelecionada = input(1);
+  readonly horariosSelecionados = input<ReadonlySet<string>>(new Set());
   readonly bloqueada = input(false);
   readonly slotSelecionado = output<HorarioSlot>();
 
-  readonly indicesCobertos = computed<Set<number>>(() => {
-    const horaInicio = this.horaInicioSelecionada();
-    if (!horaInicio) {
-      return new Set();
-    }
-
-    const indiceInicio = this.slots().findIndex((s) => s.horaInicio === horaInicio);
-    if (indiceInicio === -1) {
-      return new Set();
-    }
-
-    const indices = new Set<number>();
-    for (let i = 0; i < this.quantidadeHorasSelecionada(); i++) {
-      indices.add(indiceInicio + i);
-    }
-    return indices;
-  });
-
-  estaSelecionado(index: number): boolean {
-    return this.indicesCobertos().has(index);
+  estaSelecionado(slot: HorarioSlot): boolean {
+    return this.horariosSelecionados().has(slot.horaInicio);
   }
 
   rotulo(slot: HorarioSlot): string {
@@ -42,7 +23,7 @@ export class GradeHorarios {
     return slot.livre ? 'Livre' : 'Ocupado';
   }
 
-  classesSlot(slot: HorarioSlot, index: number): Record<string, boolean> {
+  classesSlot(slot: HorarioSlot): Record<string, boolean> {
     if (this.bloqueada()) {
       return {
         'bg-slate-50': true,
@@ -61,7 +42,7 @@ export class GradeHorarios {
       };
     }
 
-    if (this.estaSelecionado(index)) {
+    if (this.estaSelecionado(slot)) {
       return {
         'bg-blue-600': true,
         'border-blue-600': true,

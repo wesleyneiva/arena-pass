@@ -41,12 +41,7 @@ export class QuadrasAdmin implements OnInit {
 
   carregarModalidades(): void {
     this.modalidadeService.listar().subscribe({
-      next: (modalidades) => {
-        this.modalidades.set(modalidades);
-        if (!this.modalidadeNome && modalidades.length > 0) {
-          this.modalidadeNome = modalidades[0].nome;
-        }
-      },
+      next: (modalidades) => this.modalidades.set(modalidades),
       error: () => this.erroLista.set('Não foi possível carregar as modalidades.')
     });
   }
@@ -81,7 +76,7 @@ export class QuadrasAdmin implements OnInit {
   cancelarEdicao(): void {
     this.editandoId.set(null);
     this.nome = '';
-    this.modalidadeNome = this.modalidades()[0]?.nome ?? '';
+    this.modalidadeNome = '';
     this.taxaPorHora = 80;
     this.ativa = true;
   }

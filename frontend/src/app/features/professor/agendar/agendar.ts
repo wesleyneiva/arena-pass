@@ -1,6 +1,8 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { QuadraService } from '../../../core/services/quadra.service';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -27,8 +29,7 @@ export class Agendar implements OnInit {
   readonly erro = signal<string | null>(null);
   readonly carregandoSlots = signal(false);
   readonly salvando = signal(false);
-  readonly horaInicioSelecionada = signal<string | null>(null);
-  readonly quantidadeHoras = signal(1);
+  readonly horariosSelecionados = signal<Set<string>>(new Set());
   readonly modalConfirmacaoAberto = signal(false);
   readonly mensagemConfirmacao = signal('');
 
@@ -43,18 +44,7 @@ export class Agendar implements OnInit {
 
   readonly taxaCalculada = computed(() => {
     const quadra = this.quadraSelecionada();
-    return quadra ? quadra.taxaPorHora * this.quantidadeHoras() : 0;
-  });
-
-  readonly podeSelecionarDuasHoras = computed(() => {
-    const horaInicio = this.horaInicioSelecionada();
-    if (!horaInicio) {
-      return false;
-    }
-
-    const slots = this.slots();
-    const indice = slots.findIndex((s) => s.horaInicio === horaInicio);
-    return indice !== -1 && indice + 1 < slots.length && slots[indice + 1].livre;
+    return quadra ? quadra.taxaPorHora * this.horariosSelecionados().size : 0;
   });
 
   constructor(
@@ -83,7 +73,7 @@ export class Agendar implements OnInit {
     }
 
     this.erro.set(null);
-    this.horaInicioSelecionada.set(null);
+    this.horariosSelecionados.set(new Set());
     this.carregandoSlots.set(true);
 
     this.quadraService.horariosDisponiveis(this.quadraId, this.data).subscribe({
@@ -98,53 +88,73 @@ export class Agendar implements OnInit {
     });
   }
 
-  selecionarSlot(slot: HorarioSlot): void {
-    this.horaInicioSelecionada.set(slot.horaInicio);
-    this.quantidadeHoras.set(1);
+  toggleSlot(slot: HorarioSlot): void {
+    this.horariosSelecionados.update((atual) => {
+      const novo = new Set(atual);
+      if (novo.has(slot.horaInicio)) {
+        novo.delete(slot.horaInicio);
+      } else {
+        novo.add(slot.horaInicio);
+      }
+      return novo;
+    });
   }
 
-  escolherDuracao(horas: number): void {
-    if (horas === 2 && !this.podeSelecionarDuasHoras()) {
-      return;
-    }
-    this.quantidadeHoras.set(horas);
-  }
-
-  cancelarSelecao(): void {
-    this.horaInicioSelecionada.set(null);
-    this.quantidadeHoras.set(1);
+  limparSelecao(): void {
+    this.horariosSelecionados.set(new Set());
   }
 
   confirmarAgendamento(): void {
-    const horaInicio = this.horaInicioSelecionada();
-    if (!horaInicio) {
+    const horarios = Array.from(this.horariosSelecionados()).sort();
+    if (horarios.length === 0) {
       return;
     }
 
     this.erro.set(null);
     this.salvando.set(true);
 
-    this.agendamentoService
-      .criar({
-        quadraId: this.quadraId,
-        data: this.data,
-        horaInicio,
-        quantidadeHoras: this.quantidadeHoras()
-      })
-      .subscribe({
-        next: () => {
-          this.salvando.set(false);
-          this.mensagemConfirmacao.set(`Aula agendada às ${horaInicio.slice(0, 5)}!`);
-          this.modalConfirmacaoAberto.set(true);
-          this.cancelarSelecao();
-          setTimeout(() => this.irParaMeusAgendamentos(), ATRASO_REDIRECIONAMENTO_MS);
-        },
-        error: (err) => {
-          this.salvando.set(false);
-          this.erro.set(err?.error?.message ?? 'Não foi possível agendar esse horário.');
-          this.buscarHorarios();
-        }
-      });
+    const chamadas = horarios.map((horaInicio) =>
+      this.agendamentoService
+        .criar({ quadraId: this.quadraId, data: this.data, horaInicio })
+        .pipe(
+          map(() => ({ horaInicio, sucesso: true as const })),
+          catchError((err) =>
+            of({
+              horaInicio,
+              sucesso: false as const,
+              mensagem: err?.error?.message ?? 'Erro desconhecido'
+            })
+          )
+        )
+    );
+
+    forkJoin(chamadas).subscribe((resultados) => {
+      this.salvando.set(false);
+      const sucessos = resultados.filter((r) => r.sucesso);
+      const falhas = resultados.filter((r) => !r.sucesso);
+
+      if (falhas.length > 0) {
+        const horariosFalha = falhas.map((f) => f.horaInicio.slice(0, 5)).join(', ');
+        this.erro.set(
+          sucessos.length > 0
+            ? `${sucessos.length} aula(s) agendada(s). Não foi possível reservar: ${horariosFalha}.`
+            : `Não foi possível agendar: ${horariosFalha}.`
+        );
+      }
+
+      this.limparSelecao();
+      this.buscarHorarios();
+
+      if (sucessos.length > 0) {
+        this.mensagemConfirmacao.set(
+          sucessos.length === 1
+            ? `Aula agendada às ${sucessos[0].horaInicio.slice(0, 5)}!`
+            : `${sucessos.length} aulas agendadas com sucesso!`
+        );
+        this.modalConfirmacaoAberto.set(true);
+        setTimeout(() => this.irParaMeusAgendamentos(), ATRASO_REDIRECIONAMENTO_MS);
+      }
+    });
   }
 
   irParaMeusAgendamentos(): void {

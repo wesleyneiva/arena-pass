@@ -20,10 +20,12 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ArenaPassDbContext>());
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.Configure<PixSettings>(configuration.GetSection(PixSettings.SectionName));
 
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IQrCodeGenerator, QrCodeGenerator>();
+        services.AddScoped<IPixPayloadGenerator, PixPayloadGenerator>();
 
         return services;
     }

@@ -40,7 +40,7 @@ const LARGURA_VIRTUAL = 640;
 const ALTURA_VIRTUAL = 220;
 const MARGEM_ESQUERDA = 52;
 const ALTURA_EIXO_X = 24;
-const TOPO_RESERVADO = 12;
+const TOPO_RESERVADO = 28;
 const LARGURA_MAXIMA_BARRA = 24;
 
 @Component({

@@ -23,6 +23,12 @@ public class ConfirmarPagamentoCommandHandler : IRequestHandler<ConfirmarPagamen
             .FirstOrDefaultAsync(a => a.Id == request.AgendamentoId, cancellationToken)
             ?? throw new NotFoundException(nameof(Agendamento), request.AgendamentoId);
 
+        if (request.SolicitanteProfessorId.HasValue
+            && agendamento.ProfessorId != request.SolicitanteProfessorId.Value)
+        {
+            throw new UnauthorizedAccessException("Esse agendamento não pertence a você.");
+        }
+
         if (agendamento.Status != StatusAgendamento.PendentePagamento)
         {
             throw new DomainException(

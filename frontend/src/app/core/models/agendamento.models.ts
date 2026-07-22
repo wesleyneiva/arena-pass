@@ -18,5 +18,9 @@ export interface CriarAgendamentoRequest {
   quadraId: string;
   data: string;
   horaInicio: string;
-  quantidadeHoras: number;
+}
+
+export interface PagamentoPix {
+  pixCopiaECola: string;
+  qrCodeBase64: string;
 }

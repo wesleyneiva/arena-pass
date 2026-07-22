@@ -8,6 +8,11 @@
 }
 
 <div class="mb-5 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+  <div class="min-w-40 flex-1">
+    <label class="mb-1.5 block text-xs font-medium text-slate-700">Buscar quadra</label>
+    <input [ngModel]="busca()" (ngModelChange)="busca.set($event)" placeholder="Ex: Quadra 4"
+      class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+  </div>
   <div>
     <label class="mb-1.5 block text-xs font-medium text-slate-700">Status</label>
     <select [ngModel]="filtroStatus()" (ngModelChange)="filtroStatus.set($event)"
@@ -74,7 +79,10 @@
                 {{ agendamentoExpandidoId() === agendamento.id ? 'Fechar' : 'Convites' }}
               </button>
             } @else if (agendamento.status === 'PendentePagamento') {
-              <span class="text-xs text-slate-400">Convite após confirmação do pagamento</span>
+              <button (click)="abrirPagamento(agendamento.id)"
+                class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700">
+                Pagar
+              </button>
             }
 
             @if (agendamento.status === 'PendentePagamento' || agendamento.status === 'Confirmado') {
@@ -124,5 +132,76 @@
         <p class="text-sm text-slate-500">Nenhum agendamento encontrado com esses filtros.</p>
       </div>
     }
+  </div>
+}
+
+@if (agendamentoEmPagamento(); as agendamento) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in" (click)="fecharPagamento()">
+    <div class="w-full max-w-sm animate-scale-in rounded-2xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Pagar aula</h2>
+        <button (click)="fecharPagamento()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
+      </div>
+
+      <p class="mb-4 text-sm text-slate-500">
+        {{ agendamento.quadraNome }} · {{ agendamento.data }} · {{ agendamento.horaInicio.slice(0,5) }} ·
+        <span class="font-semibold text-slate-900">R$ {{ agendamento.taxaValor }}</span>
+      </p>
+
+      <div class="mb-4 flex gap-2">
+        <button type="button" (click)="escolherFormaPagamento('Pix')"
+          class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition"
+          [class.bg-blue-600]="formaPagamentoEscolhida() === 'Pix'"
+          [class.text-white]="formaPagamentoEscolhida() === 'Pix'"
+          [class.border-blue-600]="formaPagamentoEscolhida() === 'Pix'"
+          [class.border-slate-300]="formaPagamentoEscolhida() !== 'Pix'"
+          [class.text-slate-700]="formaPagamentoEscolhida() !== 'Pix'">
+          Pix
+        </button>
+        <button type="button" (click)="escolherFormaPagamento('Cartao')"
+          class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition"
+          [class.bg-blue-600]="formaPagamentoEscolhida() === 'Cartao'"
+          [class.text-white]="formaPagamentoEscolhida() === 'Cartao'"
+          [class.border-blue-600]="formaPagamentoEscolhida() === 'Cartao'"
+          [class.border-slate-300]="formaPagamentoEscolhida() !== 'Cartao'"
+          [class.text-slate-700]="formaPagamentoEscolhida() !== 'Cartao'">
+          Cartão
+        </button>
+        <button type="button" (click)="escolherFormaPagamento('Dinheiro')"
+          class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition"
+          [class.bg-blue-600]="formaPagamentoEscolhida() === 'Dinheiro'"
+          [class.text-white]="formaPagamentoEscolhida() === 'Dinheiro'"
+          [class.border-blue-600]="formaPagamentoEscolhida() === 'Dinheiro'"
+          [class.border-slate-300]="formaPagamentoEscolhida() !== 'Dinheiro'"
+          [class.text-slate-700]="formaPagamentoEscolhida() !== 'Dinheiro'">
+          Dinheiro
+        </button>
+      </div>
+
+      @if (erroPagamento()) {
+        <p class="mb-4 animate-fade-in rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ erroPagamento() }}</p>
+      }
+
+      @if (formaPagamentoEscolhida() === 'Pix') {
+        @if (carregandoPix()) {
+          <div class="mb-4 h-56 animate-pulse rounded-lg bg-slate-100"></div>
+        } @else if (pagamentoPix(); as pix) {
+          <div class="mb-4 text-center">
+            <img [src]="'data:image/png;base64,' + pix.qrCodeBase64" alt="QR Code Pix" class="mx-auto mb-3 h-48 w-48 rounded-lg border border-slate-100 p-2" />
+            <button (click)="copiarPixCopiaECola()"
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50">
+              {{ copiado() ? 'Copiado!' : 'Copiar código Pix' }}
+            </button>
+          </div>
+        }
+      } @else {
+        <p class="mb-4 text-sm text-slate-500">Combine com o professor/clube o pagamento em {{ formaPagamentoEscolhida() === 'Cartao' ? 'cartão' : 'dinheiro' }} no balcão.</p>
+      }
+
+      <button (click)="confirmarPagamentoModal()" [disabled]="confirmandoPagamento()"
+        class="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-60">
+        {{ confirmandoPagamento() ? 'Confirmando...' : 'Já paguei / Confirmar pagamento' }}
+      </button>
+    </div>
   </div>
 }

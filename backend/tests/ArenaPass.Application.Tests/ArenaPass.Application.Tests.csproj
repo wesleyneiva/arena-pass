@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ArenaPass.Application\ArenaPass.Application.csproj" />
+    <ProjectReference Include="..\..\src\ArenaPass.Infrastructure\ArenaPass.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

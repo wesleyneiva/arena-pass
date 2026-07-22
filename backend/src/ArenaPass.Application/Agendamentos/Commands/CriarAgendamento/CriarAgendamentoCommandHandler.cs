@@ -37,10 +37,10 @@ public class CriarAgendamentoCommandHandler : IRequestHandler<CriarAgendamentoCo
             throw new DomainException("Essa quadra está inativa e não aceita agendamentos.");
         }
 
-        // TimeOnly.AddHours dá wraparound à meia-noite (22:00 + 2h vira 00:00), então a
-        // soma é feita via TimeSpan (que não envolve) pra checar corretamente contra o
-        // horário de fechamento antes de converter de volta pra TimeOnly.
-        var horaFimSemWrap = request.HoraInicio.ToTimeSpan() + TimeSpan.FromHours(request.QuantidadeHoras);
+        // TimeOnly.Add dá wraparound à meia-noite, então a soma é feita via TimeSpan
+        // (que não envolve) pra checar corretamente contra o horário de fechamento
+        // antes de converter de volta pra TimeOnly.
+        var horaFimSemWrap = request.HoraInicio.ToTimeSpan() + TimeSpan.FromMinutes(quadra.DuracaoSlotMinutos);
 
         if (request.HoraInicio < quadra.HoraAbertura || horaFimSemWrap > quadra.HoraFechamento.ToTimeSpan())
         {
@@ -50,7 +50,8 @@ public class CriarAgendamentoCommandHandler : IRequestHandler<CriarAgendamentoCo
 
         var horaFim = TimeOnly.FromTimeSpan(horaFimSemWrap);
 
-        var taxaValor = quadra.TaxaPorHora * request.QuantidadeHoras;
+        // Taxa proporcional à duração do slot da quadra (normalmente 60min = taxa cheia).
+        var taxaValor = quadra.TaxaPorHora * quadra.DuracaoSlotMinutos / 60m;
 
         // Checagem otimista (fail-fast / boa UX) — a garantia real contra concorrência
         // vem da constraint de exclusão no banco (sobreposição de intervalo), aplicada

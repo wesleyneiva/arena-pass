@@ -6,5 +6,4 @@ public record CriarAgendamentoCommand(
     Guid ProfessorId,
     Guid QuadraId,
     DateOnly Data,
-    TimeOnly HoraInicio,
-    int QuantidadeHoras) : IRequest<Guid>;
+    TimeOnly HoraInicio) : IRequest<Guid>;

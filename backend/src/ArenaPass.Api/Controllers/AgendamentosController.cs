@@ -5,6 +5,7 @@ using ArenaPass.Application.Agendamentos.Commands.ConfirmarPagamento;
 using ArenaPass.Application.Agendamentos.Commands.MarcarRealizado;
 using ArenaPass.Application.Agendamentos.Queries.ListarMeusAgendamentos;
 using ArenaPass.Application.Agendamentos.Queries.ListarTodosAgendamentos;
+using ArenaPass.Application.Agendamentos.Queries.ObterPagamentoPix;
 using ArenaPass.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ArenaPass.Api.Controllers;
 
-public record CriarAgendamentoRequest(Guid QuadraId, DateOnly Data, TimeOnly HoraInicio, int QuantidadeHoras);
+public record CriarAgendamentoRequest(Guid QuadraId, DateOnly Data, TimeOnly HoraInicio);
 
 public record ConfirmarPagamentoRequest(FormaPagamento FormaPagamento);
 
@@ -47,8 +48,7 @@ public class AgendamentosController : ControllerBase
             ProfessorIdDoToken(),
             request.QuadraId,
             request.Data,
-            request.HoraInicio,
-            request.QuantidadeHoras);
+            request.HoraInicio);
 
         var id = await _mediator.Send(command, cancellationToken);
         return CreatedAtAction(nameof(MeusAgendamentos), new { id }, new { id });
@@ -70,14 +70,25 @@ public class AgendamentosController : ControllerBase
         return Ok(agendamentos);
     }
 
+    [HttpGet("{id:guid}/pagamento-pix")]
+    [Authorize(Roles = "Professor")]
+    public async Task<IActionResult> PagamentoPix(Guid id, CancellationToken cancellationToken)
+    {
+        var pagamento = await _mediator.Send(new ObterPagamentoPixQuery(id, ProfessorIdDoToken()), cancellationToken);
+        return Ok(pagamento);
+    }
+
     [HttpPost("{id:guid}/confirmar-pagamento")]
-    [Authorize(Roles = "AdminClube")]
+    [Authorize(Roles = "AdminClube,Professor")]
     public async Task<IActionResult> ConfirmarPagamento(
         Guid id,
         ConfirmarPagamentoRequest request,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(new ConfirmarPagamentoCommand(id, request.FormaPagamento), cancellationToken);
+        var solicitanteProfessorId = User.IsInRole("Professor") ? ProfessorIdDoToken() : (Guid?)null;
+        await _mediator.Send(
+            new ConfirmarPagamentoCommand(id, request.FormaPagamento, solicitanteProfessorId),
+            cancellationToken);
         return NoContent();
     }
 
