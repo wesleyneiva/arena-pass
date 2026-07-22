@@ -20,6 +20,10 @@ export class QuadraService {
     return this.http.put<void>(`${environment.apiUrl}/quadras/${id}`, request);
   }
 
+  excluir(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/quadras/${id}`);
+  }
+
   horariosDisponiveis(quadraId: string, data: string): Observable<HorarioSlot[]> {
     return this.http.get<HorarioSlot[]>(
       `${environment.apiUrl}/quadras/${quadraId}/horarios-disponiveis`,

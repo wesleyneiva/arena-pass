@@ -21,16 +21,19 @@ public class AtualizarQuadraCommandHandler : IRequestHandler<AtualizarQuadraComm
             .FirstOrDefaultAsync(q => q.Id == request.QuadraId, cancellationToken)
             ?? throw new NotFoundException(nameof(Quadra), request.QuadraId);
 
-        var modalidadeExiste = await _context.Modalidades
-            .AnyAsync(m => m.Id == request.ModalidadeId, cancellationToken);
+        var nomeModalidade = request.ModalidadeNome.Trim();
 
-        if (!modalidadeExiste)
+        var modalidade = await _context.Modalidades
+            .FirstOrDefaultAsync(m => m.Nome.ToLower() == nomeModalidade.ToLower(), cancellationToken);
+
+        if (modalidade is null)
         {
-            throw new NotFoundException(nameof(Modalidade), request.ModalidadeId);
+            modalidade = new Modalidade { Nome = nomeModalidade };
+            _context.Modalidades.Add(modalidade);
         }
 
         quadra.Nome = request.Nome;
-        quadra.ModalidadeId = request.ModalidadeId;
+        quadra.Modalidade = modalidade;
         quadra.HoraAbertura = request.HoraAbertura;
         quadra.HoraFechamento = request.HoraFechamento;
         quadra.DuracaoSlotMinutos = request.DuracaoSlotMinutos;

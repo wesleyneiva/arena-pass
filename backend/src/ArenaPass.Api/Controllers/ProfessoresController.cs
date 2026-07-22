@@ -1,4 +1,5 @@
 using ArenaPass.Application.Professores.Commands.AprovarProfessor;
+using ArenaPass.Application.Professores.Commands.CriarProfessor;
 using ArenaPass.Application.Professores.Commands.ReativarProfessor;
 using ArenaPass.Application.Professores.Commands.SuspenderProfessor;
 using ArenaPass.Application.Professores.Queries;
@@ -25,6 +26,13 @@ public class ProfessoresController : ControllerBase
     {
         var professores = await _mediator.Send(new ListarProfessoresQuery(), cancellationToken);
         return Ok(professores);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Criar(CriarProfessorCommand command, CancellationToken cancellationToken)
+    {
+        var id = await _mediator.Send(command, cancellationToken);
+        return CreatedAtAction(nameof(Listar), new { id }, new { id });
     }
 
     [HttpPost("{id:guid}/aprovar")]

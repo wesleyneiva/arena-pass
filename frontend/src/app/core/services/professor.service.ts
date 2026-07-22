@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Professor } from '../models/professor.models';
+import { CriarProfessorRequest, Professor } from '../models/professor.models';
 
 @Injectable({ providedIn: 'root' })
 export class ProfessorService {
@@ -10,6 +10,10 @@ export class ProfessorService {
 
   listar(): Observable<Professor[]> {
     return this.http.get<Professor[]>(`${environment.apiUrl}/professores`);
+  }
+
+  criar(request: CriarProfessorRequest): Observable<{ id: string }> {
+    return this.http.post<{ id: string }>(`${environment.apiUrl}/professores`, request);
   }
 
   aprovar(id: string): Observable<void> {

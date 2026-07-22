@@ -1,5 +1,6 @@
 using ArenaPass.Application.Quadras.Commands.AtualizarQuadra;
 using ArenaPass.Application.Quadras.Commands.CriarQuadra;
+using ArenaPass.Application.Quadras.Commands.ExcluirQuadra;
 using ArenaPass.Application.Quadras.Queries.ListarHorariosDisponiveis;
 using ArenaPass.Application.Quadras.Queries.ListarQuadras;
 using MediatR;
@@ -10,7 +11,7 @@ namespace ArenaPass.Api.Controllers;
 
 public record AtualizarQuadraRequest(
     string Nome,
-    Guid ModalidadeId,
+    string ModalidadeNome,
     TimeOnly HoraAbertura,
     TimeOnly HoraFechamento,
     int DuracaoSlotMinutos,
@@ -51,7 +52,7 @@ public class QuadrasController : ControllerBase
         var command = new AtualizarQuadraCommand(
             id,
             request.Nome,
-            request.ModalidadeId,
+            request.ModalidadeNome,
             request.HoraAbertura,
             request.HoraFechamento,
             request.DuracaoSlotMinutos,
@@ -59,6 +60,14 @@ public class QuadrasController : ControllerBase
             request.Ativa);
 
         await _mediator.Send(command, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "AdminClube")]
+    public async Task<IActionResult> Excluir(Guid id, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new ExcluirQuadraCommand(id), cancellationToken);
         return NoContent();
     }
 

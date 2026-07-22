@@ -12,7 +12,7 @@ export interface Quadra {
 
 export interface CriarQuadraRequest {
   nome: string;
-  modalidadeId: string;
+  modalidadeNome: string;
   horaAbertura: string;
   horaFechamento: string;
   duracaoSlotMinutos: number;

@@ -11,7 +11,7 @@
   <div>
     <label class="mb-1.5 block text-xs font-medium text-slate-700">Status</label>
     <select [ngModel]="filtroStatus()" (ngModelChange)="filtroStatus.set($event)"
-      class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15">
+      class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15">
       <option value="Todos">Todos</option>
       <option value="PendentePagamento">Pendente pagamento</option>
       <option value="Confirmado">Confirmado</option>
@@ -22,7 +22,7 @@
   <div>
     <label class="mb-1.5 block text-xs font-medium text-slate-700">Professor</label>
     <select [ngModel]="filtroProfessor()" (ngModelChange)="filtroProfessor.set($event)"
-      class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15">
+      class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15">
       @for (nome of professoresDisponiveis(); track nome) {
         <option [value]="nome">{{ nome }}</option>
       }
@@ -31,12 +31,12 @@
   <div>
     <label class="mb-1.5 block text-xs font-medium text-slate-700">De</label>
     <input type="date" [ngModel]="filtroDataDe()" (ngModelChange)="filtroDataDe.set($event)"
-      class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+      class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
   </div>
   <div>
     <label class="mb-1.5 block text-xs font-medium text-slate-700">Até</label>
     <input type="date" [ngModel]="filtroDataAte()" (ngModelChange)="filtroDataAte.set($event)"
-      class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+      class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
   </div>
 </div>
 
@@ -75,7 +75,7 @@
               <option value="Cartao">Cartão</option>
             </select>
             <button (click)="confirmarPagamento(agendamento.id)"
-              class="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-700">
+              class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700">
               Confirmar pagamento
             </button>
           }

@@ -8,7 +8,7 @@
     <div>
       <label class="mb-1.5 block text-sm font-medium text-slate-700">Quadra</label>
       <select [(ngModel)]="quadraId" (ngModelChange)="buscarHorarios()"
-        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15">
+        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15">
         @for (quadra of quadras(); track quadra.id) {
           <option [value]="quadra.id">{{ quadra.nome }}</option>
         }
@@ -18,13 +18,13 @@
     <div>
       <label class="mb-1.5 block text-sm font-medium text-slate-700">Data</label>
       <input type="date" [(ngModel)]="data" (ngModelChange)="buscarHorarios()"
-        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
     </div>
 
     <div class="flex items-end">
       @if (quadraSelecionada(); as q) {
         <p class="text-sm text-slate-500">
-          Taxa: <span class="font-semibold text-emerald-700">R$ {{ q.taxaPorHora }}</span>/hora
+          Taxa: <span class="font-semibold text-blue-700">R$ {{ q.taxaPorHora }}</span>/hora
         </p>
       }
     </div>
@@ -35,7 +35,7 @@
   <p class="mb-4 animate-fade-in rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ erro() }}</p>
 }
 @if (sucesso()) {
-  <p class="mb-4 animate-fade-in rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ sucesso() }}</p>
+  <p class="mb-4 animate-fade-in rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700">{{ sucesso() }}</p>
 }
 
 @if (carregandoSlots()) {
@@ -54,7 +54,7 @@
 }
 
 @if (horaInicioSelecionada(); as horaInicio) {
-  <div class="mt-6 animate-scale-in rounded-xl border border-emerald-200 bg-emerald-50/60 p-5">
+  <div class="mt-6 animate-scale-in rounded-xl border border-blue-200 bg-blue-50/60 p-5">
     <p class="text-sm font-medium text-slate-700">
       Horário de início: <span class="font-semibold text-slate-900">{{ horaInicio.slice(0, 5) }}</span>
     </p>
@@ -64,9 +64,9 @@
       <div class="flex gap-2">
         <button type="button" (click)="escolherDuracao(1)"
           class="rounded-lg border px-4 py-2 text-sm font-medium transition"
-          [class.bg-emerald-600]="quantidadeHoras() === 1"
+          [class.bg-blue-600]="quantidadeHoras() === 1"
           [class.text-white]="quantidadeHoras() === 1"
-          [class.border-emerald-600]="quantidadeHoras() === 1"
+          [class.border-blue-600]="quantidadeHoras() === 1"
           [class.border-slate-300]="quantidadeHoras() !== 1"
           [class.bg-white]="quantidadeHoras() !== 1"
           [class.text-slate-700]="quantidadeHoras() !== 1">
@@ -74,9 +74,9 @@
         </button>
         <button type="button" (click)="escolherDuracao(2)" [disabled]="!podeSelecionarDuasHoras()"
           class="rounded-lg border px-4 py-2 text-sm font-medium transition"
-          [class.bg-emerald-600]="quantidadeHoras() === 2"
+          [class.bg-blue-600]="quantidadeHoras() === 2"
           [class.text-white]="quantidadeHoras() === 2"
-          [class.border-emerald-600]="quantidadeHoras() === 2"
+          [class.border-blue-600]="quantidadeHoras() === 2"
           [class.border-slate-300]="quantidadeHoras() !== 2"
           [class.bg-white]="quantidadeHoras() !== 2 && podeSelecionarDuasHoras()"
           [class.text-slate-700]="quantidadeHoras() !== 2 && podeSelecionarDuasHoras()"
@@ -91,7 +91,7 @@
       }
     </div>
 
-    <div class="mt-4 flex items-center justify-between border-t border-emerald-200/70 pt-4">
+    <div class="mt-4 flex items-center justify-between border-t border-blue-200/70 pt-4">
       <p class="text-sm text-slate-600">
         Valor total: <span class="text-lg font-semibold text-slate-900">R$ {{ taxaCalculada() }}</span>
       </p>
@@ -101,7 +101,7 @@
           Cancelar
         </button>
         <button type="button" (click)="confirmarAgendamento()" [disabled]="salvando()"
-          class="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-60">
+          class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.99] disabled:opacity-60">
           {{ salvando() ? 'Agendando...' : 'Confirmar agendamento' }}
         </button>
       </div>

@@ -9,7 +9,7 @@
     [class.-translate-x-full]="!menuAberto()"
   >
     <div class="flex items-center gap-2.5 px-6 py-6">
-      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 font-semibold text-white">A</div>
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500 font-semibold text-white">A</div>
       <div>
         <p class="text-sm font-semibold text-white leading-tight">ArenaPass</p>
         <p class="text-xs text-slate-400 leading-tight">Painel do clube</p>
@@ -20,7 +20,7 @@
       @for (item of itens; track item.rota) {
         <a
           [routerLink]="item.rota"
-          routerLinkActive="bg-emerald-500/10 text-emerald-400"
+          routerLinkActive="bg-blue-500/10 text-blue-400"
           [routerLinkActiveOptions]="{ exact: false }"
           (click)="menuAberto.set(false)"
           class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors duration-150 hover:bg-slate-800 hover:text-slate-100"

@@ -17,11 +17,12 @@ export class QuadrasAdmin implements OnInit {
   readonly erro = signal<string | null>(null);
   readonly erroLista = signal<string | null>(null);
   readonly salvando = signal(false);
+  readonly excluindoId = signal<string | null>(null);
   readonly carregando = signal(true);
   readonly editandoId = signal<string | null>(null);
 
   nome = '';
-  modalidadeId = '';
+  modalidadeNome = '';
   horaAbertura = '07:00';
   horaFechamento = '23:00';
   duracaoSlotMinutos = 60;
@@ -35,11 +36,15 @@ export class QuadrasAdmin implements OnInit {
 
   ngOnInit(): void {
     this.carregarQuadras();
+    this.carregarModalidades();
+  }
+
+  carregarModalidades(): void {
     this.modalidadeService.listar().subscribe({
       next: (modalidades) => {
         this.modalidades.set(modalidades);
-        if (modalidades.length > 0) {
-          this.modalidadeId = modalidades[0].id;
+        if (!this.modalidadeNome && modalidades.length > 0) {
+          this.modalidadeNome = modalidades[0].nome;
         }
       },
       error: () => this.erroLista.set('Não foi possível carregar as modalidades.')
@@ -64,7 +69,7 @@ export class QuadrasAdmin implements OnInit {
   editar(quadra: Quadra): void {
     this.editandoId.set(quadra.id);
     this.nome = quadra.nome;
-    this.modalidadeId = quadra.modalidadeId;
+    this.modalidadeNome = quadra.modalidadeNome;
     this.horaAbertura = quadra.horaAbertura.slice(0, 5);
     this.horaFechamento = quadra.horaFechamento.slice(0, 5);
     this.duracaoSlotMinutos = quadra.duracaoSlotMinutos;
@@ -76,6 +81,7 @@ export class QuadrasAdmin implements OnInit {
   cancelarEdicao(): void {
     this.editandoId.set(null);
     this.nome = '';
+    this.modalidadeNome = this.modalidades()[0]?.nome ?? '';
     this.taxaPorHora = 80;
     this.ativa = true;
   }
@@ -86,7 +92,7 @@ export class QuadrasAdmin implements OnInit {
 
     const payload = {
       nome: this.nome,
-      modalidadeId: this.modalidadeId,
+      modalidadeNome: this.modalidadeNome,
       horaAbertura: this.horaAbertura,
       horaFechamento: this.horaFechamento,
       duracaoSlotMinutos: this.duracaoSlotMinutos,
@@ -98,6 +104,7 @@ export class QuadrasAdmin implements OnInit {
         this.salvando.set(false);
         this.cancelarEdicao();
         this.carregarQuadras();
+        this.carregarModalidades();
       },
       error: (err: { error?: { message?: string } }) => {
         this.salvando.set(false);
@@ -111,5 +118,25 @@ export class QuadrasAdmin implements OnInit {
     } else {
       this.quadraService.criar(payload).subscribe(aoConcluir);
     }
+  }
+
+  excluir(quadra: Quadra): void {
+    if (!confirm(`Excluir a quadra "${quadra.nome}"? Essa ação não pode ser desfeita.`)) {
+      return;
+    }
+
+    this.erro.set(null);
+    this.excluindoId.set(quadra.id);
+
+    this.quadraService.excluir(quadra.id).subscribe({
+      next: () => {
+        this.excluindoId.set(null);
+        this.carregarQuadras();
+      },
+      error: (err) => {
+        this.excluindoId.set(null);
+        this.erro.set(err?.error?.message ?? 'Não foi possível excluir a quadra.');
+      }
+    });
   }
 }

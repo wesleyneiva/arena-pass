@@ -9,13 +9,18 @@ public static class ArenaPassDbContextSeed
 {
     public static async Task SeedAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher)
     {
-        var beachTennis = await context.Modalidades.FirstOrDefaultAsync(m => m.Nome == "Beach Tennis");
-        if (beachTennis is null)
+        string[] modalidadesPadrao = ["Beach Tennis", "Tênis", "Futebol", "Handebol", "Vôlei", "Basquete"];
+        foreach (var nome in modalidadesPadrao)
         {
-            beachTennis = new Modalidade { Nome = "Beach Tennis" };
-            context.Modalidades.Add(beachTennis);
-            await context.SaveChangesAsync();
+            var existe = await context.Modalidades.AnyAsync(m => m.Nome == nome);
+            if (!existe)
+            {
+                context.Modalidades.Add(new Modalidade { Nome = nome });
+            }
         }
+        await context.SaveChangesAsync();
+
+        var beachTennis = await context.Modalidades.FirstAsync(m => m.Nome == "Beach Tennis");
 
         var quadra4 = await context.Quadras.FirstOrDefaultAsync(q => q.Nome == "Quadra 4");
         if (quadra4 is null)

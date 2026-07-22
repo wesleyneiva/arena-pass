@@ -2,12 +2,13 @@ import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProfessorService } from '../../../core/services/professor.service';
 import { Professor } from '../../../core/models/professor.models';
+import { Icon } from '../../../shared/icon/icon';
 
 type FiltroStatus = 'Todos' | 'Pendente' | 'Aprovado' | 'Suspenso';
 
 @Component({
   selector: 'app-professores-admin',
-  imports: [FormsModule],
+  imports: [FormsModule, Icon],
   templateUrl: './professores-admin.html'
 })
 export class ProfessoresAdmin implements OnInit {
@@ -16,6 +17,13 @@ export class ProfessoresAdmin implements OnInit {
   readonly filtroStatus = signal<FiltroStatus>('Todos');
   readonly erro = signal<string | null>(null);
   readonly carregando = signal(true);
+  readonly formularioAberto = signal(false);
+  readonly criando = signal(false);
+
+  novoNome = '';
+  novoEmail = '';
+  novaSenha = '';
+  novoCpf = '';
 
   readonly professoresFiltrados = computed(() => {
     const busca = this.busca().trim().toLowerCase();
@@ -76,5 +84,33 @@ export class ProfessoresAdmin implements OnInit {
       next: () => this.carregar(),
       error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível reativar.')
     });
+  }
+
+  toggleFormulario(): void {
+    this.formularioAberto.update((aberto) => !aberto);
+    this.erro.set(null);
+  }
+
+  criarProfessor(): void {
+    this.erro.set(null);
+    this.criando.set(true);
+
+    this.professorService
+      .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha, cpf: this.novoCpf })
+      .subscribe({
+        next: () => {
+          this.criando.set(false);
+          this.novoNome = '';
+          this.novoEmail = '';
+          this.novaSenha = '';
+          this.novoCpf = '';
+          this.formularioAberto.set(false);
+          this.carregar();
+        },
+        error: (err) => {
+          this.criando.set(false);
+          this.erro.set(err?.error?.message ?? 'Não foi possível cadastrar o professor.');
+        }
+      });
   }
 }

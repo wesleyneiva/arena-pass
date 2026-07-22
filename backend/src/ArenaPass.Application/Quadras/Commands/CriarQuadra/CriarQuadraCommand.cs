@@ -4,7 +4,7 @@ namespace ArenaPass.Application.Quadras.Commands.CriarQuadra;
 
 public record CriarQuadraCommand(
     string Nome,
-    Guid ModalidadeId,
+    string ModalidadeNome,
     TimeOnly HoraAbertura,
     TimeOnly HoraFechamento,
     int DuracaoSlotMinutos,

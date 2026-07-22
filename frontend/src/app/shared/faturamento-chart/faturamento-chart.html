@@ -17,7 +17,7 @@
 
     <!-- bars -->
     @for (barra of barras(); track barra.rotuloMes; let i = $index) {
-      <path [attr.d]="barra.path" [attr.fill]="indiceHover() === i ? '#047857' : '#059669'" />
+      <path [attr.d]="barra.path" [attr.fill]="indiceHover() === i ? '#1d4ed8' : '#2563eb'" />
 
       <text [attr.x]="barra.rotuloCentroX" [attr.y]="areaUtilAltura + 14"
         text-anchor="middle" font-size="9" fill="#898781">{{ barra.rotuloMes }}</text>

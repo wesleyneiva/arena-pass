@@ -60,7 +60,7 @@
               @for (convite of convitesDe(agendamento.id); track convite.id) {
                 <div class="flex items-center justify-between py-1 text-sm">
                   <span class="text-slate-700">{{ convite.alunoNome }} · {{ convite.status }}</span>
-                  <a [routerLink]="['/professor/convites', convite.id]" class="font-medium text-emerald-700 hover:underline">Ver convite</a>
+                  <a [routerLink]="['/professor/convites', convite.id]" class="font-medium text-blue-700 hover:underline">Ver convite</a>
                 </div>
               } @empty {
                 <p class="text-sm text-slate-500">Nenhum convite emitido pra essa aula ainda.</p>
@@ -71,15 +71,15 @@
               <div>
                 <label class="mb-1 block text-xs font-medium text-slate-700">Nome do aluno</label>
                 <input required name="alunoNome" [(ngModel)]="alunoNome"
-                  class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+                  class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
               </div>
               <div>
                 <label class="mb-1 block text-xs font-medium text-slate-700">CPF do aluno</label>
                 <input required name="alunoCpf" [(ngModel)]="alunoCpf" maxlength="11"
-                  class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+                  class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
               </div>
               <button type="submit" [disabled]="emitindo()"
-                class="rounded-lg bg-emerald-600 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60">
+                class="rounded-lg bg-blue-600 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-60">
                 {{ emitindo() ? 'Emitindo...' : 'Emitir convite' }}
               </button>
             </form>

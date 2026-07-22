@@ -3,6 +3,10 @@
   <p class="mt-1 text-sm text-slate-500">Cadastre as quadras do clube e defina a taxa por hora de cada uma.</p>
 </div>
 
+@if (erro()) {
+  <p class="mb-4 animate-fade-in rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ erro() }}</p>
+}
+
 <div class="grid gap-8 lg:grid-cols-5">
   <section class="lg:col-span-3">
     @if (erroLista()) {
@@ -29,13 +33,20 @@
               <p class="mt-0.5 text-sm text-slate-500">
                 {{ quadra.modalidadeNome }} · {{ quadra.horaAbertura.slice(0,5) }} às {{ quadra.horaFechamento.slice(0,5) }}
               </p>
-              <p class="mt-1 text-sm font-medium text-emerald-700">R$ {{ quadra.taxaPorHora }}/hora</p>
+              <p class="mt-1 text-sm font-medium text-blue-700">R$ {{ quadra.taxaPorHora }}/hora</p>
             </div>
-            <button (click)="editar(quadra)"
-              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 opacity-0 transition hover:bg-slate-100 group-hover:opacity-100">
-              <app-icon name="pencil" [size]="16" />
-              Editar
-            </button>
+            <div class="flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
+              <button (click)="editar(quadra)"
+                class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">
+                <app-icon name="pencil" [size]="16" />
+                Editar
+              </button>
+              <button (click)="excluir(quadra)" [disabled]="excluindoId() === quadra.id"
+                class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50">
+                <app-icon name="ban" [size]="16" />
+                {{ excluindoId() === quadra.id ? 'Excluindo...' : 'Excluir' }}
+              </button>
+            </div>
           </div>
         } @empty {
           <div class="rounded-xl border border-dashed border-slate-300 p-10 text-center">
@@ -56,29 +67,32 @@
         <div>
           <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
           <input required name="nome" [(ngModel)]="nome" placeholder="Quadra 4"
-            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
         </div>
 
         <div>
           <label class="mb-1.5 block text-sm font-medium text-slate-700">Modalidade</label>
-          <select required name="modalidadeId" [(ngModel)]="modalidadeId"
-            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15">
+          <input required name="modalidadeNome" [(ngModel)]="modalidadeNome" list="modalidades-sugeridas"
+            placeholder="Ex: Beach Tennis, Futebol..."
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+          <datalist id="modalidades-sugeridas">
             @for (modalidade of modalidades(); track modalidade.id) {
-              <option [value]="modalidade.id">{{ modalidade.nome }}</option>
+              <option [value]="modalidade.nome"></option>
             }
-          </select>
+          </datalist>
+          <p class="mt-1 text-xs text-slate-500">Escolha uma sugestão ou digite uma modalidade nova.</p>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Abertura</label>
             <input required type="time" name="horaAbertura" [(ngModel)]="horaAbertura"
-              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
           </div>
           <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Fechamento</label>
             <input required type="time" name="horaFechamento" [(ngModel)]="horaFechamento"
-              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
           </div>
         </div>
 
@@ -86,29 +100,25 @@
           <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Slot (minutos)</label>
             <input required type="number" name="duracaoSlotMinutos" [(ngModel)]="duracaoSlotMinutos"
-              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
           </div>
           <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Taxa/hora (R$)</label>
             <input required type="number" min="0" step="0.01" name="taxaPorHora" [(ngModel)]="taxaPorHora"
-              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15" />
+              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
           </div>
         </div>
 
         @if (editandoId()) {
           <label class="flex items-center gap-2 text-sm font-medium text-slate-700">
-            <input type="checkbox" name="ativa" [(ngModel)]="ativa" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+            <input type="checkbox" name="ativa" [(ngModel)]="ativa" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
             Quadra ativa
           </label>
         }
 
-        @if (erro()) {
-          <p class="animate-fade-in rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ erro() }}</p>
-        }
-
         <div class="flex gap-2">
           <button type="submit" [disabled]="salvando()"
-            class="flex-1 rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-60">
+            class="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.99] disabled:opacity-60">
             {{ salvando() ? 'Salvando...' : editandoId() ? 'Salvar alterações' : 'Criar quadra' }}
           </button>
           @if (editandoId()) {

@@ -5,7 +5,7 @@ namespace ArenaPass.Application.Quadras.Commands.AtualizarQuadra;
 public record AtualizarQuadraCommand(
     Guid QuadraId,
     string Nome,
-    Guid ModalidadeId,
+    string ModalidadeNome,
     TimeOnly HoraAbertura,
     TimeOnly HoraFechamento,
     int DuracaoSlotMinutos,

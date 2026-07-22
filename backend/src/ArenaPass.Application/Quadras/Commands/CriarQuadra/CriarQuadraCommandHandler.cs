@@ -1,4 +1,3 @@
-using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Common.Interfaces;
 using ArenaPass.Domain.Entities;
 using MediatR;
@@ -17,18 +16,21 @@ public class CriarQuadraCommandHandler : IRequestHandler<CriarQuadraCommand, Gui
 
     public async Task<Guid> Handle(CriarQuadraCommand request, CancellationToken cancellationToken)
     {
-        var modalidadeExiste = await _context.Modalidades
-            .AnyAsync(m => m.Id == request.ModalidadeId, cancellationToken);
+        var nomeModalidade = request.ModalidadeNome.Trim();
 
-        if (!modalidadeExiste)
+        var modalidade = await _context.Modalidades
+            .FirstOrDefaultAsync(m => m.Nome.ToLower() == nomeModalidade.ToLower(), cancellationToken);
+
+        if (modalidade is null)
         {
-            throw new NotFoundException(nameof(Modalidade), request.ModalidadeId);
+            modalidade = new Modalidade { Nome = nomeModalidade };
+            _context.Modalidades.Add(modalidade);
         }
 
         var quadra = new Quadra
         {
             Nome = request.Nome,
-            ModalidadeId = request.ModalidadeId,
+            Modalidade = modalidade,
             HoraAbertura = request.HoraAbertura,
             HoraFechamento = request.HoraFechamento,
             DuracaoSlotMinutos = request.DuracaoSlotMinutos,
