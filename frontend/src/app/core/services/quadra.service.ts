@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CriarQuadraRequest, HorarioSlot, Quadra } from '../models/quadra.models';
+import { AtualizarQuadraRequest, CriarQuadraRequest, HorarioSlot, Quadra } from '../models/quadra.models';
 
 @Injectable({ providedIn: 'root' })
 export class QuadraService {
@@ -14,6 +14,10 @@ export class QuadraService {
 
   criar(request: CriarQuadraRequest): Observable<{ id: string }> {
     return this.http.post<{ id: string }>(`${environment.apiUrl}/quadras`, request);
+  }
+
+  atualizar(id: string, request: AtualizarQuadraRequest): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}/quadras/${id}`, request);
   }
 
   horariosDisponiveis(quadraId: string, data: string): Observable<HorarioSlot[]> {

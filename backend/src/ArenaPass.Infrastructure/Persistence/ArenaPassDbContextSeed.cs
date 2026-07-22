@@ -27,8 +27,14 @@ public static class ArenaPassDbContextSeed
                 HoraAbertura = new TimeOnly(7, 0),
                 HoraFechamento = new TimeOnly(23, 0),
                 DuracaoSlotMinutos = 60,
+                TaxaPorHora = 80m,
                 Ativa = true
             });
+            await context.SaveChangesAsync();
+        }
+        else if (quadra4.TaxaPorHora == 0)
+        {
+            quadra4.TaxaPorHora = 80m;
             await context.SaveChangesAsync();
         }
 

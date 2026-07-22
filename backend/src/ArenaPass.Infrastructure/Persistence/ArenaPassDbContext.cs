@@ -32,10 +32,12 @@ public class ArenaPassDbContext : DbContext, IApplicationDbContext
         {
             return await base.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: "23505" })
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: "23505" or "23P01" })
         {
-            // Índice único parcial (QuadraId, Data, HoraInicio) barrou uma segunda gravação
-            // concorrente para o mesmo slot — a garantia real contra overbooking.
+            // 23505 (unique_violation) ou 23P01 (exclusion_violation, da constraint de
+            // sobreposição de intervalo) barraram uma segunda gravação concorrente pra
+            // um horário que já colide com outro agendamento — a garantia real contra
+            // overbooking, inclusive entre reservas de durações diferentes (1h/2h).
             throw new ConflitoDeAgendamentoException();
         }
     }

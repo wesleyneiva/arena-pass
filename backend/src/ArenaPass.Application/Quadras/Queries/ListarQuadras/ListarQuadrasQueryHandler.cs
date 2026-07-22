@@ -27,6 +27,7 @@ public class ListarQuadrasQueryHandler : IRequestHandler<ListarQuadrasQuery, Lis
                 q.HoraAbertura,
                 q.HoraFechamento,
                 q.DuracaoSlotMinutos,
+                q.TaxaPorHora,
                 q.Ativa))
             .ToListAsync(cancellationToken);
     }

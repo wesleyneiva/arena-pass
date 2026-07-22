@@ -31,10 +31,12 @@ public class AgendamentoConfiguration : IEntityTypeConfiguration<Agendamento>
             .HasForeignKey(a => a.ProfessorId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Bloqueio de conflito real: impede 2 agendamentos não-cancelados na mesma
-        // quadra/data/horário, mesmo sob concorrência (ver ArenaPassDbContext.SaveChangesAsync).
-        builder.HasIndex(a => new { a.QuadraId, a.Data, a.HoraInicio })
-            .IsUnique()
-            .HasFilter("\"Status\" <> 'Cancelado'");
+        // Bloqueio de conflito real: como uma reserva agora pode durar 1h ou 2h, duas
+        // reservas podem se sobrepor sem compartilhar o mesmo HoraInicio (ex: 18h-20h e
+        // 19h-20h) — um índice único simples não basta mais. A garantia real vem de uma
+        // constraint de exclusão do Postgres (EXCLUDE USING gist) criada via SQL puro na
+        // migration AddTaxaPorHoraEExclusaoDeSobreposicao, que impede sobreposição de
+        // intervalo (QuadraId, Data, HoraInicio..HoraFim) para agendamentos não cancelados.
+        // Ver ArenaPassDbContext.SaveChangesAsync para a tradução do erro do Postgres.
     }
 }

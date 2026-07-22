@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ArenaPass.Api.Controllers;
 
-public record CriarAgendamentoRequest(Guid QuadraId, DateOnly Data, TimeOnly HoraInicio, decimal TaxaValor);
+public record CriarAgendamentoRequest(Guid QuadraId, DateOnly Data, TimeOnly HoraInicio, int QuantidadeHoras);
 
 public record ConfirmarPagamentoRequest(FormaPagamento FormaPagamento);
 
@@ -48,7 +48,7 @@ public class AgendamentosController : ControllerBase
             request.QuadraId,
             request.Data,
             request.HoraInicio,
-            request.TaxaValor);
+            request.QuantidadeHoras);
 
         var id = await _mediator.Send(command, cancellationToken);
         return CreatedAtAction(nameof(MeusAgendamentos), new { id }, new { id });

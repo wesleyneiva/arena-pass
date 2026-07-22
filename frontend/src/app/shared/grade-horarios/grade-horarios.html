@@ -1,22 +1,28 @@
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-  @for (slot of slots(); track slot.horaInicio) {
+<div class="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
+  @for (slot of slots(); track slot.horaInicio; let i = $index) {
     <button
       type="button"
       (click)="selecionar(slot)"
       [disabled]="!slot.livre"
-      class="rounded-lg border px-3 py-2 text-sm font-medium transition"
-      [class.bg-emerald-50]="slot.livre"
-      [class.border-emerald-300]="slot.livre"
-      [class.text-emerald-700]="slot.livre"
-      [class.hover:bg-emerald-100]="slot.livre"
+      class="rounded-xl border px-3 py-2.5 text-sm font-medium transition-all duration-150"
+      [class.bg-emerald-50]="slot.livre && !estaSelecionado(i)"
+      [class.border-emerald-200]="slot.livre && !estaSelecionado(i)"
+      [class.text-emerald-700]="slot.livre && !estaSelecionado(i)"
+      [class.hover:border-emerald-400]="slot.livre && !estaSelecionado(i)"
+      [class.hover:shadow-sm]="slot.livre && !estaSelecionado(i)"
       [class.cursor-pointer]="slot.livre"
-      [class.bg-red-50]="!slot.livre"
-      [class.border-red-200]="!slot.livre"
-      [class.text-red-600]="!slot.livre"
+      [class.bg-emerald-600]="estaSelecionado(i)"
+      [class.border-emerald-600]="estaSelecionado(i)"
+      [class.text-white]="estaSelecionado(i)"
+      [class.shadow-md]="estaSelecionado(i)"
+      [class.scale-[1.03]]="estaSelecionado(i)"
+      [class.bg-slate-50]="!slot.livre"
+      [class.border-slate-200]="!slot.livre"
+      [class.text-slate-400]="!slot.livre"
       [class.cursor-not-allowed]="!slot.livre"
     >
-      {{ slot.horaInicio.slice(0, 5) }} - {{ slot.horaFim.slice(0, 5) }}
-      <span class="block text-xs opacity-75">{{ slot.livre ? 'Livre' : 'Ocupado' }}</span>
+      {{ slot.horaInicio.slice(0, 5) }}
+      <span class="mt-0.5 block text-xs opacity-75">{{ slot.livre ? 'Livre' : 'Ocupado' }}</span>
     </button>
   }
 </div>

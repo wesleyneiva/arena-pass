@@ -13,6 +13,7 @@ type FiltroStatus = 'Todos' | 'PendentePagamento' | 'Confirmado' | 'Realizado' |
 export class AgendamentosAdmin implements OnInit {
   readonly agendamentos = signal<Agendamento[]>([]);
   readonly erro = signal<string | null>(null);
+  readonly carregando = signal(true);
 
   readonly filtroStatus = signal<FiltroStatus>('Todos');
   readonly filtroProfessor = signal('Todos');
@@ -48,10 +49,18 @@ export class AgendamentosAdmin implements OnInit {
   }
 
   carregar(): void {
-    this.agendamentoService.listarTodos().subscribe((agendamentos) => {
-      this.agendamentos.set(agendamentos);
-      for (const agendamento of agendamentos) {
-        this.formaPagamentoPorAgendamento[agendamento.id] ??= 'Pix';
+    this.carregando.set(true);
+    this.agendamentoService.listarTodos().subscribe({
+      next: (agendamentos) => {
+        this.agendamentos.set(agendamentos);
+        for (const agendamento of agendamentos) {
+          this.formaPagamentoPorAgendamento[agendamento.id] ??= 'Pix';
+        }
+        this.carregando.set(false);
+      },
+      error: (err) => {
+        this.carregando.set(false);
+        this.erro.set(err?.error?.message ?? 'Não foi possível carregar os agendamentos.');
       }
     });
   }

@@ -13,6 +13,7 @@ export class Login {
   senha = '';
   readonly carregando = signal(false);
   readonly erro = signal<string | null>(null);
+  readonly anoAtual = new Date().getFullYear();
 
   constructor(
     private readonly auth: AuthService,

@@ -14,6 +14,9 @@ frontend/.angular/
 .env
 .env.*
 
+# Logs de teste local (servidores dev rodados em background)
+/*.log
+
 # Editor / OS
 .vs/
 .vscode/

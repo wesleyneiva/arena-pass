@@ -14,6 +14,8 @@ export class ProfessoresAdmin implements OnInit {
   readonly professores = signal<Professor[]>([]);
   readonly busca = signal('');
   readonly filtroStatus = signal<FiltroStatus>('Todos');
+  readonly erro = signal<string | null>(null);
+  readonly carregando = signal(true);
 
   readonly professoresFiltrados = computed(() => {
     const busca = this.busca().trim().toLowerCase();
@@ -37,7 +39,18 @@ export class ProfessoresAdmin implements OnInit {
   }
 
   carregar(): void {
-    this.professorService.listar().subscribe((professores) => this.professores.set(professores));
+    this.carregando.set(true);
+    this.erro.set(null);
+    this.professorService.listar().subscribe({
+      next: (professores) => {
+        this.professores.set(professores);
+        this.carregando.set(false);
+      },
+      error: (err) => {
+        this.carregando.set(false);
+        this.erro.set(err?.error?.message ?? 'Não foi possível carregar os professores.');
+      }
+    });
   }
 
   atualizarBusca(valor: string): void {
@@ -45,6 +58,23 @@ export class ProfessoresAdmin implements OnInit {
   }
 
   aprovar(id: string): void {
-    this.professorService.aprovar(id).subscribe(() => this.carregar());
+    this.professorService.aprovar(id).subscribe({
+      next: () => this.carregar(),
+      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível aprovar.')
+    });
+  }
+
+  suspender(id: string): void {
+    this.professorService.suspender(id).subscribe({
+      next: () => this.carregar(),
+      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível suspender.')
+    });
+  }
+
+  reativar(id: string): void {
+    this.professorService.reativar(id).subscribe({
+      next: () => this.carregar(),
+      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível reativar.')
+    });
   }
 }

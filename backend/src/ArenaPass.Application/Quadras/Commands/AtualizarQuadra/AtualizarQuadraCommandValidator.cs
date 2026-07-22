@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace ArenaPass.Application.Quadras.Commands.CriarQuadra;
+namespace ArenaPass.Application.Quadras.Commands.AtualizarQuadra;
 
-public class CriarQuadraCommandValidator : AbstractValidator<CriarQuadraCommand>
+public class AtualizarQuadraCommandValidator : AbstractValidator<AtualizarQuadraCommand>
 {
-    public CriarQuadraCommandValidator()
+    public AtualizarQuadraCommandValidator()
     {
         RuleFor(x => x.Nome).NotEmpty().MaximumLength(100);
         RuleFor(x => x.ModalidadeId).NotEmpty();

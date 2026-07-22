@@ -15,4 +15,12 @@ export class ProfessorService {
   aprovar(id: string): Observable<void> {
     return this.http.post<void>(`${environment.apiUrl}/professores/${id}/aprovar`, {});
   }
+
+  suspender(id: string): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/professores/${id}/suspender`, {});
+  }
+
+  reativar(id: string): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/professores/${id}/reativar`, {});
+  }
 }

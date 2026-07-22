@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { QuadraService } from '../../../core/services/quadra.service';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
@@ -24,10 +24,31 @@ export class Agendar implements OnInit {
   readonly sucesso = signal<string | null>(null);
   readonly carregandoSlots = signal(false);
   readonly salvando = signal(false);
+  readonly horaInicioSelecionada = signal<string | null>(null);
+  readonly quantidadeHoras = signal(1);
 
   quadraId = '';
   data = hoje();
-  taxaValor = 80;
+
+  readonly quadraSelecionada = computed<Quadra | null>(
+    () => this.quadras().find((q) => q.id === this.quadraId) ?? null
+  );
+
+  readonly taxaCalculada = computed(() => {
+    const quadra = this.quadraSelecionada();
+    return quadra ? quadra.taxaPorHora * this.quantidadeHoras() : 0;
+  });
+
+  readonly podeSelecionarDuasHoras = computed(() => {
+    const horaInicio = this.horaInicioSelecionada();
+    if (!horaInicio) {
+      return false;
+    }
+
+    const slots = this.slots();
+    const indice = slots.findIndex((s) => s.horaInicio === horaInicio);
+    return indice !== -1 && indice + 1 < slots.length && slots[indice + 1].livre;
+  });
 
   constructor(
     private readonly quadraService: QuadraService,
@@ -35,12 +56,15 @@ export class Agendar implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.quadraService.listar().subscribe((quadras) => {
-      this.quadras.set(quadras);
-      if (quadras.length > 0) {
-        this.quadraId = quadras[0].id;
-        this.buscarHorarios();
-      }
+    this.quadraService.listar().subscribe({
+      next: (quadras) => {
+        this.quadras.set(quadras);
+        if (quadras.length > 0) {
+          this.quadraId = quadras[0].id;
+          this.buscarHorarios();
+        }
+      },
+      error: () => this.erro.set('Não foi possível carregar as quadras.')
     });
   }
 
@@ -51,6 +75,7 @@ export class Agendar implements OnInit {
 
     this.erro.set(null);
     this.sucesso.set(null);
+    this.horaInicioSelecionada.set(null);
     this.carregandoSlots.set(true);
 
     this.quadraService.horariosDisponiveis(this.quadraId, this.data).subscribe({
@@ -65,17 +90,45 @@ export class Agendar implements OnInit {
     });
   }
 
-  agendar(slot: HorarioSlot): void {
+  selecionarSlot(slot: HorarioSlot): void {
+    this.horaInicioSelecionada.set(slot.horaInicio);
+    this.quantidadeHoras.set(1);
+  }
+
+  escolherDuracao(horas: number): void {
+    if (horas === 2 && !this.podeSelecionarDuasHoras()) {
+      return;
+    }
+    this.quantidadeHoras.set(horas);
+  }
+
+  cancelarSelecao(): void {
+    this.horaInicioSelecionada.set(null);
+    this.quantidadeHoras.set(1);
+  }
+
+  confirmarAgendamento(): void {
+    const horaInicio = this.horaInicioSelecionada();
+    if (!horaInicio) {
+      return;
+    }
+
     this.erro.set(null);
     this.sucesso.set(null);
     this.salvando.set(true);
 
     this.agendamentoService
-      .criar({ quadraId: this.quadraId, data: this.data, horaInicio: slot.horaInicio, taxaValor: this.taxaValor })
+      .criar({
+        quadraId: this.quadraId,
+        data: this.data,
+        horaInicio,
+        quantidadeHoras: this.quantidadeHoras()
+      })
       .subscribe({
         next: () => {
           this.salvando.set(false);
-          this.sucesso.set(`Aula agendada às ${slot.horaInicio.slice(0, 5)}!`);
+          this.sucesso.set(`Aula agendada às ${horaInicio.slice(0, 5)}!`);
+          this.cancelarSelecao();
           this.buscarHorarios();
         },
         error: (err) => {

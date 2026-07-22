@@ -31,7 +31,8 @@ public class CriarQuadraCommandHandler : IRequestHandler<CriarQuadraCommand, Gui
             ModalidadeId = request.ModalidadeId,
             HoraAbertura = request.HoraAbertura,
             HoraFechamento = request.HoraFechamento,
-            DuracaoSlotMinutos = request.DuracaoSlotMinutos
+            DuracaoSlotMinutos = request.DuracaoSlotMinutos,
+            TaxaPorHora = request.TaxaPorHora
         };
 
         _context.Quadras.Add(quadra);

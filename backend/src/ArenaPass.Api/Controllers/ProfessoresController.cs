@@ -1,4 +1,6 @@
 using ArenaPass.Application.Professores.Commands.AprovarProfessor;
+using ArenaPass.Application.Professores.Commands.ReativarProfessor;
+using ArenaPass.Application.Professores.Commands.SuspenderProfessor;
 using ArenaPass.Application.Professores.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -29,6 +31,20 @@ public class ProfessoresController : ControllerBase
     public async Task<IActionResult> Aprovar(Guid id, CancellationToken cancellationToken)
     {
         await _mediator.Send(new AprovarProfessorCommand(id), cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/suspender")]
+    public async Task<IActionResult> Suspender(Guid id, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new SuspenderProfessorCommand(id), cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/reativar")]
+    public async Task<IActionResult> Reativar(Guid id, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new ReativarProfessorCommand(id), cancellationToken);
         return NoContent();
     }
 }

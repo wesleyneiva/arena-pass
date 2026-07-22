@@ -37,22 +37,31 @@ public class CriarAgendamentoCommandHandler : IRequestHandler<CriarAgendamentoCo
             throw new DomainException("Essa quadra está inativa e não aceita agendamentos.");
         }
 
-        if (request.HoraInicio < quadra.HoraAbertura || request.HoraInicio >= quadra.HoraFechamento)
+        // TimeOnly.AddHours dá wraparound à meia-noite (22:00 + 2h vira 00:00), então a
+        // soma é feita via TimeSpan (que não envolve) pra checar corretamente contra o
+        // horário de fechamento antes de converter de volta pra TimeOnly.
+        var horaFimSemWrap = request.HoraInicio.ToTimeSpan() + TimeSpan.FromHours(request.QuantidadeHoras);
+
+        if (request.HoraInicio < quadra.HoraAbertura || horaFimSemWrap > quadra.HoraFechamento.ToTimeSpan())
         {
             throw new DomainException(
                 $"Horário fora do funcionamento da quadra ({quadra.HoraAbertura:HH\\:mm} às {quadra.HoraFechamento:HH\\:mm}).");
         }
 
-        var horaFim = request.HoraInicio.Add(TimeSpan.FromMinutes(quadra.DuracaoSlotMinutos));
+        var horaFim = TimeOnly.FromTimeSpan(horaFimSemWrap);
+
+        var taxaValor = quadra.TaxaPorHora * request.QuantidadeHoras;
 
         // Checagem otimista (fail-fast / boa UX) — a garantia real contra concorrência
-        // vem do índice único parcial no banco, aplicado no SaveChangesAsync abaixo.
-        var conflito = await _context.Agendamentos.AnyAsync(
-            a => a.QuadraId == request.QuadraId
-                 && a.Data == request.Data
-                 && a.HoraInicio == request.HoraInicio
-                 && a.Status != StatusAgendamento.Cancelado,
-            cancellationToken);
+        // vem da constraint de exclusão no banco (sobreposição de intervalo), aplicada
+        // no SaveChangesAsync abaixo.
+        var agendamentosDoDia = await _context.Agendamentos
+            .Where(a => a.QuadraId == request.QuadraId
+                        && a.Data == request.Data
+                        && a.Status != StatusAgendamento.Cancelado)
+            .ToListAsync(cancellationToken);
+
+        var conflito = agendamentosDoDia.Any(a => a.HoraInicio < horaFim && request.HoraInicio < a.HoraFim);
 
         if (conflito)
         {
@@ -66,14 +75,14 @@ public class CriarAgendamentoCommandHandler : IRequestHandler<CriarAgendamentoCo
             Data = request.Data,
             HoraInicio = request.HoraInicio,
             HoraFim = horaFim,
-            TaxaValor = request.TaxaValor,
+            TaxaValor = taxaValor,
             Status = StatusAgendamento.PendentePagamento
         };
 
         _context.Agendamentos.Add(agendamento);
 
-        // Se duas requisições passarem pela checagem acima ao mesmo tempo, o índice único
-        // parcial do Postgres rejeita a segunda gravação e a Infrastructure traduz isso
+        // Se duas requisições passarem pela checagem acima ao mesmo tempo, a constraint de
+        // exclusão do Postgres rejeita a segunda gravação e a Infrastructure traduz isso
         // para ConflitoDeAgendamentoException.
         await _context.SaveChangesAsync(cancellationToken);
 

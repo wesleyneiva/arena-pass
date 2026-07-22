@@ -1,24 +1,66 @@
-<div class="min-h-screen bg-slate-50">
-  <header class="no-print bg-white border-b border-slate-200">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-6">
-        <span class="font-semibold text-slate-900">ArenaPass · Professor</span>
-        <nav class="flex gap-4 text-sm">
-          <a routerLink="/professor/agendar" routerLinkActive="text-emerald-700 font-medium" class="text-slate-600 hover:text-emerald-700">Agendar aula</a>
-          <a routerLink="/professor/meus-agendamentos" routerLinkActive="text-emerald-700 font-medium" class="text-slate-600 hover:text-emerald-700">Meus agendamentos</a>
-        </nav>
-      </div>
-      <button (click)="sair()" class="text-sm text-slate-500 hover:text-slate-800">Sair</button>
-    </div>
-  </header>
-
-  @if (auth.professorAprovado() === false) {
-    <div class="bg-amber-50 border-b border-amber-200 text-amber-800 text-sm text-center py-2">
-      Seu cadastro ainda está pendente de aprovação pelo clube — você poderá agendar assim que for aprovado.
-    </div>
+<div class="min-h-screen flex bg-slate-50">
+  @if (menuAberto()) {
+    <div class="fixed inset-0 z-30 bg-slate-900/50 lg:hidden animate-fade-in" (click)="menuAberto.set(false)"></div>
   }
 
-  <main class="max-w-5xl mx-auto px-4 py-8">
-    <router-outlet />
-  </main>
+  <aside
+    class="no-print fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-slate-900 transition-transform duration-300 ease-out lg:static lg:translate-x-0"
+    [class.translate-x-0]="menuAberto()"
+    [class.-translate-x-full]="!menuAberto()"
+  >
+    <div class="flex items-center gap-2.5 px-6 py-6">
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 font-semibold text-white">A</div>
+      <div>
+        <p class="text-sm font-semibold text-white leading-tight">ArenaPass</p>
+        <p class="text-xs text-slate-400 leading-tight">Painel do professor</p>
+      </div>
+    </div>
+
+    <nav class="flex-1 space-y-1 px-3">
+      @for (item of itens; track item.rota) {
+        <a
+          [routerLink]="item.rota"
+          routerLinkActive="bg-emerald-500/10 text-emerald-400"
+          [routerLinkActiveOptions]="{ exact: false }"
+          (click)="menuAberto.set(false)"
+          class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors duration-150 hover:bg-slate-800 hover:text-slate-100"
+        >
+          <app-icon [name]="item.icone" [size]="19" />
+          {{ item.rotulo }}
+        </a>
+      }
+    </nav>
+
+    <div class="border-t border-slate-800 px-3 py-4">
+      <div class="mb-2 truncate px-3 text-xs text-slate-500">{{ auth.usuario()?.email }}</div>
+      <button
+        (click)="sair()"
+        class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors duration-150 hover:bg-slate-800 hover:text-slate-100"
+      >
+        <app-icon name="logout" [size]="19" />
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="no-print sticky top-0 z-20 flex items-center gap-3 border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur lg:hidden">
+      <button (click)="menuAberto.set(true)" class="rounded-lg p-1.5 text-slate-600 hover:bg-slate-100">
+        <app-icon name="menu" [size]="22" />
+      </button>
+      <span class="font-semibold text-slate-900">ArenaPass</span>
+    </header>
+
+    @if (auth.professorAprovado() === false) {
+      <div class="no-print bg-amber-50 border-b border-amber-200 text-amber-800 text-sm text-center py-2 px-4">
+        Seu cadastro ainda está pendente de aprovação pelo clube — você poderá agendar assim que for aprovado.
+      </div>
+    }
+
+    <main class="mx-auto w-full max-w-6xl flex-1 p-4 sm:p-6 lg:p-10">
+      <div class="animate-fade-in-up">
+        <router-outlet />
+      </div>
+    </main>
+  </div>
 </div>

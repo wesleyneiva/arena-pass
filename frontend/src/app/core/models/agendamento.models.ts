@@ -18,5 +18,5 @@ export interface CriarAgendamentoRequest {
   quadraId: string;
   data: string;
   horaInicio: string;
-  taxaValor: number;
+  quantidadeHoras: number;
 }

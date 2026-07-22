@@ -7,4 +7,5 @@ public record CriarQuadraCommand(
     Guid ModalidadeId,
     TimeOnly HoraAbertura,
     TimeOnly HoraFechamento,
-    int DuracaoSlotMinutos) : IRequest<Guid>;
+    int DuracaoSlotMinutos,
+    decimal TaxaPorHora) : IRequest<Guid>;

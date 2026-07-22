@@ -17,6 +17,7 @@ export class MeusAgendamentos implements OnInit {
   readonly convitesPorAgendamento = signal<Record<string, ConviteResumo[]>>({});
   readonly erro = signal<string | null>(null);
   readonly emitindo = signal(false);
+  readonly carregando = signal(true);
 
   alunoNome = '';
   alunoCpf = '';
@@ -31,7 +32,17 @@ export class MeusAgendamentos implements OnInit {
   }
 
   carregar(): void {
-    this.agendamentoService.meus().subscribe((agendamentos) => this.agendamentos.set(agendamentos));
+    this.carregando.set(true);
+    this.agendamentoService.meus().subscribe({
+      next: (agendamentos) => {
+        this.agendamentos.set(agendamentos);
+        this.carregando.set(false);
+      },
+      error: (err) => {
+        this.carregando.set(false);
+        this.erro.set(err?.error?.message ?? 'Não foi possível carregar seus agendamentos.');
+      }
+    });
   }
 
   convitesDe(agendamentoId: string): ConviteResumo[] {

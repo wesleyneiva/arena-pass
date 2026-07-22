@@ -1,3 +1,4 @@
+using ArenaPass.Application.Quadras.Commands.AtualizarQuadra;
 using ArenaPass.Application.Quadras.Commands.CriarQuadra;
 using ArenaPass.Application.Quadras.Queries.ListarHorariosDisponiveis;
 using ArenaPass.Application.Quadras.Queries.ListarQuadras;
@@ -6,6 +7,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArenaPass.Api.Controllers;
+
+public record AtualizarQuadraRequest(
+    string Nome,
+    Guid ModalidadeId,
+    TimeOnly HoraAbertura,
+    TimeOnly HoraFechamento,
+    int DuracaoSlotMinutos,
+    decimal TaxaPorHora,
+    bool Ativa);
 
 [ApiController]
 [Route("api/quadras")]
@@ -32,6 +42,24 @@ public class QuadrasController : ControllerBase
     {
         var id = await _mediator.Send(command, cancellationToken);
         return CreatedAtAction(nameof(Listar), new { id }, new { id });
+    }
+
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = "AdminClube")]
+    public async Task<IActionResult> Atualizar(Guid id, AtualizarQuadraRequest request, CancellationToken cancellationToken)
+    {
+        var command = new AtualizarQuadraCommand(
+            id,
+            request.Nome,
+            request.ModalidadeId,
+            request.HoraAbertura,
+            request.HoraFechamento,
+            request.DuracaoSlotMinutos,
+            request.TaxaPorHora,
+            request.Ativa);
+
+        await _mediator.Send(command, cancellationToken);
+        return NoContent();
     }
 
     [HttpGet("{id:guid}/horarios-disponiveis")]

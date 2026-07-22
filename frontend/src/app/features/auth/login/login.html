@@ -1,47 +1,76 @@
-<div class="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-  <div class="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-    <h1 class="text-2xl font-semibold text-slate-900 mb-1">ArenaPass</h1>
-    <p class="text-sm text-slate-500 mb-6">Entre com sua conta do clube ou de professor.</p>
+<div class="min-h-screen flex bg-slate-50">
+  <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-slate-900 p-12 text-white lg:flex">
+    <div class="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"></div>
 
-    <form (ngSubmit)="entrar()" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
-        <input
-          type="email"
-          name="email"
-          required
-          [(ngModel)]="email"
-          class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        />
+    <div class="relative flex items-center gap-2.5">
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 font-semibold">A</div>
+      <span class="text-lg font-semibold">ArenaPass</span>
+    </div>
+
+    <div class="relative">
+      <h1 class="text-3xl font-semibold leading-tight">
+        Gestão completa de quadras<br />e aulas terceirizadas.
+      </h1>
+      <p class="mt-4 max-w-md text-slate-400">
+        Agendamento sem conflito, controle financeiro por professor e convites digitais
+        com QR Code para alunos não-sócios — tudo em um só lugar.
+      </p>
+    </div>
+
+    <p class="relative text-xs text-slate-500">© {{ anoAtual }} ArenaPass</p>
+  </div>
+
+  <div class="flex flex-1 items-center justify-center px-4 py-12">
+    <div class="w-full max-w-sm animate-fade-in-up">
+      <div class="mb-8 flex items-center gap-2.5 lg:hidden">
+        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 font-semibold text-white">A</div>
+        <span class="text-lg font-semibold text-slate-900">ArenaPass</span>
       </div>
 
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Senha</label>
-        <input
-          type="password"
-          name="senha"
-          required
-          [(ngModel)]="senha"
-          class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        />
-      </div>
+      <h2 class="text-2xl font-semibold text-slate-900">Entrar</h2>
+      <p class="mt-1 mb-8 text-sm text-slate-500">Acesse sua conta do clube ou de professor.</p>
 
-      @if (erro()) {
-        <p class="text-sm text-red-600">{{ erro() }}</p>
-      }
+      <form (ngSubmit)="entrar()" class="space-y-4">
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">E-mail</label>
+          <input
+            type="email"
+            name="email"
+            required
+            [(ngModel)]="email"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15"
+          />
+        </div>
 
-      <button
-        type="submit"
-        [disabled]="carregando()"
-        class="w-full rounded-lg bg-emerald-600 text-white py-2 text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-60"
-      >
-        {{ carregando() ? 'Entrando...' : 'Entrar' }}
-      </button>
-    </form>
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Senha</label>
+          <input
+            type="password"
+            name="senha"
+            required
+            [(ngModel)]="senha"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15"
+          />
+        </div>
 
-    <p class="text-sm text-slate-500 mt-6 text-center">
-      É professor e ainda não tem conta?
-      <a routerLink="/registrar" class="text-emerald-700 font-medium hover:underline">Registre-se</a>
-    </p>
+        @if (erro()) {
+          <p class="animate-fade-in rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ erro() }}</p>
+        }
+
+        <button
+          type="submit"
+          [disabled]="carregando()"
+          class="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-60"
+        >
+          {{ carregando() ? 'Entrando...' : 'Entrar' }}
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-slate-500">
+        É professor e ainda não tem conta?
+        <a routerLink="/registrar" class="font-medium text-emerald-700 hover:underline">Registre-se</a>
+      </p>
+    </div>
   </div>
 </div>

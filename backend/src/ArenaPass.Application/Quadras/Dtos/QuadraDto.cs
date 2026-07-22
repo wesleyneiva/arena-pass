@@ -8,4 +8,5 @@ public record QuadraDto(
     TimeOnly HoraAbertura,
     TimeOnly HoraFechamento,
     int DuracaoSlotMinutos,
+    decimal TaxaPorHora,
     bool Ativa);
