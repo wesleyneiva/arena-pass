@@ -27,19 +27,27 @@ public class ArenaPassDbContext : DbContext, IApplicationDbContext
         base.OnModelCreating(modelBuilder);
     }
 
+    private const string ConstraintSemSobreposicaoDeAgendamento = "EX_Agendamentos_SemSobreposicao";
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             return await base.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: "23505" or "23P01" })
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: "23505" or "23P01" } postgresException)
         {
-            // 23505 (unique_violation) ou 23P01 (exclusion_violation, da constraint de
-            // sobreposição de intervalo) barraram uma segunda gravação concorrente pra
-            // um horário que já colide com outro agendamento — a garantia real contra
-            // overbooking, inclusive entre reservas de durações diferentes (1h/2h).
-            throw new ConflitoDeAgendamentoException();
+            // 23P01 (exclusion_violation) na constraint de sobreposição de intervalo é
+            // sempre um conflito real de agendamento (duas reservas colidindo no mesmo
+            // horário/quadra). Qualquer OUTRA violação de índice único (23505) — CPF de
+            // professor duplicado, e-mail já cadastrado em uma corrida concorrente, etc. —
+            // não tem relação com agendamento e não deve usar essa mensagem.
+            if (postgresException.ConstraintName == ConstraintSemSobreposicaoDeAgendamento)
+            {
+                throw new ConflitoDeAgendamentoException();
+            }
+
+            throw new DomainException("Um dos valores informados já está em uso por outro registro.");
         }
     }
 }
