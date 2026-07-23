@@ -5,6 +5,7 @@ import { AgendamentoService } from '../../../core/services/agendamento.service';
 import { ConviteService } from '../../../core/services/convite.service';
 import { Agendamento, FormaPagamento, PagamentoPix } from '../../../core/models/agendamento.models';
 import { ConviteResumo } from '../../../core/models/convite.models';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 type FiltroStatus = 'Todos' | 'PendentePagamento' | 'Confirmado' | 'Realizado' | 'Cancelado';
 
@@ -66,7 +67,8 @@ export class MeusAgendamentos implements OnInit {
 
   constructor(
     private readonly agendamentoService: AgendamentoService,
-    private readonly conviteService: ConviteService
+    private readonly conviteService: ConviteService,
+    private readonly confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
@@ -127,8 +129,15 @@ export class MeusAgendamentos implements OnInit {
     });
   }
 
-  cancelar(agendamentoId: string): void {
-    if (!confirm('Cancelar esse agendamento?')) {
+  async cancelar(agendamentoId: string): Promise<void> {
+    const confirmado = await this.confirmDialog.confirmar({
+      titulo: 'Cancelar agendamento',
+      mensagem: 'Tem certeza que deseja cancelar esse agendamento? Essa ação não pode ser desfeita.',
+      textoConfirmar: 'Cancelar agendamento',
+      textoCancelar: 'Voltar',
+      variante: 'perigo'
+    });
+    if (!confirmado) {
       return;
     }
 

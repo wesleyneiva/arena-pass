@@ -5,6 +5,7 @@ import { QuadraService } from '../../../core/services/quadra.service';
 import { Modalidade } from '../../../core/models/modalidade.models';
 import { Quadra } from '../../../core/models/quadra.models';
 import { Icon } from '../../../shared/icon/icon';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'app-quadras-admin',
@@ -31,7 +32,8 @@ export class QuadrasAdmin implements OnInit {
 
   constructor(
     private readonly quadraService: QuadraService,
-    private readonly modalidadeService: ModalidadeService
+    private readonly modalidadeService: ModalidadeService,
+    private readonly confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
@@ -115,8 +117,14 @@ export class QuadrasAdmin implements OnInit {
     }
   }
 
-  excluir(quadra: Quadra): void {
-    if (!confirm(`Excluir a quadra "${quadra.nome}"? Essa ação não pode ser desfeita.`)) {
+  async excluir(quadra: Quadra): Promise<void> {
+    const confirmado = await this.confirmDialog.confirmar({
+      titulo: 'Excluir quadra',
+      mensagem: `Excluir a quadra "${quadra.nome}"? Essa ação não pode ser desfeita.`,
+      textoConfirmar: 'Excluir',
+      variante: 'perigo'
+    });
+    if (!confirmado) {
       return;
     }
 

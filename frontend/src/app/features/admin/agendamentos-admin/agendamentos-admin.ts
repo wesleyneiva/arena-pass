@@ -2,6 +2,7 @@ import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
 import { Agendamento, FormaPagamento } from '../../../core/models/agendamento.models';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 type FiltroStatus = 'Todos' | 'PendentePagamento' | 'Confirmado' | 'Realizado' | 'Cancelado';
 
@@ -42,7 +43,10 @@ export class AgendamentosAdmin implements OnInit {
     });
   });
 
-  constructor(private readonly agendamentoService: AgendamentoService) {}
+  constructor(
+    private readonly agendamentoService: AgendamentoService,
+    private readonly confirmDialog: ConfirmDialogService
+  ) {}
 
   ngOnInit(): void {
     this.carregar();
@@ -65,26 +69,52 @@ export class AgendamentosAdmin implements OnInit {
     });
   }
 
-  confirmarPagamento(id: string): void {
-    this.erro.set(null);
+  async confirmarPagamento(id: string): Promise<void> {
     const formaPagamento = this.formaPagamentoPorAgendamento[id] ?? 'Pix';
+    const confirmado = await this.confirmDialog.confirmar({
+      titulo: 'Confirmar pagamento',
+      mensagem: `Confirmar o recebimento do pagamento via ${formaPagamento === 'Cartao' ? 'cartão' : formaPagamento.toLowerCase()}?`,
+      textoConfirmar: 'Confirmar pagamento'
+    });
+    if (!confirmado) {
+      return;
+    }
+
+    this.erro.set(null);
     this.agendamentoService.confirmarPagamento(id, formaPagamento).subscribe({
       next: () => this.carregar(),
       error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível confirmar o pagamento.')
     });
   }
 
-  marcarRealizado(id: string): void {
+  async marcarRealizado(id: string): Promise<void> {
+    const confirmado = await this.confirmDialog.confirmar({
+      titulo: 'Marcar como realizada',
+      mensagem: 'Confirma que essa aula foi realizada?',
+      textoConfirmar: 'Marcar como realizada'
+    });
+    if (!confirmado) {
+      return;
+    }
+
     this.agendamentoService.marcarRealizado(id).subscribe({
       next: () => this.carregar(),
       error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível marcar como realizada.')
     });
   }
 
-  cancelar(id: string): void {
-    if (!confirm('Cancelar esse agendamento?')) {
+  async cancelar(id: string): Promise<void> {
+    const confirmado = await this.confirmDialog.confirmar({
+      titulo: 'Cancelar agendamento',
+      mensagem: 'Tem certeza que deseja cancelar esse agendamento? Essa ação não pode ser desfeita.',
+      textoConfirmar: 'Cancelar agendamento',
+      textoCancelar: 'Voltar',
+      variante: 'perigo'
+    });
+    if (!confirmado) {
       return;
     }
+
     this.agendamentoService.cancelar(id).subscribe({
       next: () => this.carregar(),
       error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível cancelar.')

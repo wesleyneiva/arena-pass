@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ProfessorService } from '../../../core/services/professor.service';
 import { Professor } from '../../../core/models/professor.models';
 import { Icon } from '../../../shared/icon/icon';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 type FiltroStatus = 'Todos' | 'Pendente' | 'Aprovado' | 'Suspenso';
 
@@ -42,7 +43,10 @@ export class ProfessoresAdmin implements OnInit {
     });
   });
 
-  constructor(private readonly professorService: ProfessorService) {}
+  constructor(
+    private readonly professorService: ProfessorService,
+    private readonly confirmDialog: ConfirmDialogService
+  ) {}
 
   ngOnInit(): void {
     this.carregar();
@@ -141,8 +145,14 @@ export class ProfessoresAdmin implements OnInit {
     }
   }
 
-  excluir(professor: Professor): void {
-    if (!confirm(`Excluir o professor "${professor.nome}"? Essa ação não pode ser desfeita.`)) {
+  async excluir(professor: Professor): Promise<void> {
+    const confirmado = await this.confirmDialog.confirmar({
+      titulo: 'Excluir professor',
+      mensagem: `Excluir o professor "${professor.nome}"? Essa ação não pode ser desfeita.`,
+      textoConfirmar: 'Excluir',
+      variante: 'perigo'
+    });
+    if (!confirmado) {
       return;
     }
 

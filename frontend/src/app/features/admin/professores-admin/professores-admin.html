@@ -15,43 +15,49 @@
 }
 
 @if (formularioAberto()) {
-  <div class="mb-5 animate-scale-in rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-    <h2 class="mb-4 text-base font-semibold text-slate-900">
-      {{ editandoId() ? 'Editar professor' : 'Cadastrar professor' }}
-    </h2>
-    <form (ngSubmit)="salvarProfessor()" class="grid gap-3 sm:grid-cols-2">
-      <div>
-        <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
-        <input required name="novoNome" [(ngModel)]="novoNome"
-          class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in" (click)="fecharFormulario()">
+    <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">
+          {{ editandoId() ? 'Editar professor' : 'Cadastrar professor' }}
+        </h2>
+        <button (click)="fecharFormulario()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
       </div>
-      <div>
-        <label class="mb-1.5 block text-sm font-medium text-slate-700">E-mail</label>
-        <input required type="email" name="novoEmail" [(ngModel)]="novoEmail"
-          class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
-      </div>
-      <div>
-        <label class="mb-1.5 block text-sm font-medium text-slate-700">CPF (somente números)</label>
-        <input required name="novoCpf" [(ngModel)]="novoCpf" maxlength="11"
-          class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
-      </div>
-      @if (!editandoId()) {
+
+      <form (ngSubmit)="salvarProfessor()" class="grid gap-3 sm:grid-cols-2">
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-slate-700">Senha</label>
-          <input required type="password" name="novaSenha" [(ngModel)]="novaSenha" minlength="6"
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
+          <input required name="novoNome" [(ngModel)]="novoNome"
             class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
         </div>
-      }
-      <div class="sm:col-span-2">
-        <button type="submit" [disabled]="salvando()"
-          class="rounded-lg bg-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:opacity-60">
-          {{ salvando() ? 'Salvando...' : editandoId() ? 'Salvar alterações' : 'Cadastrar professor' }}
-        </button>
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">E-mail</label>
+          <input required type="email" name="novoEmail" [(ngModel)]="novoEmail"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+        </div>
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">CPF (somente números)</label>
+          <input required name="novoCpf" [(ngModel)]="novoCpf" maxlength="11"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+        </div>
         @if (!editandoId()) {
-          <p class="mt-1.5 text-xs text-slate-500">Professores cadastrados por aqui já entram aprovados.</p>
+          <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Senha</label>
+            <input required type="password" name="novaSenha" [(ngModel)]="novaSenha" minlength="6"
+              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+          </div>
         }
-      </div>
-    </form>
+        <div class="sm:col-span-2">
+          <button type="submit" [disabled]="salvando()"
+            class="w-full rounded-lg bg-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:opacity-60">
+            {{ salvando() ? 'Salvando...' : editandoId() ? 'Salvar alterações' : 'Cadastrar professor' }}
+          </button>
+          @if (!editandoId()) {
+            <p class="mt-1.5 text-xs text-slate-500">Professores cadastrados por aqui já entram aprovados.</p>
+          }
+        </div>
+      </form>
+    </div>
   </div>
 }
 

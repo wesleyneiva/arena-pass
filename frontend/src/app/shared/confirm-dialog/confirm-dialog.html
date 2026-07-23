@@ -1,0 +1,38 @@
+@if (servico.aberto()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in" (click)="servico.cancelarAcao()">
+    <div class="w-full max-w-sm animate-scale-in rounded-2xl bg-white p-6 text-center shadow-xl" (click)="$event.stopPropagation()">
+      @if (servico.variante() === 'perigo') {
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+          </svg>
+        </div>
+      } @else {
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-500">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 8v5M12 16h.01" />
+            <circle cx="12" cy="12" r="9" />
+          </svg>
+        </div>
+      }
+
+      <h2 class="text-lg font-semibold text-slate-900">{{ servico.titulo() }}</h2>
+      <p class="mt-1.5 text-sm text-slate-500">{{ servico.mensagem() }}</p>
+
+      <div class="mt-5 flex gap-2">
+        <button (click)="servico.cancelarAcao()"
+          class="flex-1 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+          {{ servico.textoCancelar() }}
+        </button>
+        <button (click)="servico.confirmarAcao()"
+          class="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99]"
+          [class.bg-red-600]="servico.variante() === 'perigo'"
+          [class.hover:bg-red-700]="servico.variante() === 'perigo'"
+          [class.bg-blue-500]="servico.variante() !== 'perigo'"
+          [class.hover:bg-blue-600]="servico.variante() !== 'perigo'">
+          {{ servico.textoConfirmar() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
