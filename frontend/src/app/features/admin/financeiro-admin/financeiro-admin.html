@@ -8,9 +8,9 @@
     @for (opcao of presets; track opcao.valor) {
       <button (click)="aplicarPreset(opcao.valor)"
         class="rounded-lg border px-3.5 py-1.5 text-sm font-medium transition"
-        [class.bg-blue-600]="presetAtivo() === opcao.valor"
+        [class.bg-blue-500]="presetAtivo() === opcao.valor"
         [class.text-white]="presetAtivo() === opcao.valor"
-        [class.border-blue-600]="presetAtivo() === opcao.valor"
+        [class.border-blue-500]="presetAtivo() === opcao.valor"
         [class.border-slate-300]="presetAtivo() !== opcao.valor"
         [class.text-slate-700]="presetAtivo() !== opcao.valor"
         [class.hover:bg-slate-50]="presetAtivo() !== opcao.valor">
@@ -47,7 +47,7 @@
     @for (item of f.porProfessor; track item.professorId) {
       <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <p class="font-medium text-slate-900">{{ item.professorNome }}</p>
-        <p class="text-sm text-slate-600">{{ item.totalAulas }} aula(s) · <span class="font-medium text-blue-700">R$ {{ item.valorTotal }}</span></p>
+        <p class="text-sm text-slate-600">{{ item.totalAulas }} aula(s) · <span class="font-medium text-blue-600">R$ {{ item.valorTotal }}</span></p>
       </div>
     } @empty {
       <div class="rounded-xl border border-dashed border-slate-300 p-10 text-center">

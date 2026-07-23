@@ -80,7 +80,7 @@
               </button>
             } @else if (agendamento.status === 'PendentePagamento') {
               <button (click)="abrirPagamento(agendamento.id)"
-                class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700">
+                class="rounded-lg bg-blue-500 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-600">
                 Pagar
               </button>
             }
@@ -101,7 +101,7 @@
               @for (convite of convitesDe(agendamento.id); track convite.id) {
                 <div class="flex items-center justify-between py-1 text-sm">
                   <span class="text-slate-700">{{ convite.alunoNome }} · {{ convite.status }}</span>
-                  <a [routerLink]="['/professor/convites', convite.id]" class="font-medium text-blue-700 hover:underline">Ver convite</a>
+                  <a [routerLink]="['/professor/convites', convite.id]" class="font-medium text-blue-600 hover:underline">Ver convite</a>
                 </div>
               } @empty {
                 <p class="text-sm text-slate-500">Nenhum convite emitido pra essa aula ainda.</p>
@@ -120,7 +120,7 @@
                   class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
               </div>
               <button type="submit" [disabled]="emitindo()"
-                class="rounded-lg bg-blue-600 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-60">
+                class="rounded-lg bg-blue-500 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:opacity-60">
                 {{ emitindo() ? 'Emitindo...' : 'Emitir convite' }}
               </button>
             </form>
@@ -151,27 +151,27 @@
       <div class="mb-4 flex gap-2">
         <button type="button" (click)="escolherFormaPagamento('Pix')"
           class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition"
-          [class.bg-blue-600]="formaPagamentoEscolhida() === 'Pix'"
+          [class.bg-blue-500]="formaPagamentoEscolhida() === 'Pix'"
           [class.text-white]="formaPagamentoEscolhida() === 'Pix'"
-          [class.border-blue-600]="formaPagamentoEscolhida() === 'Pix'"
+          [class.border-blue-500]="formaPagamentoEscolhida() === 'Pix'"
           [class.border-slate-300]="formaPagamentoEscolhida() !== 'Pix'"
           [class.text-slate-700]="formaPagamentoEscolhida() !== 'Pix'">
           Pix
         </button>
         <button type="button" (click)="escolherFormaPagamento('Cartao')"
           class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition"
-          [class.bg-blue-600]="formaPagamentoEscolhida() === 'Cartao'"
+          [class.bg-blue-500]="formaPagamentoEscolhida() === 'Cartao'"
           [class.text-white]="formaPagamentoEscolhida() === 'Cartao'"
-          [class.border-blue-600]="formaPagamentoEscolhida() === 'Cartao'"
+          [class.border-blue-500]="formaPagamentoEscolhida() === 'Cartao'"
           [class.border-slate-300]="formaPagamentoEscolhida() !== 'Cartao'"
           [class.text-slate-700]="formaPagamentoEscolhida() !== 'Cartao'">
           Cartão
         </button>
         <button type="button" (click)="escolherFormaPagamento('Dinheiro')"
           class="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition"
-          [class.bg-blue-600]="formaPagamentoEscolhida() === 'Dinheiro'"
+          [class.bg-blue-500]="formaPagamentoEscolhida() === 'Dinheiro'"
           [class.text-white]="formaPagamentoEscolhida() === 'Dinheiro'"
-          [class.border-blue-600]="formaPagamentoEscolhida() === 'Dinheiro'"
+          [class.border-blue-500]="formaPagamentoEscolhida() === 'Dinheiro'"
           [class.border-slate-300]="formaPagamentoEscolhida() !== 'Dinheiro'"
           [class.text-slate-700]="formaPagamentoEscolhida() !== 'Dinheiro'">
           Dinheiro
@@ -199,7 +199,7 @@
       }
 
       <button (click)="confirmarPagamentoModal()" [disabled]="confirmandoPagamento()"
-        class="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-60">
+        class="w-full rounded-lg bg-blue-500 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:opacity-60">
         {{ confirmandoPagamento() ? 'Confirmando...' : 'Já paguei / Confirmar pagamento' }}
       </button>
     </div>

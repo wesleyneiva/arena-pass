@@ -18,7 +18,9 @@ export class ProfessoresAdmin implements OnInit {
   readonly erro = signal<string | null>(null);
   readonly carregando = signal(true);
   readonly formularioAberto = signal(false);
-  readonly criando = signal(false);
+  readonly editandoId = signal<string | null>(null);
+  readonly salvando = signal(false);
+  readonly excluindoId = signal<string | null>(null);
 
   novoNome = '';
   novoEmail = '';
@@ -86,31 +88,76 @@ export class ProfessoresAdmin implements OnInit {
     });
   }
 
-  toggleFormulario(): void {
-    this.formularioAberto.update((aberto) => !aberto);
+  abrirNovo(): void {
+    this.editandoId.set(null);
+    this.novoNome = '';
+    this.novoEmail = '';
+    this.novaSenha = '';
+    this.novoCpf = '';
+    this.formularioAberto.set(true);
     this.erro.set(null);
   }
 
-  criarProfessor(): void {
+  editar(professor: Professor): void {
+    this.editandoId.set(professor.id);
+    this.novoNome = professor.nome;
+    this.novoEmail = professor.email;
+    this.novoCpf = professor.cpf;
+    this.novaSenha = '';
+    this.formularioAberto.set(true);
     this.erro.set(null);
-    this.criando.set(true);
+  }
 
-    this.professorService
-      .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha, cpf: this.novoCpf })
-      .subscribe({
-        next: () => {
-          this.criando.set(false);
-          this.novoNome = '';
-          this.novoEmail = '';
-          this.novaSenha = '';
-          this.novoCpf = '';
-          this.formularioAberto.set(false);
-          this.carregar();
-        },
-        error: (err) => {
-          this.criando.set(false);
-          this.erro.set(err?.error?.message ?? 'Não foi possível cadastrar o professor.');
-        }
-      });
+  fecharFormulario(): void {
+    this.formularioAberto.set(false);
+    this.editandoId.set(null);
+  }
+
+  salvarProfessor(): void {
+    this.erro.set(null);
+    this.salvando.set(true);
+
+    const editandoId = this.editandoId();
+    const aoConcluir = {
+      next: () => {
+        this.salvando.set(false);
+        this.fecharFormulario();
+        this.carregar();
+      },
+      error: (err: { error?: { message?: string } }) => {
+        this.salvando.set(false);
+        this.erro.set(err?.error?.message ?? 'Não foi possível salvar o professor.');
+      }
+    };
+
+    if (editandoId) {
+      this.professorService
+        .atualizar(editandoId, { nome: this.novoNome, email: this.novoEmail, cpf: this.novoCpf })
+        .subscribe(aoConcluir);
+    } else {
+      this.professorService
+        .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha, cpf: this.novoCpf })
+        .subscribe(aoConcluir);
+    }
+  }
+
+  excluir(professor: Professor): void {
+    if (!confirm(`Excluir o professor "${professor.nome}"? Essa ação não pode ser desfeita.`)) {
+      return;
+    }
+
+    this.erro.set(null);
+    this.excluindoId.set(professor.id);
+
+    this.professorService.excluir(professor.id).subscribe({
+      next: () => {
+        this.excluindoId.set(null);
+        this.carregar();
+      },
+      error: (err) => {
+        this.excluindoId.set(null);
+        this.erro.set(err?.error?.message ?? 'Não foi possível excluir o professor.');
+      }
+    });
   }
 }

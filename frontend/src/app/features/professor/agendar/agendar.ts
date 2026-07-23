@@ -32,14 +32,14 @@ export class Agendar implements OnInit {
   readonly horariosSelecionados = signal<Set<string>>(new Set());
   readonly modalConfirmacaoAberto = signal(false);
   readonly mensagemConfirmacao = signal('');
+  readonly quadraId = signal('');
 
-  quadraId = '';
   data = hoje();
 
   readonly bloqueadaPorAprovacao = computed(() => this.auth.professorAprovado() === false);
 
   readonly quadraSelecionada = computed<Quadra | null>(
-    () => this.quadras().find((q) => q.id === this.quadraId) ?? null
+    () => this.quadras().find((q) => q.id === this.quadraId()) ?? null
   );
 
   readonly taxaCalculada = computed(() => {
@@ -59,7 +59,7 @@ export class Agendar implements OnInit {
       next: (quadras) => {
         this.quadras.set(quadras);
         if (quadras.length > 0) {
-          this.quadraId = quadras[0].id;
+          this.quadraId.set(quadras[0].id);
           this.buscarHorarios();
         }
       },
@@ -67,8 +67,14 @@ export class Agendar implements OnInit {
     });
   }
 
+  selecionarQuadra(id: string): void {
+    this.quadraId.set(id);
+    this.buscarHorarios();
+  }
+
   buscarHorarios(): void {
-    if (!this.quadraId || !this.data) {
+    const quadraId = this.quadraId();
+    if (!quadraId || !this.data) {
       return;
     }
 
@@ -76,7 +82,7 @@ export class Agendar implements OnInit {
     this.horariosSelecionados.set(new Set());
     this.carregandoSlots.set(true);
 
-    this.quadraService.horariosDisponiveis(this.quadraId, this.data).subscribe({
+    this.quadraService.horariosDisponiveis(quadraId, this.data).subscribe({
       next: (slots) => {
         this.slots.set(slots);
         this.carregandoSlots.set(false);
@@ -113,9 +119,10 @@ export class Agendar implements OnInit {
     this.erro.set(null);
     this.salvando.set(true);
 
+    const quadraId = this.quadraId();
     const chamadas = horarios.map((horaInicio) =>
       this.agendamentoService
-        .criar({ quadraId: this.quadraId, data: this.data, horaInicio })
+        .criar({ quadraId, data: this.data, horaInicio })
         .pipe(
           map(() => ({ horaInicio, sucesso: true as const })),
           catchError((err) =>

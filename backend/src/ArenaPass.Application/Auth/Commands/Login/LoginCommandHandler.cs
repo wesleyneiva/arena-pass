@@ -1,5 +1,6 @@
 using ArenaPass.Application.Auth.Dtos;
 using ArenaPass.Application.Common.Interfaces;
+using ArenaPass.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,12 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResultDto>
         if (usuario is null || !_passwordHasher.Verificar(usuario.SenhaHash, request.Senha))
         {
             throw new UnauthorizedAccessException("E-mail ou senha inválidos.");
+        }
+
+        if (usuario.Professor is not null && usuario.Professor.StatusAprovacao == StatusAprovacaoProfessor.Suspenso)
+        {
+            throw new UnauthorizedAccessException(
+                "Seu cadastro foi suspenso pelo clube. Entre em contato para mais informações.");
         }
 
         var professorId = usuario.Professor?.Id;

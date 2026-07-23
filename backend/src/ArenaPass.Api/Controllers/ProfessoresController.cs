@@ -1,5 +1,7 @@
 using ArenaPass.Application.Professores.Commands.AprovarProfessor;
+using ArenaPass.Application.Professores.Commands.AtualizarProfessor;
 using ArenaPass.Application.Professores.Commands.CriarProfessor;
+using ArenaPass.Application.Professores.Commands.ExcluirProfessor;
 using ArenaPass.Application.Professores.Commands.ReativarProfessor;
 using ArenaPass.Application.Professores.Commands.SuspenderProfessor;
 using ArenaPass.Application.Professores.Queries;
@@ -8,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArenaPass.Api.Controllers;
+
+public record AtualizarProfessorRequest(string Nome, string Email, string Cpf);
 
 [ApiController]
 [Route("api/professores")]
@@ -33,6 +37,22 @@ public class ProfessoresController : ControllerBase
     {
         var id = await _mediator.Send(command, cancellationToken);
         return CreatedAtAction(nameof(Listar), new { id }, new { id });
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Atualizar(Guid id, AtualizarProfessorRequest request, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new AtualizarProfessorCommand(id, request.Nome, request.Email, request.Cpf),
+            cancellationToken);
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Excluir(Guid id, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new ExcluirProfessorCommand(id), cancellationToken);
+        return NoContent();
     }
 
     [HttpPost("{id:guid}/aprovar")]

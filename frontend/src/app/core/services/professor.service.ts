@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CriarProfessorRequest, Professor } from '../models/professor.models';
+import { AtualizarProfessorRequest, CriarProfessorRequest, Professor } from '../models/professor.models';
 
 @Injectable({ providedIn: 'root' })
 export class ProfessorService {
@@ -14,6 +14,14 @@ export class ProfessorService {
 
   criar(request: CriarProfessorRequest): Observable<{ id: string }> {
     return this.http.post<{ id: string }>(`${environment.apiUrl}/professores`, request);
+  }
+
+  atualizar(id: string, request: AtualizarProfessorRequest): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}/professores/${id}`, request);
+  }
+
+  excluir(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/professores/${id}`);
   }
 
   aprovar(id: string): Observable<void> {

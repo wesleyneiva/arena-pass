@@ -12,3 +12,9 @@ export interface CriarProfessorRequest {
   senha: string;
   cpf: string;
 }
+
+export interface AtualizarProfessorRequest {
+  nome: string;
+  email: string;
+  cpf: string;
+}

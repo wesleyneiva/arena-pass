@@ -1,7 +1,7 @@
 @if (erro()) {
   <div class="animate-fade-in rounded-lg bg-red-50 p-4">
     <p class="text-sm text-red-700">{{ erro() }}</p>
-    <a routerLink="/professor/meus-agendamentos" class="text-sm font-medium text-blue-700 hover:underline">Voltar</a>
+    <a routerLink="/professor/meus-agendamentos" class="text-sm font-medium text-blue-600 hover:underline">Voltar</a>
   </div>
 }
 
@@ -20,12 +20,12 @@
       <p><span class="font-medium text-slate-700">Horário:</span> {{ c.horaInicio.slice(0,5) }} - {{ c.horaFim.slice(0,5) }}</p>
       <p>
         <span class="font-medium text-slate-700">Status:</span>
-        <span class="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">{{ c.status }}</span>
+        <span class="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">{{ c.status }}</span>
       </p>
     </div>
 
     <div class="no-print mt-6 flex justify-center gap-2">
-      <button (click)="imprimir()" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700">
+      <button (click)="imprimir()" class="rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600">
         Imprimir / Compartilhar
       </button>
       <a routerLink="/professor/meus-agendamentos" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
