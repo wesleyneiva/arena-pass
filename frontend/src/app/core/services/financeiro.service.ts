@@ -8,9 +8,11 @@ import { FaturamentoPeriodo } from '../models/financeiro.models';
 export class FinanceiroService {
   constructor(private readonly http: HttpClient) {}
 
-  faturamento(dataInicio: string, dataFim: string): Observable<FaturamentoPeriodo> {
-    return this.http.get<FaturamentoPeriodo>(`${environment.apiUrl}/financeiro/faturamento`, {
-      params: { dataInicio, dataFim }
-    });
+  faturamento(dataInicio: string, dataFim: string, professorId?: string): Observable<FaturamentoPeriodo> {
+    const params: Record<string, string> = { dataInicio, dataFim };
+    if (professorId) {
+      params['professorId'] = professorId;
+    }
+    return this.http.get<FaturamentoPeriodo>(`${environment.apiUrl}/financeiro/faturamento`, { params });
   }
 }

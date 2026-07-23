@@ -3,12 +3,13 @@ import { FormsModule } from '@angular/forms';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
 import { Agendamento, FormaPagamento } from '../../../core/models/agendamento.models';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
+import { DataBrPipe } from '../../../shared/pipes/data-br.pipe';
 
 type FiltroStatus = 'Todos' | 'PendentePagamento' | 'Confirmado' | 'Realizado' | 'Cancelado';
 
 @Component({
   selector: 'app-agendamentos-admin',
-  imports: [FormsModule],
+  imports: [FormsModule, DataBrPipe],
   templateUrl: './agendamentos-admin.html'
 })
 export class AgendamentosAdmin implements OnInit {

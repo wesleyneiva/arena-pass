@@ -51,4 +51,33 @@ public class ObterFaturamentoPeriodoQueryHandlerTests
         Assert.Equal(100m, resultado.PorMes[1].Total);
         Assert.Equal(0m, resultado.PorMes[2].Total);
     }
+
+    [Fact]
+    public async Task Handle_ComProfessorId_DeveFiltrarApenasAgendamentosDoProfessor()
+    {
+        var context = TestDbContextFactory.Create();
+        var modalidade = new Modalidade { Nome = "Beach Tennis" };
+        var quadra = new Quadra { Nome = "Quadra 4", ModalidadeId = modalidade.Id };
+        context.Modalidades.Add(modalidade);
+        context.Quadras.Add(quadra);
+
+        var (profA, nomeA) = CriarProfessor(context, "Professor A", "11111111111");
+        var (profB, _) = CriarProfessor(context, "Professor B", "22222222222");
+
+        context.Agendamentos.AddRange(
+            new Agendamento { QuadraId = quadra.Id, ProfessorId = profA, Data = new DateOnly(2026, 7, 20), HoraInicio = new TimeOnly(10, 0), HoraFim = new TimeOnly(11, 0), TaxaValor = 80m, Status = StatusAgendamento.Confirmado },
+            new Agendamento { QuadraId = quadra.Id, ProfessorId = profB, Data = new DateOnly(2026, 7, 21), HoraInicio = new TimeOnly(10, 0), HoraFim = new TimeOnly(11, 0), TaxaValor = 500m, Status = StatusAgendamento.Confirmado });
+
+        await context.SaveChangesAsync();
+
+        var handler = new ObterFaturamentoPeriodoQueryHandler(context);
+        var resultado = await handler.Handle(
+            new ObterFaturamentoPeriodoQuery(new DateOnly(2026, 7, 1), new DateOnly(2026, 7, 31), profA),
+            CancellationToken.None);
+
+        Assert.Equal(80m, resultado.TotalGeral);
+        var faturamentoA = Assert.Single(resultado.PorProfessor);
+        Assert.Equal(nomeA, faturamentoA.ProfessorNome);
+        Assert.Equal(80m, resultado.PorMes.Single().Total);
+    }
 }

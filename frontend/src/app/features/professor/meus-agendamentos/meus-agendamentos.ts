@@ -6,12 +6,13 @@ import { ConviteService } from '../../../core/services/convite.service';
 import { Agendamento, FormaPagamento, PagamentoPix } from '../../../core/models/agendamento.models';
 import { ConviteResumo } from '../../../core/models/convite.models';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
+import { DataBrPipe } from '../../../shared/pipes/data-br.pipe';
 
 type FiltroStatus = 'Todos' | 'PendentePagamento' | 'Confirmado' | 'Realizado' | 'Cancelado';
 
 @Component({
   selector: 'app-meus-agendamentos',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, DataBrPipe],
   templateUrl: './meus-agendamentos.html'
 })
 export class MeusAgendamentos implements OnInit {

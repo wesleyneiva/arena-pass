@@ -21,9 +21,10 @@ public class FinanceiroController : ControllerBase
     public async Task<IActionResult> Faturamento(
         [FromQuery] DateOnly dataInicio,
         [FromQuery] DateOnly dataFim,
+        [FromQuery] Guid? professorId,
         CancellationToken cancellationToken)
     {
-        var faturamento = await _mediator.Send(new ObterFaturamentoPeriodoQuery(dataInicio, dataFim), cancellationToken);
+        var faturamento = await _mediator.Send(new ObterFaturamentoPeriodoQuery(dataInicio, dataFim, professorId), cancellationToken);
         return Ok(faturamento);
     }
 }

@@ -28,6 +28,15 @@
       <label class="mb-1.5 block text-xs font-medium text-slate-700">Até</label>
       <input type="date" [(ngModel)]="dataFim" class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
     </div>
+    <div>
+      <label class="mb-1.5 block text-xs font-medium text-slate-700">Professor</label>
+      <select [(ngModel)]="professorId" class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15">
+        <option value="">Todos os professores</option>
+        @for (professor of professores(); track professor.id) {
+          <option [value]="professor.id">{{ professor.nome }}</option>
+        }
+      </select>
+    </div>
     <button (click)="buscar()" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-slate-900">
       Consultar
     </button>
@@ -38,21 +47,27 @@
   <div class="h-64 animate-pulse rounded-xl bg-slate-100"></div>
 } @else if (faturamento(); as f) {
   <div class="mb-5 animate-fade-in-up rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-    <p class="text-sm text-slate-500">Faturamento total do clube no período</p>
+    <p class="text-sm text-slate-500">{{ professorId ? 'Faturamento gerado ao clube por ' + nomeProfessorSelecionado() + ' no período' : 'Faturamento total do clube no período' }}</p>
     <p class="mb-5 text-3xl font-semibold text-slate-900">R$ {{ f.totalGeral }}</p>
     <app-faturamento-chart [dados]="f.porMes" />
   </div>
 
-  <div class="space-y-3">
-    @for (item of f.porProfessor; track item.professorId) {
-      <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="font-medium text-slate-900">{{ item.professorNome }}</p>
-        <p class="text-sm text-slate-600">{{ item.totalAulas }} aula(s) · <span class="font-medium text-blue-600">R$ {{ item.valorTotal }}</span></p>
-      </div>
-    } @empty {
-      <div class="rounded-xl border border-dashed border-slate-300 p-10 text-center">
-        <p class="text-sm text-slate-500">Nenhum agendamento pago nesse período.</p>
-      </div>
-    }
-  </div>
+  @if (!professorId) {
+    <div class="space-y-3">
+      @for (item of f.porProfessor; track item.professorId) {
+        <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <p class="font-medium text-slate-900">{{ item.professorNome }}</p>
+          <p class="text-sm text-slate-600">{{ item.totalAulas }} aula(s) · <span class="font-medium text-blue-600">R$ {{ item.valorTotal }}</span></p>
+        </div>
+      } @empty {
+        <div class="rounded-xl border border-dashed border-slate-300 p-10 text-center">
+          <p class="text-sm text-slate-500">Nenhum agendamento pago nesse período.</p>
+        </div>
+      }
+    </div>
+  } @else if (f.porProfessor.length === 0) {
+    <div class="rounded-xl border border-dashed border-slate-300 p-10 text-center">
+      <p class="text-sm text-slate-500">Nenhum agendamento pago desse professor nesse período.</p>
+    </div>
+  }
 }

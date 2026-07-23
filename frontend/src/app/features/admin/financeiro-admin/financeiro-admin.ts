@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { FinanceiroService } from '../../../core/services/financeiro.service';
 import { FaturamentoPeriodo } from '../../../core/models/financeiro.models';
 import { FaturamentoChart } from '../../../shared/faturamento-chart/faturamento-chart';
+import { ProfessorService } from '../../../core/services/professor.service';
+import { Professor } from '../../../core/models/professor.models';
 
 type Preset = 'mes' | 'trimestre' | 'semestre' | 'ano';
 
@@ -29,6 +31,9 @@ export class FinanceiroAdmin implements OnInit {
   readonly faturamento = signal<FaturamentoPeriodo | null>(null);
   readonly carregando = signal(false);
   readonly presetAtivo = signal<Preset>('mes');
+  readonly professores = signal<Professor[]>([]);
+
+  professorId = '';
 
   readonly presets: { valor: Preset; rotulo: string }[] = [
     { valor: 'mes', rotulo: 'Este mês' },
@@ -40,9 +45,13 @@ export class FinanceiroAdmin implements OnInit {
   dataInicio = '';
   dataFim = '';
 
-  constructor(private readonly financeiroService: FinanceiroService) {}
+  constructor(
+    private readonly financeiroService: FinanceiroService,
+    private readonly professorService: ProfessorService
+  ) {}
 
   ngOnInit(): void {
+    this.professorService.listar().subscribe((professores) => this.professores.set(professores));
     this.aplicarPreset('mes');
   }
 
@@ -74,9 +83,13 @@ export class FinanceiroAdmin implements OnInit {
     this.buscar();
   }
 
+  nomeProfessorSelecionado(): string {
+    return this.professores().find((p) => p.id === this.professorId)?.nome ?? '';
+  }
+
   buscar(): void {
     this.carregando.set(true);
-    this.financeiroService.faturamento(this.dataInicio, this.dataFim).subscribe({
+    this.financeiroService.faturamento(this.dataInicio, this.dataFim, this.professorId || undefined).subscribe({
       next: (faturamento) => {
         this.faturamento.set(faturamento);
         this.carregando.set(false);

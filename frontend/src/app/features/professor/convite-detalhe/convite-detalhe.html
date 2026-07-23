@@ -16,7 +16,7 @@
     <div class="space-y-1.5 border-t border-slate-200 pt-4 text-left text-sm">
       <p><span class="font-medium text-slate-700">Aluno:</span> {{ c.alunoNome }}</p>
       <p><span class="font-medium text-slate-700">Quadra:</span> {{ c.quadraNome }}</p>
-      <p><span class="font-medium text-slate-700">Data:</span> {{ c.data }}</p>
+      <p><span class="font-medium text-slate-700">Data:</span> {{ c.data | dataBr }}</p>
       <p><span class="font-medium text-slate-700">Horário:</span> {{ c.horaInicio.slice(0,5) }} - {{ c.horaFim.slice(0,5) }}</p>
       <p>
         <span class="font-medium text-slate-700">Status:</span>

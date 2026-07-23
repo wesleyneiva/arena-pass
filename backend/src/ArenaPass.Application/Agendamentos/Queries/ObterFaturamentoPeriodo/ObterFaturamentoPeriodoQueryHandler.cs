@@ -24,7 +24,8 @@ public class ObterFaturamentoPeriodoQueryHandler
             .Include(a => a.Professor).ThenInclude(p => p!.Usuario)
             .Where(a => a.Data >= request.DataInicio
                         && a.Data <= request.DataFim
-                        && (a.Status == StatusAgendamento.Confirmado || a.Status == StatusAgendamento.Realizado))
+                        && (a.Status == StatusAgendamento.Confirmado || a.Status == StatusAgendamento.Realizado)
+                        && (request.ProfessorId == null || a.ProfessorId == request.ProfessorId))
             .ToListAsync(cancellationToken);
 
         var porProfessor = agendamentosPagos
