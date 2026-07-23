@@ -27,7 +27,7 @@ export class Login {
     this.auth.login({ email: this.email, senha: this.senha }).subscribe({
       next: (resultado) => {
         this.carregando.set(false);
-        if (resultado.role === 'AdminClube') {
+        if (resultado.role === 'AdminClube' || resultado.role === 'Master') {
           this.router.navigateByUrl('/admin/quadras');
         } else {
           this.router.navigateByUrl('/professor/agendar');

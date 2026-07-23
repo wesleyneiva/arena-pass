@@ -2,7 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthResult, LoginRequest, RegistrarProfessorRequest } from '../models/auth.models';
+import {
+  AtualizarPerfilRequest,
+  AuthResult,
+  LoginRequest,
+  RegistrarProfessorRequest
+} from '../models/auth.models';
 
 const STORAGE_KEY = 'arenapass.auth';
 
@@ -28,6 +33,17 @@ export class AuthService {
     return this.http.post<{ professorId: string }>(
       `${environment.apiUrl}/auth/registrar-professor`,
       request
+    );
+  }
+
+  atualizarPerfil(request: AtualizarPerfilRequest): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}/auth/perfil`, request).pipe(
+      tap(() => {
+        const atual = this.authState();
+        if (atual) {
+          this.salvarSessao({ ...atual, email: request.email });
+        }
+      })
     );
   }
 

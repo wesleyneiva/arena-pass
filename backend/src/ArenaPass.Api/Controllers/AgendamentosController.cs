@@ -63,7 +63,7 @@ public class AgendamentosController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "AdminClube")]
+    [Authorize(Roles = "AdminClube,Master")]
     public async Task<IActionResult> Listar(CancellationToken cancellationToken)
     {
         var agendamentos = await _mediator.Send(new ListarTodosAgendamentosQuery(), cancellationToken);
@@ -79,7 +79,7 @@ public class AgendamentosController : ControllerBase
     }
 
     [HttpPost("{id:guid}/confirmar-pagamento")]
-    [Authorize(Roles = "AdminClube,Professor")]
+    [Authorize(Roles = "AdminClube,Master,Professor")]
     public async Task<IActionResult> ConfirmarPagamento(
         Guid id,
         ConfirmarPagamentoRequest request,
@@ -93,7 +93,7 @@ public class AgendamentosController : ControllerBase
     }
 
     [HttpPost("{id:guid}/marcar-realizado")]
-    [Authorize(Roles = "AdminClube")]
+    [Authorize(Roles = "AdminClube,Master")]
     public async Task<IActionResult> MarcarRealizado(Guid id, CancellationToken cancellationToken)
     {
         await _mediator.Send(new MarcarAgendamentoRealizadoCommand(id), cancellationToken);
@@ -101,7 +101,7 @@ public class AgendamentosController : ControllerBase
     }
 
     [HttpPost("{id:guid}/cancelar")]
-    [Authorize(Roles = "AdminClube,Professor")]
+    [Authorize(Roles = "AdminClube,Master,Professor")]
     public async Task<IActionResult> Cancelar(Guid id, CancellationToken cancellationToken)
     {
         var solicitanteProfessorId = User.IsInRole("Professor") ? ProfessorIdDoToken() : (Guid?)null;

@@ -57,5 +57,20 @@ public static class ArenaPassDbContextSeed
             context.Usuarios.Add(admin);
             await context.SaveChangesAsync();
         }
+
+        var masterExiste = await context.Usuarios.AnyAsync(u => u.Role == RoleUsuario.Master);
+        if (!masterExiste)
+        {
+            var master = new Usuario
+            {
+                Nome = "Master",
+                Email = "master@arenapass.local",
+                Role = RoleUsuario.Master
+            };
+            master.SenhaHash = passwordHasher.Hash("Master@123");
+
+            context.Usuarios.Add(master);
+            await context.SaveChangesAsync();
+        }
     }
 }

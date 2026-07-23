@@ -14,7 +14,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [authGuard, roleGuard('AdminClube')],
+    canActivate: [authGuard, roleGuard(['AdminClube', 'Master'])],
     loadComponent: () =>
       import('./features/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
     children: [
@@ -44,6 +44,17 @@ export const routes: Routes = [
           import('./features/admin/financeiro-admin/financeiro-admin').then(
             (m) => m.FinanceiroAdmin
           )
+      },
+      {
+        path: 'administradores',
+        canActivate: [roleGuard('Master')],
+        loadComponent: () =>
+          import('./features/admin/admins-master/admins-master').then((m) => m.AdminsMaster)
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/admin/perfil-admin/perfil-admin').then((m) => m.PerfilAdmin)
       }
     ]
   },

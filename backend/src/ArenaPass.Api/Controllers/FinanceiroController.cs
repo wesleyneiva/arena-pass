@@ -7,7 +7,7 @@ namespace ArenaPass.Api.Controllers;
 
 [ApiController]
 [Route("api/financeiro")]
-[Authorize(Roles = "AdminClube")]
+[Authorize(Roles = "AdminClube,Master")]
 public class FinanceiroController : ControllerBase
 {
     private readonly ISender _mediator;

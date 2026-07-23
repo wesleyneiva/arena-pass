@@ -15,7 +15,13 @@ export interface AuthResult {
   usuarioId: string;
   nome: string;
   email: string;
-  role: 'AdminClube' | 'Professor';
+  role: 'AdminClube' | 'Professor' | 'Master';
   professorId: string | null;
   professorAprovado: boolean | null;
+}
+
+export interface AtualizarPerfilRequest {
+  email: string;
+  senhaAtual: string;
+  novaSenha?: string;
 }

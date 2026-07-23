@@ -25,7 +25,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, usuario.Email),
             new(ClaimTypes.Name, usuario.Nome),
-            new(ClaimTypes.Role, usuario.Role.ToString())
+            new(ClaimTypes.Role, usuario.Role.ToString()),
+            new("userId", usuario.Id.ToString())
         };
 
         if (professorId.HasValue)

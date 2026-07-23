@@ -2,7 +2,11 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-export function roleGuard(roleEsperado: 'AdminClube' | 'Professor'): CanActivateFn {
+type Role = 'AdminClube' | 'Professor' | 'Master';
+
+export function roleGuard(rolesPermitidos: Role | Role[]): CanActivateFn {
+  const roles = Array.isArray(rolesPermitidos) ? rolesPermitidos : [rolesPermitidos];
+
   return () => {
     const auth = inject(AuthService);
     const router = inject(Router);
@@ -11,7 +15,7 @@ export function roleGuard(roleEsperado: 'AdminClube' | 'Professor'): CanActivate
       return router.parseUrl('/login');
     }
 
-    if (auth.role() !== roleEsperado) {
+    if (!roles.includes(auth.role() as Role)) {
       return router.parseUrl('/login');
     }
 
