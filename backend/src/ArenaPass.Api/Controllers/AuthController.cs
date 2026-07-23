@@ -1,7 +1,8 @@
 using System.Security.Claims;
 using ArenaPass.Application.Auth.Commands.AtualizarPerfil;
+using ArenaPass.Application.Auth.Commands.ConfirmarCodigoRegistroProfessor;
 using ArenaPass.Application.Auth.Commands.Login;
-using ArenaPass.Application.Auth.Commands.RegistrarProfessor;
+using ArenaPass.Application.Auth.Commands.SolicitarCodigoRegistroProfessor;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace ArenaPass.Api.Controllers;
 
 public record AtualizarPerfilRequest(string Email, string SenhaAtual, string? NovaSenha);
+
+public record ConfirmarCodigoRegistroProfessorRequest(string Email, string Codigo);
 
 [ApiController]
 [Route("api/auth")]
@@ -21,10 +24,23 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("registrar-professor")]
-    public async Task<IActionResult> RegistrarProfessor(RegistrarProfessorCommand command, CancellationToken cancellationToken)
+    [HttpPost("registrar-professor/solicitar-codigo")]
+    public async Task<IActionResult> SolicitarCodigoRegistroProfessor(
+        SolicitarCodigoRegistroProfessorCommand command,
+        CancellationToken cancellationToken)
     {
-        var professorId = await _mediator.Send(command, cancellationToken);
+        await _mediator.Send(command, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPost("registrar-professor/confirmar-codigo")]
+    public async Task<IActionResult> ConfirmarCodigoRegistroProfessor(
+        ConfirmarCodigoRegistroProfessorRequest request,
+        CancellationToken cancellationToken)
+    {
+        var professorId = await _mediator.Send(
+            new ConfirmarCodigoRegistroProfessorCommand(request.Email, request.Codigo),
+            cancellationToken);
         return Ok(new { professorId });
     }
 

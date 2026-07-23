@@ -19,6 +19,7 @@ public class ArenaPassDbContext : DbContext, IApplicationDbContext
     public DbSet<Quadra> Quadras => Set<Quadra>();
     public DbSet<Agendamento> Agendamentos => Set<Agendamento>();
     public DbSet<Convite> Convites => Set<Convite>();
+    public DbSet<SolicitacaoRegistroProfessor> SolicitacoesRegistroProfessor => Set<SolicitacaoRegistroProfessor>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

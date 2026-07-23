@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace ArenaPass.Application.Auth.Commands.RegistrarProfessor;
+namespace ArenaPass.Application.Auth.Commands.SolicitarCodigoRegistroProfessor;
 
-public class RegistrarProfessorCommandValidator : AbstractValidator<RegistrarProfessorCommand>
+public class SolicitarCodigoRegistroProfessorCommandValidator : AbstractValidator<SolicitarCodigoRegistroProfessorCommand>
 {
-    public RegistrarProfessorCommandValidator()
+    public SolicitarCodigoRegistroProfessorCommandValidator()
     {
         RuleFor(x => x.Nome).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(200);

@@ -3,16 +3,21 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
+type Etapa = 'dados' | 'codigo';
+
 @Component({
   selector: 'app-registrar',
   imports: [FormsModule, RouterLink],
   templateUrl: './registrar.html'
 })
 export class Registrar {
+  readonly etapa = signal<Etapa>('dados');
+
   nome = '';
   email = '';
   senha = '';
   cpf = '';
+  codigo = '';
 
   readonly carregando = signal(false);
   readonly erro = signal<string | null>(null);
@@ -22,21 +27,43 @@ export class Registrar {
     private readonly router: Router
   ) {}
 
-  registrar(): void {
+  solicitarCodigo(): void {
     this.erro.set(null);
     this.carregando.set(true);
 
     this.auth
-      .registrarProfessor({ nome: this.nome, email: this.email, senha: this.senha, cpf: this.cpf })
+      .solicitarCodigoRegistroProfessor({ nome: this.nome, email: this.email, senha: this.senha, cpf: this.cpf })
       .subscribe({
         next: () => {
           this.carregando.set(false);
-          this.router.navigateByUrl('/login');
+          this.etapa.set('codigo');
         },
         error: (err) => {
           this.carregando.set(false);
-          this.erro.set(err?.error?.message ?? 'Não foi possível concluir o cadastro.');
+          this.erro.set(err?.error?.message ?? 'Não foi possível enviar o código. Verifique os dados.');
         }
       });
+  }
+
+  confirmarCodigo(): void {
+    this.erro.set(null);
+    this.carregando.set(true);
+
+    this.auth.confirmarCodigoRegistroProfessor({ email: this.email, codigo: this.codigo }).subscribe({
+      next: () => {
+        this.carregando.set(false);
+        this.router.navigateByUrl('/login');
+      },
+      error: (err) => {
+        this.carregando.set(false);
+        this.erro.set(err?.error?.message ?? 'Código inválido. Tente novamente.');
+      }
+    });
+  }
+
+  voltarParaDados(): void {
+    this.erro.set(null);
+    this.codigo = '';
+    this.etapa.set('dados');
   }
 }

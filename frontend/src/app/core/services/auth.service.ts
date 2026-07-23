@@ -5,8 +5,9 @@ import { environment } from '../../../environments/environment';
 import {
   AtualizarPerfilRequest,
   AuthResult,
+  ConfirmarCodigoRegistroProfessorRequest,
   LoginRequest,
-  RegistrarProfessorRequest
+  SolicitarCodigoRegistroProfessorRequest
 } from '../models/auth.models';
 
 const STORAGE_KEY = 'arenapass.auth';
@@ -29,9 +30,15 @@ export class AuthService {
     );
   }
 
-  registrarProfessor(request: RegistrarProfessorRequest): Observable<{ professorId: string }> {
+  solicitarCodigoRegistroProfessor(request: SolicitarCodigoRegistroProfessorRequest): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/auth/registrar-professor/solicitar-codigo`, request);
+  }
+
+  confirmarCodigoRegistroProfessor(
+    request: ConfirmarCodigoRegistroProfessorRequest
+  ): Observable<{ professorId: string }> {
     return this.http.post<{ professorId: string }>(
-      `${environment.apiUrl}/auth/registrar-professor`,
+      `${environment.apiUrl}/auth/registrar-professor/confirmar-codigo`,
       request
     );
   }

@@ -3,11 +3,16 @@ export interface LoginRequest {
   senha: string;
 }
 
-export interface RegistrarProfessorRequest {
+export interface SolicitarCodigoRegistroProfessorRequest {
   nome: string;
   email: string;
   senha: string;
   cpf: string;
+}
+
+export interface ConfirmarCodigoRegistroProfessorRequest {
+  email: string;
+  codigo: string;
 }
 
 export interface AuthResult {
