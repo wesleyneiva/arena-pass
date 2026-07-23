@@ -18,7 +18,6 @@ export class QuadrasAdmin implements OnInit {
   readonly erro = signal<string | null>(null);
   readonly erroLista = signal<string | null>(null);
   readonly salvando = signal(false);
-  readonly excluindoId = signal<string | null>(null);
   readonly carregando = signal(true);
   readonly editandoId = signal<string | null>(null);
 
@@ -122,24 +121,11 @@ export class QuadrasAdmin implements OnInit {
       titulo: 'Excluir quadra',
       mensagem: `Excluir a quadra "${quadra.nome}"? Essa ação não pode ser desfeita.`,
       textoConfirmar: 'Excluir',
-      variante: 'perigo'
+      variante: 'perigo',
+      aoConfirmar: () => this.quadraService.excluir(quadra.id)
     });
-    if (!confirmado) {
-      return;
+    if (confirmado) {
+      this.carregarQuadras();
     }
-
-    this.erro.set(null);
-    this.excluindoId.set(quadra.id);
-
-    this.quadraService.excluir(quadra.id).subscribe({
-      next: () => {
-        this.excluindoId.set(null);
-        this.carregarQuadras();
-      },
-      error: (err) => {
-        this.excluindoId.set(null);
-        this.erro.set(err?.error?.message ?? 'Não foi possível excluir a quadra.');
-      }
-    });
   }
 }

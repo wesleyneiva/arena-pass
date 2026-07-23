@@ -75,33 +75,24 @@ export class AgendamentosAdmin implements OnInit {
     const confirmado = await this.confirmDialog.confirmar({
       titulo: 'Confirmar pagamento',
       mensagem: `Confirmar o recebimento do pagamento via ${formaPagamento === 'Cartao' ? 'cartão' : formaPagamento.toLowerCase()}?`,
-      textoConfirmar: 'Confirmar pagamento'
+      textoConfirmar: 'Confirmar pagamento',
+      aoConfirmar: () => this.agendamentoService.confirmarPagamento(id, formaPagamento)
     });
-    if (!confirmado) {
-      return;
+    if (confirmado) {
+      this.carregar();
     }
-
-    this.erro.set(null);
-    this.agendamentoService.confirmarPagamento(id, formaPagamento).subscribe({
-      next: () => this.carregar(),
-      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível confirmar o pagamento.')
-    });
   }
 
   async marcarRealizado(id: string): Promise<void> {
     const confirmado = await this.confirmDialog.confirmar({
       titulo: 'Marcar como realizada',
       mensagem: 'Confirma que essa aula foi realizada?',
-      textoConfirmar: 'Marcar como realizada'
+      textoConfirmar: 'Marcar como realizada',
+      aoConfirmar: () => this.agendamentoService.marcarRealizado(id)
     });
-    if (!confirmado) {
-      return;
+    if (confirmado) {
+      this.carregar();
     }
-
-    this.agendamentoService.marcarRealizado(id).subscribe({
-      next: () => this.carregar(),
-      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível marcar como realizada.')
-    });
   }
 
   async cancelar(id: string): Promise<void> {
@@ -110,15 +101,11 @@ export class AgendamentosAdmin implements OnInit {
       mensagem: 'Tem certeza que deseja cancelar esse agendamento? Essa ação não pode ser desfeita.',
       textoConfirmar: 'Cancelar agendamento',
       textoCancelar: 'Voltar',
-      variante: 'perigo'
+      variante: 'perigo',
+      aoConfirmar: () => this.agendamentoService.cancelar(id)
     });
-    if (!confirmado) {
-      return;
+    if (confirmado) {
+      this.carregar();
     }
-
-    this.agendamentoService.cancelar(id).subscribe({
-      next: () => this.carregar(),
-      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível cancelar.')
-    });
   }
 }

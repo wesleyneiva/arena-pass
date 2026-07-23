@@ -24,7 +24,7 @@
         <button (click)="fecharFormulario()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
       </div>
 
-      <form (ngSubmit)="salvarAdmin()" class="grid gap-3">
+      <form ngNativeValidate (ngSubmit)="salvarAdmin()" class="grid gap-3">
         <div>
           <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
           <input required name="novoNome" [(ngModel)]="novoNome"
@@ -74,8 +74,8 @@
             <app-icon name="pencil" [size]="15" />
           </button>
 
-          <button (click)="excluir(admin)" [disabled]="excluindoId() === admin.id"
-            class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50">
+          <button (click)="excluir(admin)"
+            class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50">
             <app-icon name="ban" [size]="15" />
           </button>
         </div>

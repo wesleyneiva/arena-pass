@@ -21,7 +21,6 @@ export class ProfessoresAdmin implements OnInit {
   readonly formularioAberto = signal(false);
   readonly editandoId = signal<string | null>(null);
   readonly salvando = signal(false);
-  readonly excluindoId = signal<string | null>(null);
 
   novoNome = '';
   novoEmail = '';
@@ -150,24 +149,11 @@ export class ProfessoresAdmin implements OnInit {
       titulo: 'Excluir professor',
       mensagem: `Excluir o professor "${professor.nome}"? Essa ação não pode ser desfeita.`,
       textoConfirmar: 'Excluir',
-      variante: 'perigo'
+      variante: 'perigo',
+      aoConfirmar: () => this.professorService.excluir(professor.id)
     });
-    if (!confirmado) {
-      return;
+    if (confirmado) {
+      this.carregar();
     }
-
-    this.erro.set(null);
-    this.excluindoId.set(professor.id);
-
-    this.professorService.excluir(professor.id).subscribe({
-      next: () => {
-        this.excluindoId.set(null);
-        this.carregar();
-      },
-      error: (err) => {
-        this.excluindoId.set(null);
-        this.erro.set(err?.error?.message ?? 'Não foi possível excluir o professor.');
-      }
-    });
   }
 }

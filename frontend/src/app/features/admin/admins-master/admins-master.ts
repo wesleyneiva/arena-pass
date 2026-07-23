@@ -17,7 +17,6 @@ export class AdminsMaster implements OnInit {
   readonly formularioAberto = signal(false);
   readonly editandoId = signal<string | null>(null);
   readonly salvando = signal(false);
-  readonly excluindoId = signal<string | null>(null);
 
   novoNome = '';
   novoEmail = '';
@@ -101,24 +100,11 @@ export class AdminsMaster implements OnInit {
       titulo: 'Excluir administrador',
       mensagem: `Excluir o administrador "${admin.nome}"? Essa ação não pode ser desfeita.`,
       textoConfirmar: 'Excluir',
-      variante: 'perigo'
+      variante: 'perigo',
+      aoConfirmar: () => this.adminService.excluir(admin.id)
     });
-    if (!confirmado) {
-      return;
+    if (confirmado) {
+      this.carregar();
     }
-
-    this.erro.set(null);
-    this.excluindoId.set(admin.id);
-
-    this.adminService.excluir(admin.id).subscribe({
-      next: () => {
-        this.excluindoId.set(null);
-        this.carregar();
-      },
-      error: (err) => {
-        this.excluindoId.set(null);
-        this.erro.set(err?.error?.message ?? 'Não foi possível excluir o administrador.');
-      }
-    });
   }
 }

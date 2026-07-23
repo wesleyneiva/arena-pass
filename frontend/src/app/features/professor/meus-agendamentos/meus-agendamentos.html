@@ -108,7 +108,7 @@
               }
             </div>
 
-            <form (ngSubmit)="emitirConvite(agendamento.id)" class="grid items-end gap-2 border-t border-slate-200 pt-3 sm:grid-cols-3">
+            <form ngNativeValidate (ngSubmit)="emitirConvite(agendamento.id)" class="grid items-end gap-2 border-t border-slate-200 pt-3 sm:grid-cols-3">
               <div>
                 <label class="mb-1 block text-xs font-medium text-slate-700">Nome do aluno</label>
                 <input required name="alunoNome" [(ngModel)]="alunoNome"

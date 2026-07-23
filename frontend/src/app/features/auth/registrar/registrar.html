@@ -12,7 +12,7 @@
           Vamos enviar um código de confirmação para o seu e-mail antes de concluir o cadastro.
         </p>
 
-        <form (ngSubmit)="solicitarCodigo()" class="space-y-4">
+        <form ngNativeValidate (ngSubmit)="solicitarCodigo()" class="space-y-4">
           <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
             <input required name="nome" [(ngModel)]="nome"
@@ -55,7 +55,7 @@
           Não recebeu? Confira também a caixa de spam/lixo eletrônico.
         </p>
 
-        <form (ngSubmit)="confirmarCodigo()" class="space-y-4">
+        <form ngNativeValidate (ngSubmit)="confirmarCodigo()" class="space-y-4">
           <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-700">Código de 6 dígitos</label>
             <input required name="codigo" [(ngModel)]="codigo" maxlength="6" inputmode="numeric"

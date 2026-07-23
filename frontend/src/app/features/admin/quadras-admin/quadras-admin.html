@@ -41,10 +41,10 @@
                 <app-icon name="pencil" [size]="16" />
                 Editar
               </button>
-              <button (click)="excluir(quadra)" [disabled]="excluindoId() === quadra.id"
-                class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50">
+              <button (click)="excluir(quadra)"
+                class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50">
                 <app-icon name="ban" [size]="16" />
-                {{ excluindoId() === quadra.id ? 'Excluindo...' : 'Excluir' }}
+                Excluir
               </button>
             </div>
           </div>
@@ -63,7 +63,7 @@
         {{ editandoId() ? 'Editar quadra' : 'Nova quadra' }}
       </h2>
 
-      <form (ngSubmit)="salvar()" class="space-y-4">
+      <form ngNativeValidate (ngSubmit)="salvar()" class="space-y-4">
         <div>
           <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
           <input required name="nome" [(ngModel)]="nome" placeholder="Quadra 4"

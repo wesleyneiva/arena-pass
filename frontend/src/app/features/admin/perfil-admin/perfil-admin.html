@@ -11,7 +11,7 @@
     <p class="mb-4 animate-fade-in rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ sucesso() }}</p>
   }
 
-  <form (ngSubmit)="salvar()" class="grid gap-3">
+  <form ngNativeValidate (ngSubmit)="salvar()" class="grid gap-3">
     <div>
       <label class="mb-1.5 block text-sm font-medium text-slate-700">E-mail</label>
       <input required type="email" name="email" [(ngModel)]="email"
@@ -31,7 +31,7 @@
     @if (novaSenha) {
       <div>
         <label class="mb-1.5 block text-sm font-medium text-slate-700">Confirmar nova senha</label>
-        <input type="password" name="confirmarNovaSenha" [(ngModel)]="confirmarNovaSenha" minlength="6"
+        <input required type="password" name="confirmarNovaSenha" [(ngModel)]="confirmarNovaSenha" minlength="6"
           class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
       </div>
     }

@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 type Etapa = 'dados' | 'codigo';
 
@@ -24,7 +25,8 @@ export class Registrar {
 
   constructor(
     private readonly auth: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly confirmDialog: ConfirmDialogService
   ) {}
 
   solicitarCodigo(): void {
@@ -50,8 +52,14 @@ export class Registrar {
     this.carregando.set(true);
 
     this.auth.confirmarCodigoRegistroProfessor({ email: this.email, codigo: this.codigo }).subscribe({
-      next: () => {
+      next: async () => {
         this.carregando.set(false);
+        await this.confirmDialog.confirmar({
+          titulo: 'Cadastro criado com sucesso!',
+          mensagem: 'Aguarde a aprovação do clube para poder fazer as marcações de aulas.',
+          textoConfirmar: 'Entendi',
+          somenteConfirmar: true
+        });
         this.router.navigateByUrl('/login');
       },
       error: (err) => {

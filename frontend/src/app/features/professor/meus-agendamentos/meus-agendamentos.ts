@@ -136,16 +136,12 @@ export class MeusAgendamentos implements OnInit {
       mensagem: 'Tem certeza que deseja cancelar esse agendamento? Essa ação não pode ser desfeita.',
       textoConfirmar: 'Cancelar agendamento',
       textoCancelar: 'Voltar',
-      variante: 'perigo'
+      variante: 'perigo',
+      aoConfirmar: () => this.agendamentoService.cancelar(agendamentoId)
     });
-    if (!confirmado) {
-      return;
+    if (confirmado) {
+      this.carregar();
     }
-
-    this.agendamentoService.cancelar(agendamentoId).subscribe({
-      next: () => this.carregar(),
-      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível cancelar.')
-    });
   }
 
   abrirPagamento(agendamentoId: string): void {
