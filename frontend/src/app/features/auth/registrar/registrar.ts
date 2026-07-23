@@ -56,7 +56,7 @@ export class Registrar {
         this.carregando.set(false);
         await this.confirmDialog.confirmar({
           titulo: 'Cadastro criado com sucesso!',
-          mensagem: 'Aguarde a aprovação do clube para poder fazer as marcações de aulas.',
+          mensagem: 'Aguarde a aprovação do clube para fazer as marcações de aulas.',
           textoConfirmar: 'Entendi',
           somenteConfirmar: true
         });
