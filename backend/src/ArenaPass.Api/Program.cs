@@ -84,28 +84,32 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
 
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (!string.IsNullOrWhiteSpace(connectionString))
-    {
-        using var scope = app.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<ArenaPassDbContext>();
-        var passwordHasher = scope.ServiceProvider.GetRequiredService<ArenaPass.Application.Common.Interfaces.IPasswordHasher>();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (!string.IsNullOrWhiteSpace(connectionString))
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ArenaPassDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<ArenaPass.Application.Common.Interfaces.IPasswordHasher>();
 
-        await context.Database.MigrateAsync();
-        await ArenaPassDbContextSeed.SeedAsync(context, passwordHasher);
-    }
+    await context.Database.MigrateAsync();
+    await ArenaPassDbContextSeed.SeedAsync(context, passwordHasher);
 }
 
 app.UseArenaPassExceptionHandling();
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors(CorsPolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGet("/", () => Results.Ok("ArenaPass API"));
 app.MapControllers();
 
 app.Run();
