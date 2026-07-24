@@ -1,5 +1,6 @@
 using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Common.Interfaces;
+using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
 using ArenaPass.Domain.Exceptions;
@@ -33,6 +34,11 @@ public class ConfirmarPagamentoCommandHandler : IRequestHandler<ConfirmarPagamen
         {
             throw new DomainException(
                 $"Só é possível confirmar pagamento de agendamentos com status '{StatusAgendamento.PendentePagamento}'.");
+        }
+
+        if (BrasilClock.Agora > agendamento.Data.ToDateTime(agendamento.HoraFim))
+        {
+            throw new DomainException("Não é possível confirmar pagamento — o horário dessa aula já passou.");
         }
 
         agendamento.Status = StatusAgendamento.Confirmado;

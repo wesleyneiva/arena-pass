@@ -30,10 +30,6 @@ export class AgendamentoService {
     return this.http.get<PagamentoPix>(`${environment.apiUrl}/agendamentos/${id}/pagamento-pix`);
   }
 
-  marcarRealizado(id: string): Observable<void> {
-    return this.http.post<void>(`${environment.apiUrl}/agendamentos/${id}/marcar-realizado`, {});
-  }
-
   cancelar(id: string): Observable<void> {
     return this.http.post<void>(`${environment.apiUrl}/agendamentos/${id}/cancelar`, {});
   }

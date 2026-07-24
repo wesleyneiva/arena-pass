@@ -130,6 +130,16 @@ export class MeusAgendamentos implements OnInit {
     });
   }
 
+  rotuloStatus(agendamento: Agendamento): string {
+    if (agendamento.encerrado && agendamento.status === 'Confirmado') {
+      return 'Realizada';
+    }
+    if (agendamento.encerrado && agendamento.status === 'PendentePagamento') {
+      return 'Expirado';
+    }
+    return agendamento.status;
+  }
+
   async cancelar(agendamentoId: string): Promise<void> {
     const confirmado = await this.confirmDialog.confirmar({
       titulo: 'Cancelar agendamento',

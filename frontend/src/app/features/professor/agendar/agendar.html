@@ -17,7 +17,7 @@
 
     <div>
       <label class="mb-1.5 block text-sm font-medium text-slate-700">Data</label>
-      <input type="date" [(ngModel)]="data" (ngModelChange)="buscarHorarios()"
+      <input type="date" [min]="dataMinima" [(ngModel)]="data" (ngModelChange)="buscarHorarios()"
         class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
     </div>
 

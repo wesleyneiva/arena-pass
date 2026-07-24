@@ -34,6 +34,7 @@ export class Agendar implements OnInit {
   readonly mensagemConfirmacao = signal('');
   readonly quadraId = signal('');
 
+  readonly dataMinima = hoje();
   data = hoje();
 
   readonly bloqueadaPorAprovacao = computed(() => this.auth.professorAprovado() === false);

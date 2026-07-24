@@ -2,7 +2,6 @@ using System.Security.Claims;
 using ArenaPass.Application.Agendamentos.Commands.CancelarAgendamento;
 using ArenaPass.Application.Agendamentos.Commands.CriarAgendamento;
 using ArenaPass.Application.Agendamentos.Commands.ConfirmarPagamento;
-using ArenaPass.Application.Agendamentos.Commands.MarcarRealizado;
 using ArenaPass.Application.Agendamentos.Queries.ListarMeusAgendamentos;
 using ArenaPass.Application.Agendamentos.Queries.ListarTodosAgendamentos;
 using ArenaPass.Application.Agendamentos.Queries.ObterPagamentoPix;
@@ -89,14 +88,6 @@ public class AgendamentosController : ControllerBase
         await _mediator.Send(
             new ConfirmarPagamentoCommand(id, request.FormaPagamento, solicitanteProfessorId),
             cancellationToken);
-        return NoContent();
-    }
-
-    [HttpPost("{id:guid}/marcar-realizado")]
-    [Authorize(Roles = "AdminClube,Master")]
-    public async Task<IActionResult> MarcarRealizado(Guid id, CancellationToken cancellationToken)
-    {
-        await _mediator.Send(new MarcarAgendamentoRealizadoCommand(id), cancellationToken);
         return NoContent();
     }
 

@@ -70,7 +70,7 @@
 
           <div class="flex items-center gap-2">
             <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-              {{ agendamento.status }}
+              {{ rotuloStatus(agendamento) }}
             </span>
 
             @if (agendamento.status === 'Confirmado' || agendamento.status === 'Realizado') {
@@ -78,14 +78,14 @@
                 class="rounded-lg bg-slate-800 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-900">
                 {{ agendamentoExpandidoId() === agendamento.id ? 'Fechar' : 'Convites' }}
               </button>
-            } @else if (agendamento.status === 'PendentePagamento') {
+            } @else if (agendamento.status === 'PendentePagamento' && !agendamento.encerrado) {
               <button (click)="abrirPagamento(agendamento.id)"
                 class="rounded-lg bg-blue-500 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-600">
                 Pagar
               </button>
             }
 
-            @if (agendamento.status === 'PendentePagamento' || agendamento.status === 'Confirmado') {
+            @if ((agendamento.status === 'PendentePagamento' || agendamento.status === 'Confirmado') && !agendamento.encerrado) {
               <button (click)="cancelar(agendamento.id)"
                 class="rounded-lg px-2 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50">
                 Cancelar
@@ -108,22 +108,24 @@
               }
             </div>
 
-            <form ngNativeValidate (ngSubmit)="emitirConvite(agendamento.id)" class="grid items-end gap-2 border-t border-slate-200 pt-3 sm:grid-cols-3">
-              <div>
-                <label class="mb-1 block text-xs font-medium text-slate-700">Nome do aluno</label>
-                <input required name="alunoNome" [(ngModel)]="alunoNome"
-                  class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
-              </div>
-              <div>
-                <label class="mb-1 block text-xs font-medium text-slate-700">CPF do aluno</label>
-                <input required name="alunoCpf" [(ngModel)]="alunoCpf" maxlength="11"
-                  class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
-              </div>
-              <button type="submit" [disabled]="emitindo()"
-                class="rounded-lg bg-blue-500 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:opacity-60">
-                {{ emitindo() ? 'Emitindo...' : 'Emitir convite' }}
-              </button>
-            </form>
+            @if (!agendamento.encerrado) {
+              <form ngNativeValidate (ngSubmit)="emitirConvite(agendamento.id)" class="grid items-end gap-2 border-t border-slate-200 pt-3 sm:grid-cols-3">
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-slate-700">Nome do aluno</label>
+                  <input required name="alunoNome" [(ngModel)]="alunoNome"
+                    class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+                </div>
+                <div>
+                  <label class="mb-1 block text-xs font-medium text-slate-700">CPF do aluno</label>
+                  <input required name="alunoCpf" [(ngModel)]="alunoCpf" maxlength="11"
+                    class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+                </div>
+                <button type="submit" [disabled]="emitindo()"
+                  class="rounded-lg bg-blue-500 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:opacity-60">
+                  {{ emitindo() ? 'Emitindo...' : 'Emitir convite' }}
+                </button>
+              </form>
+            }
           </div>
         }
       </div>

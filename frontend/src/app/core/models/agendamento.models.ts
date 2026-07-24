@@ -12,6 +12,7 @@ export interface Agendamento {
   status: 'PendentePagamento' | 'Confirmado' | 'Realizado' | 'Cancelado';
   taxaValor: number;
   formaPagamento: FormaPagamento | null;
+  encerrado: boolean;
 }
 
 export interface CriarAgendamentoRequest {

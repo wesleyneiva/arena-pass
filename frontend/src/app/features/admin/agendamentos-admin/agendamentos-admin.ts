@@ -83,16 +83,14 @@ export class AgendamentosAdmin implements OnInit {
     }
   }
 
-  async marcarRealizado(id: string): Promise<void> {
-    const confirmado = await this.confirmDialog.confirmar({
-      titulo: 'Marcar como realizada',
-      mensagem: 'Confirma que essa aula foi realizada?',
-      textoConfirmar: 'Marcar como realizada',
-      aoConfirmar: () => this.agendamentoService.marcarRealizado(id)
-    });
-    if (confirmado) {
-      this.carregar();
+  rotuloStatus(agendamento: Agendamento): string {
+    if (agendamento.encerrado && agendamento.status === 'Confirmado') {
+      return 'Realizada';
     }
+    if (agendamento.encerrado && agendamento.status === 'PendentePagamento') {
+      return 'Expirado';
+    }
+    return agendamento.status;
   }
 
   async cancelar(id: string): Promise<void> {

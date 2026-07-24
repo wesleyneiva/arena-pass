@@ -1,5 +1,6 @@
 using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Common.Interfaces;
+using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
 using ArenaPass.Domain.Exceptions;
@@ -19,6 +20,11 @@ public class CriarAgendamentoCommandHandler : IRequestHandler<CriarAgendamentoCo
 
     public async Task<Guid> Handle(CriarAgendamentoCommand request, CancellationToken cancellationToken)
     {
+        if (request.Data.ToDateTime(request.HoraInicio) < BrasilClock.Agora)
+        {
+            throw new DomainException("Não é possível agendar um horário que já passou.");
+        }
+
         var professor = await _context.Professores
             .FirstOrDefaultAsync(p => p.Id == request.ProfessorId, cancellationToken)
             ?? throw new NotFoundException(nameof(Professor), request.ProfessorId);

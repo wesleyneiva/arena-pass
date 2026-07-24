@@ -1,5 +1,6 @@
 using ArenaPass.Application.Convites.Commands.ValidarConvite;
 using ArenaPass.Application.Tests.Common;
+using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
 using ArenaPass.Domain.Exceptions;
@@ -42,7 +43,7 @@ public class ValidarConviteCommandHandlerTests
     public async Task Handle_DeveValidarEMarcarUtilizado_QuandoDentroDaJanela()
     {
         var context = TestDbContextFactory.Create();
-        var agora = DateTime.Now;
+        var agora = BrasilClock.Agora;
         var convite = CriarConviteParaAgendamento(
             context,
             DateOnly.FromDateTime(agora),
@@ -60,7 +61,7 @@ public class ValidarConviteCommandHandlerTests
     public async Task Handle_DeveLancarDomainException_QuandoJaUtilizado()
     {
         var context = TestDbContextFactory.Create();
-        var agora = DateTime.Now;
+        var agora = BrasilClock.Agora;
         var convite = CriarConviteParaAgendamento(
             context,
             DateOnly.FromDateTime(agora),
@@ -79,7 +80,7 @@ public class ValidarConviteCommandHandlerTests
     public async Task Handle_DeveLancarDomainException_QuandoAulaJaTerminou()
     {
         var context = TestDbContextFactory.Create();
-        var ontem = DateTime.Now.AddDays(-1);
+        var ontem = BrasilClock.Agora.AddDays(-1);
         var convite = CriarConviteParaAgendamento(
             context,
             DateOnly.FromDateTime(ontem),
@@ -97,7 +98,7 @@ public class ValidarConviteCommandHandlerTests
     public async Task Handle_DeveLancarDomainException_QuandoAindaNaoComecouAJanelaDeTolerancia()
     {
         var context = TestDbContextFactory.Create();
-        var amanha = DateTime.Now.AddDays(1);
+        var amanha = BrasilClock.Agora.AddDays(1);
         var convite = CriarConviteParaAgendamento(
             context,
             DateOnly.FromDateTime(amanha),
@@ -108,6 +109,23 @@ public class ValidarConviteCommandHandlerTests
 
         await Assert.ThrowsAsync<DomainException>(
             () => handler.Handle(new ValidarConviteCommand(convite.Token), CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_DeveValidar_QuandoDentroDaToleranciaDeUmaHoraAntes()
+    {
+        var context = TestDbContextFactory.Create();
+        var inicioDaAula = BrasilClock.Agora.AddMinutes(55);
+        var convite = CriarConviteParaAgendamento(
+            context,
+            DateOnly.FromDateTime(inicioDaAula),
+            TimeOnly.FromDateTime(inicioDaAula),
+            TimeOnly.FromDateTime(inicioDaAula.AddHours(1)));
+
+        var handler = new ValidarConviteCommandHandler(context);
+        var resultado = await handler.Handle(new ValidarConviteCommand(convite.Token), CancellationToken.None);
+
+        Assert.Equal("Aluno Teste", resultado.AlunoNome);
     }
 
     [Fact]

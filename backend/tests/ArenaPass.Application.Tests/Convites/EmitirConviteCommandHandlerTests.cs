@@ -1,5 +1,6 @@
 using ArenaPass.Application.Convites.Commands.EmitirConvite;
 using ArenaPass.Application.Tests.Common;
+using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
 using ArenaPass.Domain.Exceptions;
@@ -11,7 +12,10 @@ public class EmitirConviteCommandHandlerTests
 {
     private static (Agendamento agendamento, Guid outroProfessorId) CriarAgendamento(
         InMemoryDbContext context,
-        StatusAgendamento status = StatusAgendamento.Confirmado)
+        StatusAgendamento status = StatusAgendamento.Confirmado,
+        DateOnly? data = null,
+        TimeOnly? horaInicio = null,
+        TimeOnly? horaFim = null)
     {
         var usuario = new Usuario { Nome = "Professor Teste", Email = "prof@teste.com", Role = RoleUsuario.Professor };
         var professor = new Professor
@@ -26,9 +30,9 @@ public class EmitirConviteCommandHandlerTests
         {
             QuadraId = quadra.Id,
             ProfessorId = professor.Id,
-            Data = new DateOnly(2026, 8, 1),
-            HoraInicio = new TimeOnly(18, 0),
-            HoraFim = new TimeOnly(19, 0),
+            Data = data ?? new DateOnly(2026, 8, 1),
+            HoraInicio = horaInicio ?? new TimeOnly(18, 0),
+            HoraFim = horaFim ?? new TimeOnly(19, 0),
             TaxaValor = 80m,
             Status = status
         };
@@ -105,5 +109,23 @@ public class EmitirConviteCommandHandlerTests
         var id = await handler.Handle(command, CancellationToken.None);
 
         Assert.NotEqual(Guid.Empty, id);
+    }
+
+    [Fact]
+    public async Task Handle_DeveLancarDomainException_QuandoHorarioDaAulaJaPassou()
+    {
+        var context = TestDbContextFactory.Create();
+        var ontem = BrasilClock.Agora.AddDays(-1);
+        var (agendamento, _) = CriarAgendamento(
+            context,
+            StatusAgendamento.Confirmado,
+            DateOnly.FromDateTime(ontem),
+            TimeOnly.FromDateTime(ontem),
+            TimeOnly.FromDateTime(ontem.AddHours(1)));
+        var handler = new EmitirConviteCommandHandler(context);
+
+        var command = new EmitirConviteCommand(agendamento.Id, agendamento.ProfessorId, "Aluno Teste", "98765432100");
+
+        await Assert.ThrowsAsync<DomainException>(() => handler.Handle(command, CancellationToken.None));
     }
 }

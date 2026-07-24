@@ -1,5 +1,6 @@
 using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Common.Interfaces;
+using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
 using ArenaPass.Domain.Exceptions;
@@ -29,14 +30,14 @@ public class CancelarAgendamentoCommandHandler : IRequestHandler<CancelarAgendam
             throw new UnauthorizedAccessException("Esse agendamento não pertence a você.");
         }
 
-        if (agendamento.Status == StatusAgendamento.Realizado)
-        {
-            throw new DomainException("Não é possível cancelar um agendamento já realizado.");
-        }
-
         if (agendamento.Status == StatusAgendamento.Cancelado)
         {
             throw new DomainException("Esse agendamento já está cancelado.");
+        }
+
+        if (BrasilClock.Agora > agendamento.Data.ToDateTime(agendamento.HoraFim))
+        {
+            throw new DomainException("Não é possível cancelar — o horário dessa aula já passou.");
         }
 
         agendamento.Status = StatusAgendamento.Cancelado;

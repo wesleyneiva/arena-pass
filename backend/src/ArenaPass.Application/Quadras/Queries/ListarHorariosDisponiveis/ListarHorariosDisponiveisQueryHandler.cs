@@ -1,6 +1,7 @@
 using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Common.Interfaces;
 using ArenaPass.Application.Quadras.Dtos;
+using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
 using MediatR;
@@ -35,16 +36,18 @@ public class ListarHorariosDisponiveisQueryHandler
         var slots = new List<HorarioSlotDto>();
         var duracao = TimeSpan.FromMinutes(quadra.DuracaoSlotMinutos);
         var horaAtual = quadra.HoraAbertura;
+        var agora = BrasilClock.Agora;
 
         while (horaAtual < quadra.HoraFechamento)
         {
             var horaFimSlot = horaAtual.Add(duracao);
             var agendamentoNoSlot = agendamentosDoDia.FirstOrDefault(a => a.HoraInicio == horaAtual);
+            var jaPassou = request.Data.ToDateTime(horaAtual) < agora;
 
             slots.Add(new HorarioSlotDto(
                 horaAtual,
                 horaFimSlot,
-                agendamentoNoSlot is null,
+                agendamentoNoSlot is null && !jaPassou,
                 agendamentoNoSlot?.Id));
 
             horaAtual = horaFimSlot;

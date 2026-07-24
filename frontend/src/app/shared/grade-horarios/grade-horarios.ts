@@ -20,7 +20,10 @@ export class GradeHorarios {
     if (this.bloqueada()) {
       return 'Aguardando aprovação';
     }
-    return slot.livre ? 'Livre' : 'Ocupado';
+    if (slot.livre) {
+      return 'Livre';
+    }
+    return slot.agendamentoId ? 'Ocupado' : 'Indisponível';
   }
 
   intervalo(slot: HorarioSlot): string {

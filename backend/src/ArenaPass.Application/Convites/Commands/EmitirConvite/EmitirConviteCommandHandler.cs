@@ -1,5 +1,6 @@
 using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Common.Interfaces;
+using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
 using ArenaPass.Domain.Exceptions;
@@ -32,6 +33,11 @@ public class EmitirConviteCommandHandler : IRequestHandler<EmitirConviteCommand,
         {
             throw new DomainException(
                 "Só é possível emitir convite para aulas com pagamento confirmado pelo clube.");
+        }
+
+        if (BrasilClock.Agora > agendamento.Data.ToDateTime(agendamento.HoraFim))
+        {
+            throw new DomainException("Não é possível emitir convite — o horário dessa aula já passou.");
         }
 
         var convite = new Convite

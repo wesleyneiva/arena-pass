@@ -1,6 +1,7 @@
 using ArenaPass.Application.Agendamentos.Commands.CriarAgendamento;
 using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Tests.Common;
+using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
 using ArenaPass.Domain.Exceptions;
@@ -143,6 +144,20 @@ public class CriarAgendamentoCommandHandlerTests
 
         var command = new CriarAgendamentoCommand(
             professor.Id, quadra.Id, new DateOnly(2026, 8, 1), new TimeOnly(22, 0));
+
+        await Assert.ThrowsAsync<DomainException>(() => handler.Handle(command, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_DeveLancarDomainException_QuandoHorarioJaPassou()
+    {
+        var context = TestDbContextFactory.Create();
+        var (professor, quadra) = CriarProfessorEQuadraAprovados(context);
+        var handler = new CriarAgendamentoCommandHandler(context);
+
+        var ontem = BrasilClock.Agora.AddDays(-1);
+        var command = new CriarAgendamentoCommand(
+            professor.Id, quadra.Id, DateOnly.FromDateTime(ontem), TimeOnly.FromDateTime(ontem));
 
         await Assert.ThrowsAsync<DomainException>(() => handler.Handle(command, CancellationToken.None));
     }
