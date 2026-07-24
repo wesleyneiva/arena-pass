@@ -42,19 +42,21 @@ public class ConvitesController : ControllerBase
     }
 
     [HttpGet("api/agendamentos/{agendamentoId:guid}/convites")]
-    [Authorize(Roles = "Professor")]
+    [Authorize(Roles = "AdminClube,Master,Professor")]
     public async Task<IActionResult> ListarPorAgendamento(Guid agendamentoId, CancellationToken cancellationToken)
     {
-        var query = new ListarConvitesDoAgendamentoQuery(agendamentoId, ProfessorIdDoToken());
+        var solicitanteProfessorId = User.IsInRole("Professor") ? ProfessorIdDoToken() : (Guid?)null;
+        var query = new ListarConvitesDoAgendamentoQuery(agendamentoId, solicitanteProfessorId);
         var convites = await _mediator.Send(query, cancellationToken);
         return Ok(convites);
     }
 
     [HttpGet("api/convites/{id:guid}")]
-    [Authorize(Roles = "Professor")]
+    [Authorize(Roles = "AdminClube,Master,Professor")]
     public async Task<IActionResult> Obter(Guid id, CancellationToken cancellationToken)
     {
-        var convite = await _mediator.Send(new ObterConviteQuery(id, ProfessorIdDoToken()), cancellationToken);
+        var solicitanteProfessorId = User.IsInRole("Professor") ? ProfessorIdDoToken() : (Guid?)null;
+        var convite = await _mediator.Send(new ObterConviteQuery(id, solicitanteProfessorId), cancellationToken);
         return Ok(convite);
     }
 

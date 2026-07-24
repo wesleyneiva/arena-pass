@@ -49,43 +49,66 @@
 } @else {
   <div class="space-y-3">
     @for (agendamento of agendamentosFiltrados(); track agendamento.id) {
-      <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
-        <div>
-          <p class="font-semibold text-slate-900">
-            {{ agendamento.quadraNome }} · {{ agendamento.data | dataBr }} · {{ agendamento.horaInicio.slice(0,5) }}-{{ agendamento.horaFim.slice(0,5) }}
-          </p>
-          <p class="mt-0.5 text-sm text-slate-500">
-            Prof. {{ agendamento.professorNome }} · Taxa R$ {{ agendamento.taxaValor }}
-            @if (agendamento.formaPagamento) {
-              · {{ agendamento.formaPagamento }}
+      <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="font-semibold text-slate-900">
+              {{ agendamento.quadraNome }} · {{ agendamento.data | dataBr }} · {{ agendamento.horaInicio.slice(0,5) }}-{{ agendamento.horaFim.slice(0,5) }}
+            </p>
+            <p class="mt-0.5 text-sm text-slate-500">
+              Prof. {{ agendamento.professorNome }} · Taxa R$ {{ agendamento.taxaValor }}
+              @if (agendamento.formaPagamento) {
+                · {{ agendamento.formaPagamento }}
+              }
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+              {{ rotuloStatus(agendamento) }}
+            </span>
+
+            @if (agendamento.status === 'Confirmado' || agendamento.status === 'Realizado') {
+              <button (click)="toggleConvites(agendamento.id)"
+                class="rounded-lg bg-slate-800 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-900">
+                {{ agendamentoExpandidoId() === agendamento.id ? 'Fechar' : 'Convites' }}
+              </button>
             }
-          </p>
+
+            @if (agendamento.status === 'PendentePagamento' && !agendamento.encerrado) {
+              <select [(ngModel)]="formaPagamentoPorAgendamento[agendamento.id]"
+                class="rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm">
+                <option value="Pix">Pix</option>
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Cartao">Cartão</option>
+              </select>
+              <button (click)="confirmarPagamento(agendamento.id)"
+                class="rounded-lg bg-blue-500 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-600">
+                Confirmar pagamento
+              </button>
+            }
+
+            @if (agendamento.status !== 'Cancelado' && !agendamento.encerrado) {
+              <button (click)="cancelar(agendamento.id)" class="rounded-lg px-2 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50">
+                Cancelar
+              </button>
+            }
+          </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-            {{ rotuloStatus(agendamento) }}
-          </span>
-
-          @if (agendamento.status === 'PendentePagamento' && !agendamento.encerrado) {
-            <select [(ngModel)]="formaPagamentoPorAgendamento[agendamento.id]"
-              class="rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm">
-              <option value="Pix">Pix</option>
-              <option value="Dinheiro">Dinheiro</option>
-              <option value="Cartao">Cartão</option>
-            </select>
-            <button (click)="confirmarPagamento(agendamento.id)"
-              class="rounded-lg bg-blue-500 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-600">
-              Confirmar pagamento
-            </button>
-          }
-
-          @if (agendamento.status !== 'Cancelado' && !agendamento.encerrado) {
-            <button (click)="cancelar(agendamento.id)" class="rounded-lg px-2 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50">
-              Cancelar
-            </button>
-          }
-        </div>
+        @if (agendamentoExpandidoId() === agendamento.id) {
+          <div class="mt-4 animate-fade-in-up rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <p class="mb-2 text-sm font-medium text-slate-700">Convites emitidos pelo professor</p>
+            @for (convite of convitesDe(agendamento.id); track convite.id) {
+              <div class="flex items-center justify-between py-1 text-sm">
+                <span class="text-slate-700">{{ convite.alunoNome }} · CPF {{ convite.alunoCpf }}</span>
+                <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-700">{{ convite.status }}</span>
+              </div>
+            } @empty {
+              <p class="text-sm text-slate-500">Nenhum convite emitido pra essa aula ainda.</p>
+            }
+          </div>
+        }
       </div>
     } @empty {
       <div class="rounded-xl border border-dashed border-slate-300 p-10 text-center">

@@ -25,7 +25,7 @@ public class ListarConvitesDoAgendamentoQueryHandler
             .FirstOrDefaultAsync(a => a.Id == request.AgendamentoId, cancellationToken)
             ?? throw new NotFoundException(nameof(Agendamento), request.AgendamentoId);
 
-        if (agendamento.ProfessorId != request.ProfessorId)
+        if (request.ProfessorId.HasValue && agendamento.ProfessorId != request.ProfessorId.Value)
         {
             throw new UnauthorizedAccessException("Esse agendamento não pertence a você.");
         }

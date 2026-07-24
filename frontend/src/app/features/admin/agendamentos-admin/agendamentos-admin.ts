@@ -1,7 +1,9 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
+import { ConviteService } from '../../../core/services/convite.service';
 import { Agendamento, FormaPagamento } from '../../../core/models/agendamento.models';
+import { ConviteResumo } from '../../../core/models/convite.models';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 import { DataBrPipe } from '../../../shared/pipes/data-br.pipe';
 
@@ -21,6 +23,9 @@ export class AgendamentosAdmin implements OnInit {
   readonly filtroProfessor = signal('Todos');
   readonly filtroDataDe = signal('');
   readonly filtroDataAte = signal('');
+
+  readonly agendamentoExpandidoId = signal<string | null>(null);
+  readonly convitesPorAgendamento = signal<Record<string, ConviteResumo[]>>({});
 
   formaPagamentoPorAgendamento: Record<string, FormaPagamento> = {};
 
@@ -46,6 +51,7 @@ export class AgendamentosAdmin implements OnInit {
 
   constructor(
     private readonly agendamentoService: AgendamentoService,
+    private readonly conviteService: ConviteService,
     private readonly confirmDialog: ConfirmDialogService
   ) {}
 
@@ -81,6 +87,22 @@ export class AgendamentosAdmin implements OnInit {
     if (confirmado) {
       this.carregar();
     }
+  }
+
+  convitesDe(agendamentoId: string): ConviteResumo[] {
+    return this.convitesPorAgendamento()[agendamentoId] ?? [];
+  }
+
+  toggleConvites(agendamentoId: string): void {
+    if (this.agendamentoExpandidoId() === agendamentoId) {
+      this.agendamentoExpandidoId.set(null);
+      return;
+    }
+
+    this.agendamentoExpandidoId.set(agendamentoId);
+    this.conviteService.listarPorAgendamento(agendamentoId).subscribe((convites) => {
+      this.convitesPorAgendamento.update((atual) => ({ ...atual, [agendamentoId]: convites }));
+    });
   }
 
   rotuloStatus(agendamento: Agendamento): string {

@@ -25,7 +25,7 @@ public class ObterConviteQueryHandler : IRequestHandler<ObterConviteQuery, Convi
             .FirstOrDefaultAsync(c => c.Id == request.ConviteId, cancellationToken)
             ?? throw new NotFoundException(nameof(Convite), request.ConviteId);
 
-        if (convite.Agendamento!.ProfessorId != request.ProfessorId)
+        if (request.ProfessorId.HasValue && convite.Agendamento!.ProfessorId != request.ProfessorId.Value)
         {
             throw new UnauthorizedAccessException("Esse convite não pertence a você.");
         }
