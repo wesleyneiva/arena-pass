@@ -9,4 +9,5 @@ public record ConviteDetalhesDto(
     DateOnly Data,
     TimeOnly HoraInicio,
     TimeOnly HoraFim,
+    TimeOnly ValidoDesde,
     string QrCodeBase64);

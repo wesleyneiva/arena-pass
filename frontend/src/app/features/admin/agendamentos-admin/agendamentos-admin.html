@@ -48,7 +48,7 @@
   </div>
 } @else {
   <div class="space-y-3">
-    @for (agendamento of agendamentosFiltrados(); track agendamento.id) {
+    @for (agendamento of agendamentosPaginados(); track agendamento.id) {
       <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -116,4 +116,5 @@
       </div>
     }
   </div>
+  <app-paginador [paginaAtual]="paginaEfetiva()" [totalPaginas]="totalPaginas()" (mudarPagina)="paginaAtual.set($event)" />
 }

@@ -12,8 +12,6 @@ namespace ArenaPass.Application.Convites.Commands.ValidarConvite;
 
 public class ValidarConviteCommandHandler : IRequestHandler<ValidarConviteCommand, ConviteValidacaoResultDto>
 {
-    private static readonly TimeSpan ToleranciaAntesDaAula = TimeSpan.FromHours(1);
-
     private readonly IApplicationDbContext _context;
 
     public ValidarConviteCommandHandler(IApplicationDbContext context)
@@ -36,7 +34,7 @@ public class ValidarConviteCommandHandler : IRequestHandler<ValidarConviteComman
         }
 
         var agendamento = convite.Agendamento!;
-        var inicioValidade = agendamento.Data.ToDateTime(agendamento.HoraInicio) - ToleranciaAntesDaAula;
+        var inicioValidade = agendamento.Data.ToDateTime(agendamento.HoraInicio) - ConviteRegras.ToleranciaAntesDaAula;
         var fimValidade = agendamento.Data.ToDateTime(agendamento.HoraFim);
         var agora = BrasilClock.Agora;
 

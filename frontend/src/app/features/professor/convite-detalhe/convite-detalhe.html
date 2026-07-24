@@ -17,7 +17,8 @@
       <p><span class="font-medium text-slate-700">Aluno:</span> {{ c.alunoNome }}</p>
       <p><span class="font-medium text-slate-700">Quadra:</span> {{ c.quadraNome }}</p>
       <p><span class="font-medium text-slate-700">Data:</span> {{ c.data | dataBr }}</p>
-      <p><span class="font-medium text-slate-700">Horário:</span> {{ c.horaInicio.slice(0,5) }} - {{ c.horaFim.slice(0,5) }}</p>
+      <p><span class="font-medium text-slate-700">Horário da aula:</span> {{ c.horaInicio.slice(0,5) }} - {{ c.horaFim.slice(0,5) }}</p>
+      <p><span class="font-medium text-slate-700">Convite válido:</span> {{ c.validoDesde.slice(0,5) }} - {{ c.horaFim.slice(0,5) }}</p>
       <p>
         <span class="font-medium text-slate-700">Status:</span>
         <span class="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">{{ c.status }}</span>

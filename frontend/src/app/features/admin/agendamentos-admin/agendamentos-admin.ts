@@ -6,12 +6,15 @@ import { Agendamento, FormaPagamento } from '../../../core/models/agendamento.mo
 import { ConviteResumo } from '../../../core/models/convite.models';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 import { DataBrPipe } from '../../../shared/pipes/data-br.pipe';
+import { Paginador } from '../../../shared/paginador/paginador';
 
 type FiltroStatus = 'Todos' | 'PendentePagamento' | 'Confirmado' | 'Realizado' | 'Cancelado';
 
+const ITENS_POR_PAGINA = 10;
+
 @Component({
   selector: 'app-agendamentos-admin',
-  imports: [FormsModule, DataBrPipe],
+  imports: [FormsModule, DataBrPipe, Paginador],
   templateUrl: './agendamentos-admin.html'
 })
 export class AgendamentosAdmin implements OnInit {
@@ -47,6 +50,19 @@ export class AgendamentosAdmin implements OnInit {
       const bateDataAte = dataAte === '' || a.data <= dataAte;
       return bateStatus && bateProfessor && bateDataDe && bateDataAte;
     });
+  });
+
+  readonly paginaAtual = signal(1);
+
+  readonly totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.agendamentosFiltrados().length / ITENS_POR_PAGINA))
+  );
+
+  readonly paginaEfetiva = computed(() => Math.min(this.paginaAtual(), this.totalPaginas()));
+
+  readonly agendamentosPaginados = computed(() => {
+    const inicio = (this.paginaEfetiva() - 1) * ITENS_POR_PAGINA;
+    return this.agendamentosFiltrados().slice(inicio, inicio + ITENS_POR_PAGINA);
   });
 
   constructor(

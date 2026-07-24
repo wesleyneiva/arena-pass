@@ -14,6 +14,7 @@ export interface ConviteDetalhes {
   data: string;
   horaInicio: string;
   horaFim: string;
+  validoDesde: string;
   qrCodeBase64: string;
 }
 

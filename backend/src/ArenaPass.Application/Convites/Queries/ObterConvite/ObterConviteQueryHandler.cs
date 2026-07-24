@@ -1,6 +1,7 @@
 using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Common.Interfaces;
 using ArenaPass.Application.Convites.Dtos;
+using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,15 @@ public class ObterConviteQueryHandler : IRequestHandler<ObterConviteQuery, Convi
 
         var qrCodeBase64 = _qrCodeGenerator.GerarPngBase64(convite.Token.ToString());
 
+        // TimeOnly.FromTimeSpan exige um intervalo entre 0 e 24h, entao soma um dia
+        // inteiro se o resultado for negativo (ex: aula às 00:30 menos 1h de tolerância).
+        var validoDesdeSpan = convite.Agendamento.HoraInicio.ToTimeSpan() - ConviteRegras.ToleranciaAntesDaAula;
+        if (validoDesdeSpan < TimeSpan.Zero)
+        {
+            validoDesdeSpan += TimeSpan.FromHours(24);
+        }
+        var validoDesde = TimeOnly.FromTimeSpan(validoDesdeSpan);
+
         return new ConviteDetalhesDto(
             convite.Id,
             convite.AlunoNome,
@@ -41,6 +51,7 @@ public class ObterConviteQueryHandler : IRequestHandler<ObterConviteQuery, Convi
             convite.Agendamento.Data,
             convite.Agendamento.HoraInicio,
             convite.Agendamento.HoraFim,
+            validoDesde,
             qrCodeBase64);
     }
 }

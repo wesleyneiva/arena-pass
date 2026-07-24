@@ -1,0 +1,13 @@
+@if (totalPaginas() > 1) {
+  <div class="mt-5 flex items-center justify-center gap-3">
+    <button type="button" (click)="anterior()" [disabled]="paginaAtual() <= 1"
+      class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40">
+      Anterior
+    </button>
+    <span class="text-sm text-slate-500">Página {{ paginaAtual() }} de {{ totalPaginas() }}</span>
+    <button type="button" (click)="proxima()" [disabled]="paginaAtual() >= totalPaginas()"
+      class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40">
+      Próxima
+    </button>
+  </div>
+}
