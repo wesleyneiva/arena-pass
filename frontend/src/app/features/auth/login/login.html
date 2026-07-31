@@ -61,7 +61,10 @@
         <button
           type="submit"
           [disabled]="carregando()"
-          class="w-full rounded-lg bg-blue-500 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 active:scale-[0.99] disabled:opacity-60"
+          [class]="carregando()
+            ? 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-blue-400 via-blue-200 to-blue-400'
+            : 'bg-blue-500 hover:bg-blue-600'"
+          class="w-full rounded-lg py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:cursor-not-allowed"
         >
           {{ carregando() ? 'Entrando...' : 'Entrar' }}
         </button>

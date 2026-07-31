@@ -31,11 +31,8 @@
           </button>
         }
         <button (click)="servico.confirmarAcao()" [disabled]="servico.processando()"
-          class="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
-          [class.bg-red-600]="servico.variante() === 'perigo'"
-          [class.hover:bg-red-700]="servico.variante() === 'perigo'"
-          [class.bg-blue-500]="servico.variante() !== 'perigo'"
-          [class.hover:bg-blue-600]="servico.variante() !== 'perigo'">
+          [class]="classeConfirmar()"
+          class="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:cursor-not-allowed">
           {{ servico.processando() ? 'Aguarde...' : servico.textoConfirmar() }}
         </button>
       </div>

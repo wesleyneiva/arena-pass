@@ -125,7 +125,10 @@
                       class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
                   </div>
                   <button type="submit" [disabled]="emitindo()"
-                    class="rounded-lg bg-blue-500 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:opacity-60">
+                    [class]="emitindo()
+                      ? 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-blue-400 via-blue-200 to-blue-400'
+                      : 'bg-blue-500 hover:bg-blue-600'"
+                    class="rounded-lg py-1.5 text-sm font-semibold text-white shadow-sm transition disabled:cursor-not-allowed">
                     {{ emitindo() ? 'Emitindo...' : 'Emitir convite' }}
                   </button>
                 </form>
@@ -207,7 +210,10 @@
       }
 
       <button (click)="confirmarPagamentoModal()" [disabled]="confirmandoPagamento()"
-        class="w-full rounded-lg bg-blue-500 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 disabled:opacity-60">
+        [class]="confirmandoPagamento()
+          ? 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-blue-400 via-blue-200 to-blue-400'
+          : 'bg-blue-500 hover:bg-blue-600'"
+        class="w-full rounded-lg py-2.5 text-sm font-semibold text-white shadow-sm transition disabled:cursor-not-allowed">
         {{ confirmandoPagamento() ? 'Confirmando...' : 'Já paguei / Confirmar pagamento' }}
       </button>
     </div>
