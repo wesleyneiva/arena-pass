@@ -16,8 +16,6 @@ function hoje(): string {
   return `${agora.getFullYear()}-${mes}-${dia}`;
 }
 
-const ATRASO_REDIRECIONAMENTO_MS = 1800;
-
 @Component({
   selector: 'app-agendar',
   imports: [FormsModule, GradeHorarios],
@@ -160,7 +158,6 @@ export class Agendar implements OnInit {
             : `${sucessos.length} aulas agendadas com sucesso!`
         );
         this.modalConfirmacaoAberto.set(true);
-        setTimeout(() => this.irParaMeusAgendamentos(), ATRASO_REDIRECIONAMENTO_MS);
       }
     });
   }

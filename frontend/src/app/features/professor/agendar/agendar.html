@@ -67,7 +67,10 @@
         Limpar seleção
       </button>
       <button type="button" (click)="confirmarAgendamento()" [disabled]="salvando()"
-        class="rounded-lg bg-blue-500 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600 active:scale-[0.99] disabled:opacity-60">
+        [class]="salvando()
+          ? 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-blue-400 via-blue-200 to-blue-400'
+          : 'bg-blue-500 hover:bg-blue-600'"
+        class="rounded-lg px-5 py-2 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:cursor-not-allowed">
         {{ salvando() ? 'Agendando...' : 'Confirmar agendamento' }}
       </button>
     </div>
