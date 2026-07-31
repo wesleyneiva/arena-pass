@@ -156,6 +156,23 @@ export class MeusAgendamentos implements OnInit {
     return agendamento.status;
   }
 
+  corStatus(agendamento: Agendamento): { badge: string; barra: string } {
+    switch (this.rotuloStatus(agendamento)) {
+      case 'Confirmado':
+        return { badge: 'bg-blue-50 text-blue-700', barra: 'bg-blue-500' };
+      case 'PendentePagamento':
+        return { badge: 'bg-amber-50 text-amber-700', barra: 'bg-amber-400' };
+      case 'Realizada':
+        return { badge: 'bg-emerald-50 text-emerald-700', barra: 'bg-emerald-500' };
+      case 'Cancelado':
+        return { badge: 'bg-red-50 text-red-700', barra: 'bg-red-300' };
+      case 'Expirado':
+        return { badge: 'bg-slate-100 text-slate-500', barra: 'bg-slate-300' };
+      default:
+        return { badge: 'bg-slate-100 text-slate-700', barra: 'bg-slate-300' };
+    }
+  }
+
   async cancelar(agendamentoId: string): Promise<void> {
     const confirmado = await this.confirmDialog.confirmar({
       titulo: 'Cancelar agendamento',
