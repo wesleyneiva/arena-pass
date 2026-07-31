@@ -44,13 +44,20 @@ export class AgendamentosAdmin implements OnInit {
     const dataAte = this.filtroDataAte();
 
     return this.agendamentos().filter((a) => {
-      const bateStatus = status === 'Todos' || a.status === status;
+      const bateStatus = status === 'Todos' || this.statusEfetivo(a) === status;
       const bateProfessor = professor === 'Todos' || a.professorNome === professor;
       const bateDataDe = dataDe === '' || a.data >= dataDe;
       const bateDataAte = dataAte === '' || a.data <= dataAte;
       return bateStatus && bateProfessor && bateDataDe && bateDataAte;
     });
   });
+
+  private statusEfetivo(agendamento: Agendamento): FiltroStatus {
+    if (agendamento.encerrado && agendamento.status === 'Confirmado') {
+      return 'Realizado';
+    }
+    return agendamento.status as FiltroStatus;
+  }
 
   readonly paginaAtual = signal(1);
 

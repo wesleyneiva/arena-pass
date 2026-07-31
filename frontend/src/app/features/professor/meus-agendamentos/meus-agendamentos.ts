@@ -56,7 +56,7 @@ export class MeusAgendamentos implements OnInit {
     const busca = this.busca().trim().toLowerCase();
 
     return this.agendamentos().filter((a) => {
-      const bateStatus = status === 'Todos' || a.status === status;
+      const bateStatus = status === 'Todos' || this.statusEfetivo(a) === status;
       const bateQuadra = quadra === 'Todas' || a.quadraNome === quadra;
       const bateDataDe = dataDe === '' || a.data >= dataDe;
       const bateDataAte = dataAte === '' || a.data <= dataAte;
@@ -64,6 +64,13 @@ export class MeusAgendamentos implements OnInit {
       return bateStatus && bateQuadra && bateDataDe && bateDataAte && bateBusca;
     });
   });
+
+  private statusEfetivo(agendamento: Agendamento): FiltroStatus {
+    if (agendamento.encerrado && agendamento.status === 'Confirmado') {
+      return 'Realizado';
+    }
+    return agendamento.status as FiltroStatus;
+  }
 
   readonly agendamentoEmPagamento = computed(() =>
     this.agendamentos().find((a) => a.id === this.modalPagamentoId()) ?? null
