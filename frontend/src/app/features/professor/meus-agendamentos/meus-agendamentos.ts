@@ -40,6 +40,8 @@ export class MeusAgendamentos implements OnInit {
   readonly copiado = signal(false);
   readonly erroPagamento = signal<string | null>(null);
 
+  readonly sucessoPagamentoInfo = signal<{ quadraNome: string; data: string; horaInicio: string; formaPagamento: FormaPagamento } | null>(null);
+
   alunoNome = '';
   alunoCpf = '';
 
@@ -251,17 +253,26 @@ export class MeusAgendamentos implements OnInit {
 
   confirmarPagamentoModal(): void {
     const agendamentoId = this.modalPagamentoId();
-    if (!agendamentoId) {
+    const agendamento = this.agendamentoEmPagamento();
+    if (!agendamentoId || !agendamento) {
       return;
     }
 
     this.erroPagamento.set(null);
     this.confirmandoPagamento.set(true);
 
-    this.agendamentoService.confirmarPagamento(agendamentoId, this.formaPagamentoEscolhida()).subscribe({
+    const formaPagamento = this.formaPagamentoEscolhida();
+
+    this.agendamentoService.confirmarPagamento(agendamentoId, formaPagamento).subscribe({
       next: () => {
         this.confirmandoPagamento.set(false);
         this.fecharPagamento();
+        this.sucessoPagamentoInfo.set({
+          quadraNome: agendamento.quadraNome,
+          data: agendamento.data,
+          horaInicio: agendamento.horaInicio,
+          formaPagamento
+        });
         this.carregar();
       },
       error: (err) => {
@@ -269,5 +280,16 @@ export class MeusAgendamentos implements OnInit {
         this.erroPagamento.set(err?.error?.message ?? 'Não foi possível confirmar o pagamento.');
       }
     });
+  }
+
+  rotuloFormaPagamento(forma: FormaPagamento): string {
+    if (forma === 'Cartao') {
+      return 'cartão';
+    }
+    return forma === 'Pix' ? 'Pix' : 'dinheiro';
+  }
+
+  fecharSucessoPagamento(): void {
+    this.sucessoPagamentoInfo.set(null);
   }
 }

@@ -219,3 +219,23 @@
     </div>
   </div>
 }
+
+@if (sucessoPagamentoInfo(); as info) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in">
+    <div class="w-full max-w-sm animate-scale-in rounded-2xl bg-white p-6 text-center shadow-xl">
+      <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-500">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12.5l5 5L20 6" />
+        </svg>
+      </div>
+      <h2 class="text-lg font-semibold text-slate-900">Pagamento confirmado!</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        {{ info.quadraNome }} · {{ info.data | dataBr }} · {{ info.horaInicio.slice(0,5) }} · pago via {{ rotuloFormaPagamento(info.formaPagamento) }}.
+      </p>
+      <button (click)="fecharSucessoPagamento()"
+        class="mt-5 w-full rounded-lg bg-blue-500 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600">
+        Fechar
+      </button>
+    </div>
+  </div>
+}
