@@ -70,6 +70,25 @@ export class ProfessoresAdmin implements OnInit {
     this.busca.set(valor);
   }
 
+  iniciais(nome: string): string {
+    const partes = nome.trim().split(/\s+/).filter(Boolean);
+    if (partes.length === 0) return '?';
+    const primeira = partes[0][0];
+    const ultima = partes.length > 1 ? partes[partes.length - 1][0] : '';
+    return (primeira + ultima).toUpperCase();
+  }
+
+  corStatus(status: Professor['statusAprovacao']): { badge: string; barra: string } {
+    switch (status) {
+      case 'Pendente':
+        return { badge: 'bg-amber-50 text-amber-700', barra: 'bg-amber-400' };
+      case 'Aprovado':
+        return { badge: 'bg-blue-50 text-blue-600', barra: 'bg-blue-500' };
+      case 'Suspenso':
+        return { badge: 'bg-red-50 text-red-700', barra: 'bg-red-300' };
+    }
+  }
+
   aprovar(id: string): void {
     this.professorService.aprovar(id).subscribe({
       next: () => this.carregar(),
