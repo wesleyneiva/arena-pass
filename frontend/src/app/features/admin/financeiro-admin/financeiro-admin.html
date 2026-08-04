@@ -43,13 +43,30 @@
   </div>
 </div>
 
+@if (erroExportacao()) {
+  <p class="mb-4 animate-fade-in rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ erroExportacao() }}</p>
+}
+
 @if (carregando()) {
   <div class="h-64 animate-pulse rounded-xl bg-slate-100"></div>
 } @else if (faturamento(); as f) {
   <div class="mb-5 animate-fade-in-up rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-    <p class="text-sm text-slate-500">{{ professorId ? 'Faturamento gerado ao clube por ' + nomeProfessorSelecionado() + ' no período' : 'Faturamento total do clube no período' }}</p>
-    <p class="mb-5 text-3xl font-semibold text-slate-900">R$ {{ f.totalGeral }}</p>
-    <app-faturamento-chart [dados]="f.porMes" />
+    <div class="mb-5 flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <p class="text-sm text-slate-500">{{ professorId ? 'Faturamento gerado ao clube por ' + nomeProfessorSelecionado() + ' no período' : 'Faturamento total do clube no período' }}</p>
+        <p class="text-3xl font-semibold text-slate-900">R$ {{ f.totalGeral }}</p>
+      </div>
+      <button (click)="exportarRelatorio()" [disabled]="exportando()"
+        [class]="exportando()
+          ? 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-slate-500 via-slate-300 to-slate-500'
+          : 'bg-slate-800 hover:bg-slate-900'"
+        class="flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition disabled:cursor-not-allowed">
+        {{ exportando() ? 'Gerando PDF...' : 'Exportar relatório (PDF)' }}
+      </button>
+    </div>
+    <div #graficoWrapper>
+      <app-faturamento-chart [dados]="f.porMes" />
+    </div>
   </div>
 
   @if (!professorId) {
