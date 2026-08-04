@@ -14,42 +14,55 @@
     }
 
     @if (carregando()) {
-      <div class="space-y-3">
-        @for (i of [1, 2, 3]; track i) {
-          <div class="h-20 animate-pulse rounded-xl bg-slate-100"></div>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div class="h-44 animate-pulse rounded-2xl bg-slate-100"></div>
         }
       </div>
     } @else {
-      <div class="space-y-3">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         @for (quadra of quadras(); track quadra.id) {
-          <div class="group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
-            <div>
-              <div class="flex items-center gap-2">
-                <p class="font-semibold text-slate-900">{{ quadra.nome }}</p>
+          <div class="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+            <div class="h-1.5" [class]="quadra.ativa ? 'bg-blue-500' : 'bg-slate-300'"></div>
+
+            <div class="flex flex-1 flex-col gap-4 p-5">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex min-w-0 items-center gap-3">
+                  <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white">
+                    <app-icon name="grid" [size]="20" />
+                  </div>
+                  <div class="min-w-0">
+                    <p class="truncate font-semibold text-slate-900">{{ quadra.nome }}</p>
+                    <p class="truncate text-xs text-slate-500">{{ quadra.modalidadeNome }}</p>
+                  </div>
+                </div>
                 @if (!quadra.ativa) {
-                  <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">Inativa</span>
+                  <span class="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-500">Inativa</span>
                 }
               </div>
-              <p class="mt-0.5 text-sm text-slate-500">
-                {{ quadra.modalidadeNome }} · {{ quadra.horaAbertura.slice(0,5) }} às {{ quadra.horaFechamento.slice(0,5) }}
-              </p>
-              <p class="mt-1 text-sm font-medium text-blue-600">R$ {{ quadra.taxaPorHora }}/hora</p>
-            </div>
-            <div class="flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
-              <button (click)="editar(quadra)"
-                class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">
-                <app-icon name="pencil" [size]="16" />
-                Editar
-              </button>
-              <button (click)="excluir(quadra)"
-                class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50">
-                <app-icon name="ban" [size]="16" />
-                Excluir
-              </button>
+
+              <div>
+                <p class="text-xs text-slate-500">{{ quadra.horaAbertura.slice(0,5) }} às {{ quadra.horaFechamento.slice(0,5) }}</p>
+                <p class="mt-1 text-sm font-medium text-blue-600">R$ {{ quadra.taxaPorHora }}/hora</p>
+              </div>
+
+              <div class="mt-auto flex items-center gap-1 border-t border-slate-100 pt-4">
+                <div class="ml-auto flex items-center gap-1">
+                  <button (click)="editar(quadra)"
+                    class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100">
+                    <app-icon name="pencil" [size]="15" />
+                  </button>
+
+                  <button (click)="excluir(quadra)"
+                    class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50">
+                    <app-icon name="ban" [size]="15" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         } @empty {
-          <div class="rounded-xl border border-dashed border-slate-300 p-10 text-center">
+          <div class="col-span-full rounded-xl border border-dashed border-slate-300 p-10 text-center">
             <p class="text-sm text-slate-500">Nenhuma quadra cadastrada ainda.</p>
           </div>
         }
