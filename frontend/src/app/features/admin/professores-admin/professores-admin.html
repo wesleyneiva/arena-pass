@@ -114,21 +114,21 @@
 
           <div class="mt-auto flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
             @if (professor.statusAprovacao === 'Pendente') {
-              <button (click)="aprovar(professor.id)"
+              <button (click)="aprovar(professor)"
                 class="rounded-lg bg-blue-500 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-600">
                 Aprovar
               </button>
             }
 
             @if (professor.statusAprovacao === 'Aprovado') {
-              <button (click)="suspender(professor.id)"
+              <button (click)="suspender(professor)"
                 class="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50">
                 Suspender
               </button>
             }
 
             @if (professor.statusAprovacao === 'Suspenso') {
-              <button (click)="reativar(professor.id)"
+              <button (click)="reativar(professor)"
                 class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
                 Reativar
               </button>

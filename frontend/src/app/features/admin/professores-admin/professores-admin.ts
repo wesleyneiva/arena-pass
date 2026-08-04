@@ -89,25 +89,41 @@ export class ProfessoresAdmin implements OnInit {
     }
   }
 
-  aprovar(id: string): void {
-    this.professorService.aprovar(id).subscribe({
-      next: () => this.carregar(),
-      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível aprovar.')
+  async aprovar(professor: Professor): Promise<void> {
+    const confirmado = await this.confirmDialog.confirmar({
+      titulo: 'Aprovar professor',
+      mensagem: `Aprovar o professor "${professor.nome}"? Ele passará a ter acesso normal ao sistema.`,
+      textoConfirmar: 'Aprovar',
+      aoConfirmar: () => this.professorService.aprovar(professor.id)
     });
+    if (confirmado) {
+      this.carregar();
+    }
   }
 
-  suspender(id: string): void {
-    this.professorService.suspender(id).subscribe({
-      next: () => this.carregar(),
-      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível suspender.')
+  async suspender(professor: Professor): Promise<void> {
+    const confirmado = await this.confirmDialog.confirmar({
+      titulo: 'Suspender professor',
+      mensagem: `Suspender o professor "${professor.nome}"? Ele perderá o acesso ao sistema até ser reativado.`,
+      textoConfirmar: 'Suspender',
+      variante: 'perigo',
+      aoConfirmar: () => this.professorService.suspender(professor.id)
     });
+    if (confirmado) {
+      this.carregar();
+    }
   }
 
-  reativar(id: string): void {
-    this.professorService.reativar(id).subscribe({
-      next: () => this.carregar(),
-      error: (err) => this.erro.set(err?.error?.message ?? 'Não foi possível reativar.')
+  async reativar(professor: Professor): Promise<void> {
+    const confirmado = await this.confirmDialog.confirmar({
+      titulo: 'Reativar professor',
+      mensagem: `Reativar o professor "${professor.nome}"? Ele voltará a ter acesso ao sistema.`,
+      textoConfirmar: 'Reativar',
+      aoConfirmar: () => this.professorService.reativar(professor.id)
     });
+    if (confirmado) {
+      this.carregar();
+    }
   }
 
   abrirNovo(): void {
@@ -135,32 +151,39 @@ export class ProfessoresAdmin implements OnInit {
     this.editandoId.set(null);
   }
 
-  salvarProfessor(): void {
+  async salvarProfessor(): Promise<void> {
     this.erro.set(null);
-    this.salvando.set(true);
 
     const editandoId = this.editandoId();
-    const aoConcluir = {
-      next: () => {
-        this.salvando.set(false);
+    if (editandoId) {
+      const confirmado = await this.confirmDialog.confirmar({
+        titulo: 'Salvar alterações',
+        mensagem: `Salvar as alterações do professor "${this.novoNome}"?`,
+        textoConfirmar: 'Salvar',
+        aoConfirmar: () =>
+          this.professorService.atualizar(editandoId, { nome: this.novoNome, email: this.novoEmail, cpf: this.novoCpf })
+      });
+      if (confirmado) {
         this.fecharFormulario();
         this.carregar();
-      },
-      error: (err: { error?: { message?: string } }) => {
-        this.salvando.set(false);
-        this.erro.set(err?.error?.message ?? 'Não foi possível salvar o professor.');
       }
-    };
-
-    if (editandoId) {
-      this.professorService
-        .atualizar(editandoId, { nome: this.novoNome, email: this.novoEmail, cpf: this.novoCpf })
-        .subscribe(aoConcluir);
-    } else {
-      this.professorService
-        .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha, cpf: this.novoCpf })
-        .subscribe(aoConcluir);
+      return;
     }
+
+    this.salvando.set(true);
+    this.professorService
+      .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha, cpf: this.novoCpf })
+      .subscribe({
+        next: () => {
+          this.salvando.set(false);
+          this.fecharFormulario();
+          this.carregar();
+        },
+        error: (err: { error?: { message?: string } }) => {
+          this.salvando.set(false);
+          this.erro.set(err?.error?.message ?? 'Não foi possível salvar o professor.');
+        }
+      });
   }
 
   async excluir(professor: Professor): Promise<void> {

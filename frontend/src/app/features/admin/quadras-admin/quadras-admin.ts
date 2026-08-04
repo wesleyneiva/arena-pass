@@ -82,9 +82,8 @@ export class QuadrasAdmin implements OnInit {
     this.ativa = true;
   }
 
-  salvar(): void {
+  async salvar(): Promise<void> {
     this.erro.set(null);
-    this.salvando.set(true);
 
     const payload = {
       nome: this.nome,
@@ -95,7 +94,24 @@ export class QuadrasAdmin implements OnInit {
       taxaPorHora: this.taxaPorHora
     };
 
-    const aoConcluir = {
+    const editandoId = this.editandoId();
+    if (editandoId) {
+      const confirmado = await this.confirmDialog.confirmar({
+        titulo: 'Salvar alterações',
+        mensagem: `Salvar as alterações da quadra "${this.nome}"?`,
+        textoConfirmar: 'Salvar',
+        aoConfirmar: () => this.quadraService.atualizar(editandoId, { ...payload, ativa: this.ativa })
+      });
+      if (confirmado) {
+        this.cancelarEdicao();
+        this.carregarQuadras();
+        this.carregarModalidades();
+      }
+      return;
+    }
+
+    this.salvando.set(true);
+    this.quadraService.criar(payload).subscribe({
       next: () => {
         this.salvando.set(false);
         this.cancelarEdicao();
@@ -106,14 +122,7 @@ export class QuadrasAdmin implements OnInit {
         this.salvando.set(false);
         this.erro.set(err?.error?.message ?? 'Não foi possível salvar a quadra.');
       }
-    };
-
-    const editandoId = this.editandoId();
-    if (editandoId) {
-      this.quadraService.atualizar(editandoId, { ...payload, ativa: this.ativa }).subscribe(aoConcluir);
-    } else {
-      this.quadraService.criar(payload).subscribe(aoConcluir);
-    }
+    });
   }
 
   async excluir(quadra: Quadra): Promise<void> {

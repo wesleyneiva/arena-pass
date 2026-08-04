@@ -77,30 +77,38 @@ export class AdminsMaster implements OnInit {
     this.editandoId.set(null);
   }
 
-  salvarAdmin(): void {
+  async salvarAdmin(): Promise<void> {
     this.erro.set(null);
-    this.salvando.set(true);
 
     const editandoId = this.editandoId();
-    const aoConcluir = {
-      next: () => {
-        this.salvando.set(false);
+    if (editandoId) {
+      const confirmado = await this.confirmDialog.confirmar({
+        titulo: 'Salvar alterações',
+        mensagem: `Salvar as alterações do administrador "${this.novoNome}"?`,
+        textoConfirmar: 'Salvar',
+        aoConfirmar: () => this.adminService.atualizar(editandoId, { nome: this.novoNome, email: this.novoEmail })
+      });
+      if (confirmado) {
         this.fecharFormulario();
         this.carregar();
-      },
-      error: (err: { error?: { message?: string } }) => {
-        this.salvando.set(false);
-        this.erro.set(err?.error?.message ?? 'Não foi possível salvar o administrador.');
       }
-    };
-
-    if (editandoId) {
-      this.adminService.atualizar(editandoId, { nome: this.novoNome, email: this.novoEmail }).subscribe(aoConcluir);
-    } else {
-      this.adminService
-        .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha })
-        .subscribe(aoConcluir);
+      return;
     }
+
+    this.salvando.set(true);
+    this.adminService
+      .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha })
+      .subscribe({
+        next: () => {
+          this.salvando.set(false);
+          this.fecharFormulario();
+          this.carregar();
+        },
+        error: (err: { error?: { message?: string } }) => {
+          this.salvando.set(false);
+          this.erro.set(err?.error?.message ?? 'Não foi possível salvar o administrador.');
+        }
+      });
   }
 
   async excluir(admin: Admin): Promise<void> {
