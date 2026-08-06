@@ -56,9 +56,10 @@ export class Agendar implements OnInit {
   ngOnInit(): void {
     this.quadraService.listar().subscribe({
       next: (quadras) => {
-        this.quadras.set(quadras);
-        if (quadras.length > 0) {
-          this.quadraId.set(quadras[0].id);
+        const quadrasAtivas = quadras.filter((q) => q.ativa);
+        this.quadras.set(quadrasAtivas);
+        if (quadrasAtivas.length > 0) {
+          this.quadraId.set(quadrasAtivas[0].id);
           this.buscarHorarios();
         }
       },
@@ -86,9 +87,10 @@ export class Agendar implements OnInit {
         this.slots.set(slots);
         this.carregandoSlots.set(false);
       },
-      error: () => {
+      error: (err) => {
         this.carregandoSlots.set(false);
-        this.erro.set('Não foi possível carregar os horários dessa quadra.');
+        this.slots.set([]);
+        this.erro.set(err?.error?.message ?? 'Não foi possível carregar os horários dessa quadra.');
       }
     });
   }

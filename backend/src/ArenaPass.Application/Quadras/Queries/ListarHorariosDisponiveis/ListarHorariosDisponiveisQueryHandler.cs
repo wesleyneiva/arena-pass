@@ -4,6 +4,7 @@ using ArenaPass.Application.Quadras.Dtos;
 using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
+using ArenaPass.Domain.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,11 @@ public class ListarHorariosDisponiveisQueryHandler
         var quadra = await _context.Quadras
             .FirstOrDefaultAsync(q => q.Id == request.QuadraId, cancellationToken)
             ?? throw new NotFoundException(nameof(Quadra), request.QuadraId);
+
+        if (!quadra.Ativa)
+        {
+            throw new DomainException("Essa quadra está inativa e não aceita agendamentos.");
+        }
 
         var agendamentosDoDia = await _context.Agendamentos
             .Where(a => a.QuadraId == request.QuadraId

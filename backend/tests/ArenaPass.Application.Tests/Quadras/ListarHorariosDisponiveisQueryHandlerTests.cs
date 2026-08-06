@@ -2,13 +2,14 @@ using ArenaPass.Application.Quadras.Queries.ListarHorariosDisponiveis;
 using ArenaPass.Application.Tests.Common;
 using ArenaPass.Domain.Common;
 using ArenaPass.Domain.Entities;
+using ArenaPass.Domain.Exceptions;
 using Xunit;
 
 namespace ArenaPass.Application.Tests.Quadras;
 
 public class ListarHorariosDisponiveisQueryHandlerTests
 {
-    private static Quadra CriarQuadra(InMemoryDbContext context)
+    private static Quadra CriarQuadra(InMemoryDbContext context, bool ativa = true)
     {
         var modalidade = new Modalidade { Nome = "Beach Tennis" };
         var quadra = new Quadra
@@ -19,7 +20,7 @@ public class ListarHorariosDisponiveisQueryHandlerTests
             HoraFechamento = new TimeOnly(23, 0),
             DuracaoSlotMinutos = 60,
             TaxaPorHora = 80m,
-            Ativa = true
+            Ativa = ativa
         };
         context.Modalidades.Add(modalidade);
         context.Quadras.Add(quadra);
@@ -61,5 +62,19 @@ public class ListarHorariosDisponiveisQueryHandlerTests
         {
             Assert.True(slotFuturo.Livre);
         }
+    }
+
+    [Fact]
+    public async Task Handle_DeveLancarDomainException_QuandoQuadraEstaInativa()
+    {
+        var context = TestDbContextFactory.Create();
+        var quadra = CriarQuadra(context, ativa: false);
+        var agora = BrasilClock.Agora;
+
+        var handler = new ListarHorariosDisponiveisQueryHandler(context);
+
+        await Assert.ThrowsAsync<DomainException>(() => handler.Handle(
+            new ListarHorariosDisponiveisQuery(quadra.Id, DateOnly.FromDateTime(agora)),
+            CancellationToken.None));
     }
 }
