@@ -1,8 +1,13 @@
 @import "tailwindcss";
 @import "@fontsource-variable/inter";
+@import "@fontsource-variable/space-grotesk";
 
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Fonte de destaque — títulos, marca e números grandes. Geométrica e com mais
+     personalidade que a Inter, pro visual ficar mais "tech" nos pontos de maior
+     impacto sem trocar a fonte de leitura/formulários (que continua Inter). */
+  --font-display: "Space Grotesk Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 
   --animate-fade-in: fade-in 0.35s ease-out both;
   --animate-fade-in-up: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -32,6 +37,16 @@
 
 html {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Fonte de destaque aplicada globalmente nos títulos de página — não precisa
+   tocar cada template, cobre a app inteira de uma vez. Números grandes (stat
+   tiles) e a marca "ArenaPass" usam a utilidade "font-display" (gerada pelo
+   Tailwind a partir de --font-display) explicitamente onde não são um
+   h1/h2/h3 semântico. */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 
 /* Cursor de mãozinha em todo elemento clicável, globalmente — botões nativos não
