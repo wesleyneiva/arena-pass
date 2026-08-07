@@ -15,7 +15,8 @@ export type IconName =
   | 'ban'
   | 'refresh'
   | 'pencil'
-  | 'shield';
+  | 'shield'
+  | 'trash';
 
 @Component({
   selector: 'app-icon',

@@ -25,7 +25,13 @@ public class TenantResolutionMiddleware
         var espacoIdClaim = context.User.FindFirst("espacoId")?.Value;
         if (espacoIdClaim is not null && Guid.TryParse(espacoIdClaim, out var espacoIdDoToken))
         {
-            currentTenant.EspacoId = espacoIdDoToken;
+            // Reconfirma que o espaço ainda está ativo a cada requisição — permite que
+            // o Master bloqueie um espaço (inadimplência) e derrube o acesso na hora,
+            // mesmo pra quem já tinha um token válido emitido antes do bloqueio.
+            var espacoAindaAtivo = await db.Espacos.AsNoTracking()
+                .AnyAsync(e => e.Id == espacoIdDoToken && e.Ativo);
+
+            currentTenant.EspacoId = espacoAindaAtivo ? espacoIdDoToken : null;
         }
         else if (context.Request.Headers.TryGetValue("X-Tenant", out var subdominioHeader))
         {

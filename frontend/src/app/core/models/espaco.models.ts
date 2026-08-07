@@ -14,3 +14,8 @@ export interface CriarEspacoRequest {
   nome: string;
   subdominio: string;
 }
+
+export interface AtualizarEspacoRequest {
+  nome: string;
+  subdominio: string;
+}

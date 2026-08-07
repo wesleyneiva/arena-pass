@@ -15,8 +15,8 @@
 }
 
 @if (formularioAberto()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in" (click)="fecharFormulario()">
-    <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in">
+    <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl">
       <div class="mb-4 flex items-center justify-between">
         <h2 class="text-lg font-semibold text-slate-900">
           {{ editandoId() ? 'Editar professor' : 'Cadastrar professor' }}
