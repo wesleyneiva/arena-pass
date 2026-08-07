@@ -7,12 +7,25 @@ namespace ArenaPass.Infrastructure.Persistence;
 
 public static class ArenaPassDbContextSeed
 {
-    // Subdomínio do espaço seedado localmente/em dev — mesmo valor do espaço real
-    // criado em produção pela migration de backfill (ver AddMultiTenancy), não por
-    // este seed.
     private const string EspacoPadraoSubdominio = "hrtennis";
 
-    public static async Task SeedAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher)
+    // O Master é sempre semeado (é a conta que dá o bootstrap de qualquer ambiente).
+    // O espaço de demonstração (HR Tennis + quadra + admin de teste) só é semeado em
+    // Development — em produção, onboarding de espaço passa a ser 100% manual pelo
+    // painel do Master. Isso importa de verdade porque o Render free tier hiberna e
+    // reinicia sozinho, o que re-executa este seed a cada cold start; sem essa guarda,
+    // um "zerar o banco" em produção seria desfeito automaticamente no próximo restart.
+    public static async Task SeedAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher, bool seedEspacoDemo)
+    {
+        if (seedEspacoDemo)
+        {
+            await SeedEspacoDemoAsync(context, passwordHasher);
+        }
+
+        await SeedMasterAsync(context, passwordHasher);
+    }
+
+    private static async Task SeedEspacoDemoAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher)
     {
         // O seed roda fora do pipeline HTTP (direto no startup), então não há tenant
         // resolvido pelo middleware — IgnoreQueryFilters() é necessário pra essas
@@ -79,7 +92,10 @@ public static class ArenaPassDbContextSeed
             context.Usuarios.Add(admin);
             await context.SaveChangesAsync();
         }
+    }
 
+    private static async Task SeedMasterAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher)
+    {
         var masterExiste = await context.Usuarios.AnyAsync(u => u.Role == RoleUsuario.Master);
         if (!masterExiste)
         {

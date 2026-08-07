@@ -7,4 +7,5 @@ public record AuthResultDto(
     string Email,
     string Role,
     Guid? ProfessorId,
-    bool? ProfessorAprovado);
+    bool? ProfessorAprovado,
+    string? EspacoNome);

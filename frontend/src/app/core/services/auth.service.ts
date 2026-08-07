@@ -21,6 +21,7 @@ export class AuthService {
   readonly role = computed(() => this.authState()?.role ?? null);
   readonly professorId = computed(() => this.authState()?.professorId ?? null);
   readonly professorAprovado = computed(() => this.authState()?.professorAprovado ?? null);
+  readonly espacoNome = computed(() => this.authState()?.espacoNome ?? null);
 
   constructor(private readonly http: HttpClient) {}
 

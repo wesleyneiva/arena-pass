@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { EspacoService } from '../../../core/services/espaco.service';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 type Etapa = 'dados' | 'codigo';
@@ -11,7 +12,7 @@ type Etapa = 'dados' | 'codigo';
   imports: [FormsModule, RouterLink],
   templateUrl: './registrar.html'
 })
-export class Registrar {
+export class Registrar implements OnInit {
   readonly etapa = signal<Etapa>('dados');
 
   nome = '';
@@ -23,11 +24,26 @@ export class Registrar {
   readonly carregando = signal(false);
   readonly erro = signal<string | null>(null);
 
+  readonly nomeEspaco = signal<string | null>(null);
+  readonly espacoNaoEncontrado = signal(false);
+  readonly anoAtual = new Date().getFullYear();
+
   constructor(
     private readonly auth: AuthService,
+    private readonly espacos: EspacoService,
     private readonly router: Router,
     private readonly confirmDialog: ConfirmDialogService
   ) {}
+
+  ngOnInit(): void {
+    this.espacos.resolverAtual().subscribe({
+      next: (resultado) => {
+        this.nomeEspaco.set(resultado.nome);
+        this.espacoNaoEncontrado.set(!resultado.encontrado);
+      },
+      error: () => this.espacoNaoEncontrado.set(true)
+    });
+  }
 
   solicitarCodigo(): void {
     this.erro.set(null);

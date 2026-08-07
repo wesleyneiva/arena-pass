@@ -12,7 +12,7 @@
       <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-400 font-semibold text-white">A</div>
       <div>
         <p class="text-sm font-semibold text-white leading-tight">ArenaPass</p>
-        <p class="text-xs text-slate-400 leading-tight">Painel do clube</p>
+        <p class="text-xs text-slate-400 leading-tight">{{ auth.espacoNome() ?? 'Painel do clube' }}</p>
       </div>
     </div>
 
@@ -49,6 +49,9 @@
         <app-icon name="menu" [size]="22" />
       </button>
       <span class="font-semibold text-slate-900">ArenaPass</span>
+      @if (auth.espacoNome()) {
+        <span class="text-sm text-slate-400">· {{ auth.espacoNome() }}</span>
+      }
     </header>
 
     <main class="mx-auto w-full max-w-6xl flex-1 p-4 sm:p-6 lg:p-10">

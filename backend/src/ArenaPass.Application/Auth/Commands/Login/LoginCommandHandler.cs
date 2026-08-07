@@ -79,6 +79,13 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResultDto>
 
         // Master: espacoId fica null (cross-tenant, sem espaço fixo na sessão).
 
+        string? espacoNome = null;
+        if (espacoId.HasValue)
+        {
+            espacoNome = (await _context.Espacos
+                .FirstOrDefaultAsync(e => e.Id == espacoId.Value, cancellationToken))?.Nome;
+        }
+
         var professorId = usuario.Professor?.Id;
         var token = _jwtTokenGenerator.GerarToken(usuario, professorId, espacoId);
 
@@ -89,6 +96,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResultDto>
             usuario.Email,
             usuario.Role.ToString(),
             professorId,
-            professorAprovado);
+            professorAprovado,
+            espacoNome);
     }
 }

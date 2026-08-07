@@ -94,7 +94,7 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     var passwordHasher = scope.ServiceProvider.GetRequiredService<ArenaPass.Application.Common.Interfaces.IPasswordHasher>();
 
     await context.Database.MigrateAsync();
-    await ArenaPassDbContextSeed.SeedAsync(context, passwordHasher);
+    await ArenaPassDbContextSeed.SeedAsync(context, passwordHasher, seedEspacoDemo: app.Environment.IsDevelopment());
 }
 
 app.UseArenaPassExceptionHandling();

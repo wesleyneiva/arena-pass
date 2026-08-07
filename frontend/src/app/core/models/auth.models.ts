@@ -23,6 +23,7 @@ export interface AuthResult {
   role: 'AdminClube' | 'Professor' | 'Master';
   professorId: string | null;
   professorAprovado: boolean | null;
+  espacoNome: string | null;
 }
 
 export interface AtualizarPerfilRequest {

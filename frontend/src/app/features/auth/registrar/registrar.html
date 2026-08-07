@@ -1,16 +1,59 @@
-<div class="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
-  <div class="w-full max-w-sm animate-fade-in-up">
-    <div class="mb-8 flex items-center justify-center gap-2.5">
-      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-400 font-semibold text-white">A</div>
-      <span class="text-lg font-semibold text-slate-900">ArenaPass</span>
+<div class="min-h-screen flex bg-slate-50">
+  <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-slate-900 p-12 text-white lg:flex">
+    <div class="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-blue-400/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-amber-400/10 blur-3xl"></div>
+
+    <div class="relative flex items-center gap-2.5">
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-400 font-semibold">A</div>
+      <span class="text-lg font-semibold">ArenaPass</span>
     </div>
 
-    <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-      @if (etapa() === 'dados') {
-        <h1 class="text-2xl font-semibold text-slate-900">Cadastro de professor</h1>
-        <p class="mt-1 mb-6 text-sm text-slate-500">
-          Vamos enviar um código de confirmação para o seu e-mail antes de concluir o cadastro.
+    <div class="relative">
+      @if (nomeEspaco()) {
+        <h1 class="text-3xl font-semibold leading-tight">
+          Cadastro de professor<br />em {{ nomeEspaco() }}.
+        </h1>
+        <p class="mt-4 max-w-md text-slate-400">
+          Já dá aula em outro espaço com o ArenaPass? Use o mesmo e-mail — a gente reconhece
+          sua conta e só cria o vínculo com este espaço, sem duplicar cadastro.
         </p>
+      } @else {
+        <h1 class="text-3xl font-semibold leading-tight">
+          Cadastro de professor.
+        </h1>
+        <p class="mt-4 max-w-md text-slate-400">
+          Já dá aula em outro espaço com o ArenaPass? Use o mesmo e-mail — a gente reconhece
+          sua conta e só cria o vínculo com este espaço, sem duplicar cadastro.
+        </p>
+      }
+    </div>
+
+    <p class="relative text-xs text-slate-500">&copy; {{ anoAtual }} ArenaPass</p>
+  </div>
+
+  <div class="flex flex-1 items-center justify-center px-4 py-12">
+    <div class="w-full max-w-sm animate-fade-in-up">
+      <div class="mb-8 flex items-center gap-2.5 lg:hidden">
+        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-400 font-semibold text-white">A</div>
+        <span class="text-lg font-semibold text-slate-900">ArenaPass</span>
+      </div>
+
+      @if (etapa() === 'dados') {
+        <h2 class="text-2xl font-semibold text-slate-900">Cadastro de professor</h2>
+        @if (nomeEspaco()) {
+          <p class="mt-1 mb-8 text-sm text-slate-500">
+            Você está se cadastrando em <strong>{{ nomeEspaco() }}</strong>. Vamos enviar um código de
+            confirmação para o seu e-mail antes de concluir.
+          </p>
+        } @else if (espacoNaoEncontrado()) {
+          <p class="mt-1 mb-8 text-sm text-amber-600">
+            Não identificamos um espaço para este endereço. Confirme o link de acesso do clube antes de continuar.
+          </p>
+        } @else {
+          <p class="mt-1 mb-8 text-sm text-slate-500">
+            Vamos enviar um código de confirmação para o seu e-mail antes de concluir o cadastro.
+          </p>
+        }
 
         <form ngNativeValidate (ngSubmit)="solicitarCodigo()" class="space-y-4">
           <div>
@@ -50,11 +93,11 @@
           </button>
         </form>
       } @else {
-        <h1 class="text-2xl font-semibold text-slate-900">Confirme seu e-mail</h1>
+        <h2 class="text-2xl font-semibold text-slate-900">Confirme seu e-mail</h2>
         <p class="mt-1 text-sm text-slate-500">
           Enviamos um código para <span class="font-medium text-slate-700">{{ email }}</span>. Digite-o abaixo para concluir o cadastro.
         </p>
-        <p class="mt-1 mb-6 text-xs text-slate-400">
+        <p class="mt-1 mb-8 text-xs text-slate-400">
           Não recebeu? Confira também a caixa de spam/lixo eletrônico.
         </p>
 
@@ -83,10 +126,10 @@
           </button>
         </form>
       }
-    </div>
 
-    <p class="mt-6 text-center text-sm text-slate-500">
-      Já tem conta? <a routerLink="/login" class="font-medium text-blue-600 hover:underline">Entrar</a>
-    </p>
+      <p class="mt-6 text-center text-sm text-slate-500">
+        Já tem conta? <a routerLink="/login" class="font-medium text-blue-600 hover:underline">Entrar</a>
+      </p>
+    </div>
   </div>
 </div>
