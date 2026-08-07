@@ -42,7 +42,7 @@ public class ConvitesController : ControllerBase
     }
 
     [HttpGet("api/agendamentos/{agendamentoId:guid}/convites")]
-    [Authorize(Roles = "AdminClube,Master,Professor")]
+    [Authorize(Roles = "AdminClube,Professor")]
     public async Task<IActionResult> ListarPorAgendamento(Guid agendamentoId, CancellationToken cancellationToken)
     {
         var solicitanteProfessorId = User.IsInRole("Professor") ? ProfessorIdDoToken() : (Guid?)null;
@@ -52,7 +52,7 @@ public class ConvitesController : ControllerBase
     }
 
     [HttpGet("api/convites/{id:guid}")]
-    [Authorize(Roles = "AdminClube,Master,Professor")]
+    [Authorize(Roles = "AdminClube,Professor")]
     public async Task<IActionResult> Obter(Guid id, CancellationToken cancellationToken)
     {
         var solicitanteProfessorId = User.IsInRole("Professor") ? ProfessorIdDoToken() : (Guid?)null;

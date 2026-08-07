@@ -6,7 +6,7 @@ import { Icon } from '../../../shared/icon/icon';
 interface ItemMenu {
   rota: string;
   rotulo: string;
-  icone: 'grid' | 'users' | 'calendar' | 'chart' | 'shield' | 'pencil';
+  icone: 'grid' | 'users' | 'calendar' | 'chart' | 'shield' | 'pencil' | 'clipboard';
 }
 
 const ITENS_BASE: ItemMenu[] = [
@@ -16,6 +16,7 @@ const ITENS_BASE: ItemMenu[] = [
   { rota: '/admin/financeiro', rotulo: 'Financeiro', icone: 'chart' }
 ];
 
+const ITEM_ESPACOS: ItemMenu = { rota: '/admin/espacos', rotulo: 'Espaços', icone: 'clipboard' };
 const ITEM_ADMINISTRADORES: ItemMenu = { rota: '/admin/administradores', rotulo: 'Administradores', icone: 'shield' };
 const ITEM_PERFIL: ItemMenu = { rota: '/admin/perfil', rotulo: 'Meu perfil', icone: 'pencil' };
 
@@ -28,12 +29,10 @@ export class AdminLayout {
   readonly menuAberto = signal(false);
 
   readonly itens = computed<ItemMenu[]>(() => {
-    const itens = [...ITENS_BASE];
     if (this.auth.role() === 'Master') {
-      itens.push(ITEM_ADMINISTRADORES);
+      return [ITEM_ESPACOS, ITEM_ADMINISTRADORES, ITEM_PERFIL];
     }
-    itens.push(ITEM_PERFIL);
-    return itens;
+    return [...ITENS_BASE, ITEM_PERFIL];
   });
 
   constructor(

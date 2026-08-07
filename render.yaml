@@ -21,6 +21,11 @@ services:
         value: "480"
       - key: Cors__FrontendOrigins__0
         sync: false
+      # Segundo domínio permitido pelo CORS (ex: https://hrtennis.wnlabs.com.br) —
+      # preencher no dashboard do Render quando o subdomínio do primeiro cliente
+      # for adicionado como domínio do projeto na Vercel.
+      - key: Cors__FrontendOrigins__1
+        sync: false
       - key: Pix__Chave
         sync: false
       - key: Pix__NomeRecebedor

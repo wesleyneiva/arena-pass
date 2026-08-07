@@ -3,4 +3,4 @@ using MediatR;
 
 namespace ArenaPass.Application.Admins.Queries;
 
-public record ListarAdminsQuery : IRequest<List<AdminDto>>;
+public record ListarAdminsQuery(Guid? EspacoId = null) : IRequest<List<AdminDto>>;

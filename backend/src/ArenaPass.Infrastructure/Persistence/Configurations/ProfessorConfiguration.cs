@@ -11,8 +11,9 @@ public class ProfessorConfiguration : IEntityTypeConfiguration<Professor>
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Cpf).IsRequired().HasMaxLength(11);
-        builder.Property(p => p.StatusAprovacao).HasConversion<string>().HasMaxLength(30);
 
+        // Cpf identifica uma pessoa física real — continua único globalmente, não
+        // composto com EspacoId (o vínculo por espaço vive em ProfessorEspaco).
         builder.HasIndex(p => p.Cpf).IsUnique();
     }
 }

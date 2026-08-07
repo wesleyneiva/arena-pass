@@ -38,7 +38,7 @@ public class QuadrasController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "AdminClube,Master")]
+    [Authorize(Roles = "AdminClube")]
     public async Task<IActionResult> Criar(CriarQuadraCommand command, CancellationToken cancellationToken)
     {
         var id = await _mediator.Send(command, cancellationToken);
@@ -46,7 +46,7 @@ public class QuadrasController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "AdminClube,Master")]
+    [Authorize(Roles = "AdminClube")]
     public async Task<IActionResult> Atualizar(Guid id, AtualizarQuadraRequest request, CancellationToken cancellationToken)
     {
         var command = new AtualizarQuadraCommand(
@@ -64,7 +64,7 @@ public class QuadrasController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "AdminClube,Master")]
+    [Authorize(Roles = "AdminClube")]
     public async Task<IActionResult> Excluir(Guid id, CancellationToken cancellationToken)
     {
         await _mediator.Send(new ExcluirQuadraCommand(id), cancellationToken);

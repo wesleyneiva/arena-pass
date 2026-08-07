@@ -11,7 +11,7 @@ public class ListarConvitesDoAgendamentoQueryHandlerTests
     private static Agendamento CriarAgendamentoComConvite(InMemoryDbContext context, out Guid professorId)
     {
         var usuario = new Usuario { Nome = "Professor Teste", Email = "prof@teste.com", Role = RoleUsuario.Professor };
-        var professor = new Professor { UsuarioId = usuario.Id, Cpf = "12345678900", StatusAprovacao = StatusAprovacaoProfessor.Aprovado };
+        var professor = new Professor { UsuarioId = usuario.Id, Cpf = "12345678900" };
         var modalidade = new Modalidade { Nome = "Beach Tennis" };
         var quadra = new Quadra { Nome = "Quadra 4", ModalidadeId = modalidade.Id };
         var agendamento = new Agendamento

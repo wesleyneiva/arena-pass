@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using ArenaPass.Application.Common.Interfaces;
 using ArenaPass.Domain.Entities;
+using ArenaPass.Domain.Enums;
 using ArenaPass.Domain.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,29 +15,58 @@ public class SolicitarCodigoRegistroProfessorCommandHandler : IRequestHandler<So
     private readonly IApplicationDbContext _context;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IEmailSender _emailSender;
+    private readonly ICurrentTenant _currentTenant;
 
     public SolicitarCodigoRegistroProfessorCommandHandler(
         IApplicationDbContext context,
         IPasswordHasher passwordHasher,
-        IEmailSender emailSender)
+        IEmailSender emailSender,
+        ICurrentTenant currentTenant)
     {
         _context = context;
         _passwordHasher = passwordHasher;
         _emailSender = emailSender;
+        _currentTenant = currentTenant;
     }
 
     public async Task Handle(SolicitarCodigoRegistroProfessorCommand request, CancellationToken cancellationToken)
     {
-        var emailJaExiste = await _context.Usuarios
-            .AnyAsync(u => u.Email == request.Email, cancellationToken);
+        var espacoId = _currentTenant.EspacoId
+            ?? throw new DomainException("Não foi possível identificar o espaço atual.");
 
-        if (emailJaExiste)
+        var usuarioExistente = await _context.Usuarios
+            .Include(u => u.Professor)
+            .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+
+        if (usuarioExistente is not null && usuarioExistente.Professor is null)
         {
             throw new DomainException($"Já existe um usuário cadastrado com o e-mail '{request.Email}'.");
         }
 
+        // Já é professor em outro espaço — está pedindo um vínculo aqui, não uma conta
+        // nova. Ainda exige confirmação por código pra provar que é o dono do e-mail.
+        if (usuarioExistente?.Professor is not null)
+        {
+            var vinculoExistente = await _context.ProfessoresEspacos
+                .FirstOrDefaultAsync(
+                    pe => pe.ProfessorId == usuarioExistente.Professor.Id && pe.EspacoId == espacoId,
+                    cancellationToken);
+
+            if (vinculoExistente is not null)
+            {
+                var mensagem = vinculoExistente.StatusAprovacao switch
+                {
+                    StatusAprovacaoProfessor.Suspenso =>
+                        "Seu vínculo com este espaço está suspenso. Entre em contato com o administrador.",
+                    _ => "Você já possui um vínculo (ou solicitação em andamento) com este espaço."
+                };
+
+                throw new DomainException(mensagem);
+            }
+        }
+
         var solicitacaoExistente = await _context.SolicitacoesRegistroProfessor
-            .FirstOrDefaultAsync(s => s.Email == request.Email, cancellationToken);
+            .FirstOrDefaultAsync(s => s.EspacoId == espacoId && s.Email == request.Email, cancellationToken);
 
         if (solicitacaoExistente is not null)
         {
@@ -47,6 +77,7 @@ public class SolicitarCodigoRegistroProfessorCommandHandler : IRequestHandler<So
 
         var solicitacao = new SolicitacaoRegistroProfessor
         {
+            EspacoId = espacoId,
             Nome = request.Nome,
             Email = request.Email,
             Cpf = request.Cpf,

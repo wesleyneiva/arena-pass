@@ -14,6 +14,8 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+        services.AddScoped<ICurrentTenant, CurrentTenant>();
+
         services.AddDbContext<ArenaPassDbContext>(options =>
             options.UseNpgsql(connectionString));
 

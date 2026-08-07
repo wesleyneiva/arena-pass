@@ -18,7 +18,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _settings = settings.Value;
     }
 
-    public string GerarToken(Usuario usuario, Guid? professorId)
+    public string GerarToken(Usuario usuario, Guid? professorId, Guid? espacoId)
     {
         var claims = new List<Claim>
         {
@@ -32,6 +32,12 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         if (professorId.HasValue)
         {
             claims.Add(new Claim("professorId", professorId.Value.ToString()));
+        }
+
+        // Ausente para o Master (cross-tenant, sem espaço fixo na sessão).
+        if (espacoId.HasValue)
+        {
+            claims.Add(new Claim("espacoId", espacoId.Value.ToString()));
         }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));

@@ -11,7 +11,7 @@ public class ObterFaturamentoPeriodoQueryHandlerTests
     private static (Guid professorId, string nome) CriarProfessor(InMemoryDbContext context, string nome, string cpf)
     {
         var usuario = new Usuario { Nome = nome, Email = $"{cpf}@teste.com", Role = RoleUsuario.Professor };
-        var professor = new Professor { UsuarioId = usuario.Id, Cpf = cpf, StatusAprovacao = StatusAprovacaoProfessor.Aprovado };
+        var professor = new Professor { UsuarioId = usuario.Id, Cpf = cpf };
         context.Usuarios.Add(usuario);
         context.Professores.Add(professor);
         return (professor.Id, nome);

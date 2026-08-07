@@ -12,10 +12,12 @@ namespace ArenaPass.Application.Agendamentos.Commands.CriarAgendamento;
 public class CriarAgendamentoCommandHandler : IRequestHandler<CriarAgendamentoCommand, Guid>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentTenant _currentTenant;
 
-    public CriarAgendamentoCommandHandler(IApplicationDbContext context)
+    public CriarAgendamentoCommandHandler(IApplicationDbContext context, ICurrentTenant currentTenant)
     {
         _context = context;
+        _currentTenant = currentTenant;
     }
 
     public async Task<Guid> Handle(CriarAgendamentoCommand request, CancellationToken cancellationToken)
@@ -25,11 +27,14 @@ public class CriarAgendamentoCommandHandler : IRequestHandler<CriarAgendamentoCo
             throw new DomainException("Não é possível agendar um horário que já passou.");
         }
 
-        var professor = await _context.Professores
-            .FirstOrDefaultAsync(p => p.Id == request.ProfessorId, cancellationToken)
+        var espacoId = _currentTenant.EspacoId
+            ?? throw new DomainException("Não foi possível identificar o espaço atual.");
+
+        var vinculo = await _context.ProfessoresEspacos
+            .FirstOrDefaultAsync(pe => pe.ProfessorId == request.ProfessorId && pe.EspacoId == espacoId, cancellationToken)
             ?? throw new NotFoundException(nameof(Professor), request.ProfessorId);
 
-        if (professor.StatusAprovacao != StatusAprovacaoProfessor.Aprovado)
+        if (vinculo.StatusAprovacao != StatusAprovacaoProfessor.Aprovado)
         {
             throw new DomainException("Professor ainda não foi aprovado pelo clube — não é possível agendar aulas.");
         }
@@ -77,6 +82,7 @@ public class CriarAgendamentoCommandHandler : IRequestHandler<CriarAgendamentoCo
 
         var agendamento = new Agendamento
         {
+            EspacoId = espacoId,
             QuadraId = request.QuadraId,
             ProfessorId = request.ProfessorId,
             Data = request.Data,

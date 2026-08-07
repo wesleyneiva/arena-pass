@@ -29,7 +29,15 @@
       </div>
 
       <h2 class="text-2xl font-semibold text-slate-900">Entrar</h2>
-      <p class="mt-1 mb-8 text-sm text-slate-500">Acesse sua conta do clube ou de professor.</p>
+      @if (nomeEspaco()) {
+        <p class="mt-1 mb-8 text-sm text-slate-500">Você está entrando em <strong>{{ nomeEspaco() }}</strong>.</p>
+      } @else if (espacoNaoEncontrado()) {
+        <p class="mt-1 mb-8 text-sm text-amber-600">
+          Não identificamos um espaço para este endereço. Se você é professor ou administrador de um clube, confirme o link de acesso.
+        </p>
+      } @else {
+        <p class="mt-1 mb-8 text-sm text-slate-500">Acesse sua conta do clube ou de professor.</p>
+      }
 
       <form ngNativeValidate (ngSubmit)="entrar()" class="space-y-4">
         <div>

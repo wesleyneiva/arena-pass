@@ -16,6 +16,12 @@ public class SolicitacaoRegistroProfessorConfiguration : IEntityTypeConfiguratio
         builder.Property(s => s.Cpf).IsRequired().HasMaxLength(11);
         builder.Property(s => s.Codigo).IsRequired().HasMaxLength(6);
 
-        builder.HasIndex(s => s.Email).IsUnique();
+        // Composto: o mesmo e-mail pode ter uma solicitação pendente por espaço diferente.
+        builder.HasIndex(s => new { s.EspacoId, s.Email }).IsUnique();
+
+        builder.HasOne(s => s.Espaco)
+            .WithMany()
+            .HasForeignKey(s => s.EspacoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

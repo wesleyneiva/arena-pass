@@ -23,10 +23,12 @@ public class ExcluirAdminCommandHandler : IRequestHandler<ExcluirAdminCommand>
             .FirstOrDefaultAsync(u => u.Id == request.AdminId && u.Role == RoleUsuario.AdminClube, cancellationToken)
             ?? throw new NotFoundException(nameof(Usuario), request.AdminId);
 
-        var totalAdmins = await _context.Usuarios.CountAsync(u => u.Role == RoleUsuario.AdminClube, cancellationToken);
-        if (totalAdmins <= 1)
+        var totalAdminsDoEspaco = await _context.Usuarios
+            .CountAsync(u => u.Role == RoleUsuario.AdminClube && u.EspacoId == admin.EspacoId, cancellationToken);
+
+        if (totalAdminsDoEspaco <= 1)
         {
-            throw new DomainException("Não é possível excluir o único administrador do clube.");
+            throw new DomainException("Não é possível excluir o único administrador do espaço.");
         }
 
         _context.Usuarios.Remove(admin);

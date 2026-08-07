@@ -12,7 +12,7 @@ public class AtualizarProfessorCommandHandlerTests
     private static Professor CriarProfessor(InMemoryDbContext context, string email)
     {
         var usuario = new Usuario { Nome = "Professor Teste", Email = email, Role = RoleUsuario.Professor };
-        var professor = new Professor { UsuarioId = usuario.Id, Cpf = "12345678900", StatusAprovacao = StatusAprovacaoProfessor.Aprovado };
+        var professor = new Professor { UsuarioId = usuario.Id, Cpf = "12345678900" };
 
         context.Usuarios.Add(usuario);
         context.Professores.Add(professor);

@@ -17,10 +17,16 @@ public class ListarAdminsQueryHandler : IRequestHandler<ListarAdminsQuery, List<
 
     public async Task<List<AdminDto>> Handle(ListarAdminsQuery request, CancellationToken cancellationToken)
     {
-        return await _context.Usuarios
-            .Where(u => u.Role == RoleUsuario.AdminClube)
+        var query = _context.Usuarios.Where(u => u.Role == RoleUsuario.AdminClube);
+
+        if (request.EspacoId.HasValue)
+        {
+            query = query.Where(u => u.EspacoId == request.EspacoId);
+        }
+
+        return await query
             .OrderBy(u => u.Nome)
-            .Select(u => new AdminDto(u.Id, u.Nome, u.Email))
+            .Select(u => new AdminDto(u.Id, u.Nome, u.Email, u.EspacoId))
             .ToListAsync(cancellationToken);
     }
 }

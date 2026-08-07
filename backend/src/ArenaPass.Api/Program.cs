@@ -107,6 +107,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(CorsPolicyName);
 
 app.UseAuthentication();
+app.UseArenaPassTenantResolution();
 app.UseAuthorization();
 
 app.MapGet("/", () => Results.Ok("ArenaPass API"));

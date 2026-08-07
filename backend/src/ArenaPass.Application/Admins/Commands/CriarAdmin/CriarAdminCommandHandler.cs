@@ -1,3 +1,4 @@
+using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Common.Interfaces;
 using ArenaPass.Domain.Entities;
 using ArenaPass.Domain.Enums;
@@ -20,6 +21,14 @@ public class CriarAdminCommandHandler : IRequestHandler<CriarAdminCommand, Guid>
 
     public async Task<Guid> Handle(CriarAdminCommand request, CancellationToken cancellationToken)
     {
+        var espacoExiste = await _context.Espacos
+            .AnyAsync(e => e.Id == request.EspacoId, cancellationToken);
+
+        if (!espacoExiste)
+        {
+            throw new NotFoundException(nameof(Domain.Entities.Espaco), request.EspacoId);
+        }
+
         var emailJaExiste = await _context.Usuarios
             .AnyAsync(u => u.Email == request.Email, cancellationToken);
 
@@ -32,7 +41,8 @@ public class CriarAdminCommandHandler : IRequestHandler<CriarAdminCommand, Guid>
         {
             Nome = request.Nome,
             Email = request.Email,
-            Role = RoleUsuario.AdminClube
+            Role = RoleUsuario.AdminClube,
+            EspacoId = request.EspacoId
         };
         usuario.SenhaHash = _passwordHasher.Hash(request.Senha);
 

@@ -11,6 +11,11 @@ public class ModalidadeConfiguration : IEntityTypeConfiguration<Modalidade>
         builder.HasKey(m => m.Id);
 
         builder.Property(m => m.Nome).IsRequired().HasMaxLength(100);
-        builder.HasIndex(m => m.Nome).IsUnique();
+        builder.HasIndex(m => new { m.EspacoId, m.Nome }).IsUnique();
+
+        builder.HasOne(m => m.Espaco)
+            .WithMany(e => e.Modalidades)
+            .HasForeignKey(m => m.EspacoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -1,3 +1,3 @@
 namespace ArenaPass.Application.Admins.Dtos;
 
-public record AdminDto(Guid Id, string Nome, string Email);
+public record AdminDto(Guid Id, string Nome, string Email, Guid? EspacoId);

@@ -21,8 +21,7 @@ public class EmitirConviteCommandHandlerTests
         var professor = new Professor
         {
             UsuarioId = usuario.Id,
-            Cpf = "12345678900",
-            StatusAprovacao = StatusAprovacaoProfessor.Aprovado
+            Cpf = "12345678900"
         };
         var modalidade = new Modalidade { Nome = "Beach Tennis" };
         var quadra = new Quadra { Nome = "Quadra 4", ModalidadeId = modalidade.Id };
@@ -30,7 +29,7 @@ public class EmitirConviteCommandHandlerTests
         {
             QuadraId = quadra.Id,
             ProfessorId = professor.Id,
-            Data = data ?? new DateOnly(2026, 8, 1),
+            Data = data ?? new DateOnly(2027, 8, 1),
             HoraInicio = horaInicio ?? new TimeOnly(18, 0),
             HoraFim = horaFim ?? new TimeOnly(19, 0),
             TaxaValor = 80m,

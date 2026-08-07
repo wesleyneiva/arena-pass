@@ -1,0 +1,135 @@
+<div class="mb-8 flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <h1 class="text-2xl font-semibold text-slate-900">Espaços</h1>
+    <p class="mt-1 text-sm text-slate-500">Clubes, academias e outros locais cadastrados na plataforma.</p>
+  </div>
+  <button (click)="formularioEspacoAberto() ? fecharNovoEspaco() : abrirNovoEspaco()"
+    class="flex items-center gap-1.5 rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600">
+    <app-icon [name]="formularioEspacoAberto() ? 'close' : 'plus'" [size]="17" />
+    {{ formularioEspacoAberto() ? 'Cancelar' : 'Novo espaço' }}
+  </button>
+</div>
+
+@if (erro()) {
+  <p class="mb-4 animate-fade-in rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ erro() }}</p>
+}
+
+@if (formularioEspacoAberto()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in" (click)="fecharNovoEspaco()">
+    <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Novo espaço</h2>
+        <button (click)="fecharNovoEspaco()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
+      </div>
+
+      <form ngNativeValidate (ngSubmit)="salvarEspaco()" class="grid gap-3">
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
+          <input required name="novoNomeEspaco" [(ngModel)]="novoNomeEspaco" (blur)="sugerirSubdominio()"
+            placeholder="Ex: Clube Praia Grande"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+        </div>
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Subdomínio</label>
+          <input required name="novoSubdominio" [(ngModel)]="novoSubdominio" pattern="[a-z0-9-]+"
+            placeholder="clube-praia-grande"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+          <p class="mt-1 text-xs text-slate-400">Só letras minúsculas, números e hífen — vira o endereço de acesso do espaço.</p>
+        </div>
+        <div>
+          <button type="submit" [disabled]="salvandoEspaco()"
+            [class]="salvandoEspaco()
+              ? 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-blue-400 via-blue-200 to-blue-400'
+              : 'bg-blue-500 hover:bg-blue-600'"
+            class="w-full rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition disabled:cursor-not-allowed">
+            {{ salvandoEspaco() ? 'Criando...' : 'Criar espaço' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+@if (espacoParaAdmin(); as espaco) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in" (click)="fecharCriarAdmin()">
+    <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Primeiro administrador de {{ espaco.nome }}</h2>
+        <button (click)="fecharCriarAdmin()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
+      </div>
+
+      @if (erroAdmin()) {
+        <p class="mb-3 animate-fade-in rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ erroAdmin() }}</p>
+      }
+
+      <form ngNativeValidate (ngSubmit)="salvarAdmin()" class="grid gap-3">
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
+          <input required name="novoNomeAdmin" [(ngModel)]="novoNomeAdmin"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+        </div>
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">E-mail</label>
+          <input required type="email" name="novoEmailAdmin" [(ngModel)]="novoEmailAdmin"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+        </div>
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Senha</label>
+          <input required type="password" name="novaSenhaAdmin" [(ngModel)]="novaSenhaAdmin" minlength="6"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+        </div>
+        <div>
+          <button type="submit" [disabled]="salvandoAdmin()"
+            [class]="salvandoAdmin()
+              ? 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-blue-400 via-blue-200 to-blue-400'
+              : 'bg-blue-500 hover:bg-blue-600'"
+            class="w-full rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition disabled:cursor-not-allowed">
+            {{ salvandoAdmin() ? 'Criando...' : 'Criar administrador' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+@if (carregando()) {
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+      <div class="h-44 animate-pulse rounded-2xl bg-slate-100"></div>
+    }
+  </div>
+} @else {
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @for (espaco of espacos(); track espaco.id) {
+      <div class="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+        <div class="h-1.5" [class]="espaco.ativo ? 'bg-slate-800' : 'bg-slate-300'"></div>
+
+        <div class="flex flex-1 flex-col gap-4 p-5">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="truncate font-semibold text-slate-900">{{ espaco.nome }}</p>
+              <p class="truncate text-xs text-slate-500">{{ espaco.subdominio }}</p>
+            </div>
+            <span
+              class="flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+              [class]="espaco.ativo ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'">
+              {{ espaco.ativo ? 'Ativo' : 'Inativo' }}
+            </span>
+          </div>
+
+          <div class="mt-auto flex items-center border-t border-slate-100 pt-4">
+            <button (click)="abrirCriarAdmin(espaco)"
+              class="ml-auto flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50">
+              <app-icon name="shield" [size]="15" />
+              Criar admin
+            </button>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="col-span-full rounded-xl border border-dashed border-slate-300 p-10 text-center">
+        <p class="text-sm text-slate-500">Nenhum espaço cadastrado ainda.</p>
+      </div>
+    }
+  </div>
+}

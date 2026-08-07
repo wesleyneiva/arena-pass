@@ -30,7 +30,7 @@ public class ExcluirQuadraCommandHandlerTests
     {
         var context = TestDbContextFactory.Create();
         var usuario = new Usuario { Nome = "Prof", Email = "prof@teste.com", Role = RoleUsuario.Professor };
-        var professor = new Professor { UsuarioId = usuario.Id, Cpf = "12345678900", StatusAprovacao = StatusAprovacaoProfessor.Aprovado };
+        var professor = new Professor { UsuarioId = usuario.Id, Cpf = "12345678900" };
         var modalidade = new Modalidade { Nome = "Futebol" };
         var quadra = new Quadra { Nome = "Quadra 1", ModalidadeId = modalidade.Id };
         var agendamento = new Agendamento

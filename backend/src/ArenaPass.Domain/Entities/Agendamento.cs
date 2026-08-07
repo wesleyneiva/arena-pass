@@ -5,6 +5,11 @@ namespace ArenaPass.Domain.Entities;
 
 public class Agendamento : BaseEntity
 {
+    // Denormalizado a partir de Quadra.EspacoId na criação, para o filtro global de tenant
+    // não depender de join.
+    public Guid EspacoId { get; set; }
+    public Espaco? Espaco { get; set; }
+
     public Guid QuadraId { get; set; }
     public Quadra? Quadra { get; set; }
 

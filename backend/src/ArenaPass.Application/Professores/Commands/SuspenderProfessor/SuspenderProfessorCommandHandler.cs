@@ -10,24 +10,29 @@ namespace ArenaPass.Application.Professores.Commands.SuspenderProfessor;
 public class SuspenderProfessorCommandHandler : IRequestHandler<SuspenderProfessorCommand>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentTenant _currentTenant;
 
-    public SuspenderProfessorCommandHandler(IApplicationDbContext context)
+    public SuspenderProfessorCommandHandler(IApplicationDbContext context, ICurrentTenant currentTenant)
     {
         _context = context;
+        _currentTenant = currentTenant;
     }
 
     public async Task Handle(SuspenderProfessorCommand request, CancellationToken cancellationToken)
     {
-        var professor = await _context.Professores
-            .FirstOrDefaultAsync(p => p.Id == request.ProfessorId, cancellationToken)
+        var espacoId = _currentTenant.EspacoId
+            ?? throw new DomainException("Não foi possível identificar o espaço atual.");
+
+        var vinculo = await _context.ProfessoresEspacos
+            .FirstOrDefaultAsync(pe => pe.ProfessorId == request.ProfessorId && pe.EspacoId == espacoId, cancellationToken)
             ?? throw new NotFoundException(nameof(Domain.Entities.Professor), request.ProfessorId);
 
-        if (professor.StatusAprovacao != StatusAprovacaoProfessor.Aprovado)
+        if (vinculo.StatusAprovacao != StatusAprovacaoProfessor.Aprovado)
         {
             throw new DomainException("Só é possível suspender um professor que está aprovado.");
         }
 
-        professor.StatusAprovacao = StatusAprovacaoProfessor.Suspenso;
+        vinculo.StatusAprovacao = StatusAprovacaoProfessor.Suspenso;
 
         await _context.SaveChangesAsync(cancellationToken);
     }

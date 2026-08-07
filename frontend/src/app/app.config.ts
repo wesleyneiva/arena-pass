@@ -11,6 +11,7 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { tenantInterceptor } from './core/interceptors/tenant.interceptor';
 
 registerLocaleData(localePt);
 
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([tenantInterceptor, authInterceptor])),
     { provide: LOCALE_ID, useValue: 'pt-BR' }
   ]
 };

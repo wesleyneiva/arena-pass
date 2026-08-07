@@ -8,8 +8,9 @@ import { Admin, AtualizarAdminRequest, CriarAdminRequest } from '../models/admin
 export class AdminService {
   constructor(private readonly http: HttpClient) {}
 
-  listar(): Observable<Admin[]> {
-    return this.http.get<Admin[]>(`${environment.apiUrl}/admins`);
+  listar(espacoId?: string): Observable<Admin[]> {
+    const params = espacoId ? { espacoId } : undefined;
+    return this.http.get<Admin[]>(`${environment.apiUrl}/admins`, { params });
   }
 
   criar(request: CriarAdminRequest): Observable<{ id: string }> {

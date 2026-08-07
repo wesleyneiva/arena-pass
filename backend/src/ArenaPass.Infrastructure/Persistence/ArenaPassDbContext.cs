@@ -9,12 +9,18 @@ namespace ArenaPass.Infrastructure.Persistence;
 
 public class ArenaPassDbContext : DbContext, IApplicationDbContext
 {
-    public ArenaPassDbContext(DbContextOptions<ArenaPassDbContext> options) : base(options)
+    private readonly ICurrentTenant _currentTenant;
+
+    public ArenaPassDbContext(DbContextOptions<ArenaPassDbContext> options, ICurrentTenant currentTenant)
+        : base(options)
     {
+        _currentTenant = currentTenant;
     }
 
+    public DbSet<Espaco> Espacos => Set<Espaco>();
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<Professor> Professores => Set<Professor>();
+    public DbSet<ProfessorEspaco> ProfessoresEspacos => Set<ProfessorEspaco>();
     public DbSet<Modalidade> Modalidades => Set<Modalidade>();
     public DbSet<Quadra> Quadras => Set<Quadra>();
     public DbSet<Agendamento> Agendamentos => Set<Agendamento>();
@@ -24,6 +30,19 @@ public class ArenaPassDbContext : DbContext, IApplicationDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        // Isolamento por tenant: cada entidade "do espaço" só enxerga linhas do
+        // EspacoId corrente. Quando _currentTenant.EspacoId é null (Master sem
+        // tenant selecionado, ou requisição anônima sem tenant resolvido), o filtro
+        // não casa com nenhuma linha real — é o comportamento correto (sem acesso
+        // ambíguo cross-tenant). Usuario/Professor não são filtrados aqui de propósito:
+        // são identidades globais, o escopo por tenant é aplicado explicitamente nos
+        // handlers (Usuario.EspacoId para AdminClube, ProfessorEspaco para Professor).
+        modelBuilder.Entity<Quadra>().HasQueryFilter(q => q.EspacoId == _currentTenant.EspacoId);
+        modelBuilder.Entity<Modalidade>().HasQueryFilter(m => m.EspacoId == _currentTenant.EspacoId);
+        modelBuilder.Entity<Agendamento>().HasQueryFilter(a => a.EspacoId == _currentTenant.EspacoId);
+        modelBuilder.Entity<SolicitacaoRegistroProfessor>().HasQueryFilter(s => s.EspacoId == _currentTenant.EspacoId);
+
         base.OnModelCreating(modelBuilder);
     }
 

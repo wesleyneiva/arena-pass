@@ -1,24 +1,42 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { EspacoService } from '../../../core/services/espaco.service';
 
 @Component({
   selector: 'app-login',
   imports: [FormsModule, RouterLink],
   templateUrl: './login.html'
 })
-export class Login {
+export class Login implements OnInit {
   email = '';
   senha = '';
   readonly carregando = signal(false);
   readonly erro = signal<string | null>(null);
   readonly anoAtual = new Date().getFullYear();
 
+  // Resolução do espaço é só informativa aqui — não bloqueia o formulário, porque o
+  // Master loga sem nenhum espaço resolvido (é cross-tenant). Quem de fato valida o
+  // vínculo com o espaço é o próprio POST /auth/login no backend.
+  readonly nomeEspaco = signal<string | null>(null);
+  readonly espacoNaoEncontrado = signal(false);
+
   constructor(
     private readonly auth: AuthService,
+    private readonly espacos: EspacoService,
     private readonly router: Router
   ) {}
+
+  ngOnInit(): void {
+    this.espacos.resolverAtual().subscribe({
+      next: (resultado) => {
+        this.nomeEspaco.set(resultado.nome);
+        this.espacoNaoEncontrado.set(!resultado.encontrado);
+      },
+      error: () => this.espacoNaoEncontrado.set(true)
+    });
+  }
 
   entrar(): void {
     this.erro.set(null);
@@ -27,7 +45,9 @@ export class Login {
     this.auth.login({ email: this.email, senha: this.senha }).subscribe({
       next: (resultado) => {
         this.carregando.set(false);
-        if (resultado.role === 'AdminClube' || resultado.role === 'Master') {
+        if (resultado.role === 'Master') {
+          this.router.navigateByUrl('/admin/espacos');
+        } else if (resultado.role === 'AdminClube') {
           this.router.navigateByUrl('/admin/quadras');
         } else {
           this.router.navigateByUrl('/professor/agendar');

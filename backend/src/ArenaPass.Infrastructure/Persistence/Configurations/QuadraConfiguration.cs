@@ -16,5 +16,10 @@ public class QuadraConfiguration : IEntityTypeConfiguration<Quadra>
             .WithMany(m => m.Quadras)
             .HasForeignKey(q => q.ModalidadeId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(q => q.Espaco)
+            .WithMany(e => e.Quadras)
+            .HasForeignKey(q => q.EspacoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

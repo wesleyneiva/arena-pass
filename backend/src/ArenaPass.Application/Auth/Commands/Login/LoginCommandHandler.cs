@@ -11,15 +11,18 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResultDto>
     private readonly IApplicationDbContext _context;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly ICurrentTenant _currentTenant;
 
     public LoginCommandHandler(
         IApplicationDbContext context,
         IPasswordHasher passwordHasher,
-        IJwtTokenGenerator jwtTokenGenerator)
+        IJwtTokenGenerator jwtTokenGenerator,
+        ICurrentTenant currentTenant)
     {
         _context = context;
         _passwordHasher = passwordHasher;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _currentTenant = currentTenant;
     }
 
     public async Task<AuthResultDto> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -33,14 +36,51 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResultDto>
             throw new UnauthorizedAccessException("E-mail ou senha inválidos.");
         }
 
-        if (usuario.Professor is not null && usuario.Professor.StatusAprovacao == StatusAprovacaoProfessor.Suspenso)
+        Guid? espacoId = null;
+        bool? professorAprovado = null;
+
+        if (usuario.Role == RoleUsuario.AdminClube)
         {
-            throw new UnauthorizedAccessException(
-                "Seu cadastro foi suspenso pelo clube. Entre em contato para mais informações.");
+            // O admin só pode logar no subdomínio do espaço a que pertence — evita um
+            // token de um espaço sendo emitido a partir do header de outro.
+            if (_currentTenant.EspacoId is null || usuario.EspacoId != _currentTenant.EspacoId)
+            {
+                throw new UnauthorizedAccessException("Este administrador não pertence a este espaço.");
+            }
+
+            espacoId = usuario.EspacoId;
+        }
+        else if (usuario.Role == RoleUsuario.Professor && usuario.Professor is not null)
+        {
+            if (_currentTenant.EspacoId is null)
+            {
+                throw new UnauthorizedAccessException("Espaço não encontrado.");
+            }
+
+            var vinculo = await _context.ProfessoresEspacos
+                .FirstOrDefaultAsync(
+                    pe => pe.ProfessorId == usuario.Professor.Id && pe.EspacoId == _currentTenant.EspacoId,
+                    cancellationToken);
+
+            if (vinculo is null)
+            {
+                throw new UnauthorizedAccessException("Você não possui vínculo com este espaço.");
+            }
+
+            if (vinculo.StatusAprovacao == StatusAprovacaoProfessor.Suspenso)
+            {
+                throw new UnauthorizedAccessException(
+                    "Seu cadastro foi suspenso pelo clube. Entre em contato para mais informações.");
+            }
+
+            espacoId = vinculo.EspacoId;
+            professorAprovado = vinculo.StatusAprovacao == StatusAprovacaoProfessor.Aprovado;
         }
 
+        // Master: espacoId fica null (cross-tenant, sem espaço fixo na sessão).
+
         var professorId = usuario.Professor?.Id;
-        var token = _jwtTokenGenerator.GerarToken(usuario, professorId);
+        var token = _jwtTokenGenerator.GerarToken(usuario, professorId, espacoId);
 
         return new AuthResultDto(
             token,
@@ -49,6 +89,6 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResultDto>
             usuario.Email,
             usuario.Role.ToString(),
             professorId,
-            usuario.Professor is not null ? usuario.Professor.StatusAprovacao == Domain.Enums.StatusAprovacaoProfessor.Aprovado : null);
+            professorAprovado);
     }
 }

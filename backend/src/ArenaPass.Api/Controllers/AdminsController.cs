@@ -23,9 +23,9 @@ public class AdminsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Listar(CancellationToken cancellationToken)
+    public async Task<IActionResult> Listar([FromQuery] Guid? espacoId, CancellationToken cancellationToken)
     {
-        var admins = await _mediator.Send(new ListarAdminsQuery(), cancellationToken);
+        var admins = await _mediator.Send(new ListarAdminsQuery(espacoId), cancellationToken);
         return Ok(admins);
     }
 

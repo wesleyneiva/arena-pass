@@ -34,6 +34,9 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                     b.Property<DateOnly>("Data")
                         .HasColumnType("date");
 
+                    b.Property<Guid>("EspacoId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("FormaPagamento")
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
@@ -65,6 +68,8 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EspacoId");
 
                     b.HasIndex("ProfessorId");
 
@@ -113,6 +118,43 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                     b.ToTable("Convites");
                 });
 
+            modelBuilder.Entity("ArenaPass.Domain.Entities.Espaco", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DominioPersonalizado")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Subdominio")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DominioPersonalizado")
+                        .IsUnique();
+
+                    b.HasIndex("Subdominio")
+                        .IsUnique();
+
+                    b.ToTable("Espacos");
+                });
+
             modelBuilder.Entity("ArenaPass.Domain.Entities.Modalidade", b =>
                 {
                     b.Property<Guid>("Id")
@@ -122,6 +164,9 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("EspacoId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -129,7 +174,7 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Nome")
+                    b.HasIndex("EspacoId", "Nome")
                         .IsUnique();
 
                     b.ToTable("Modalidades");
@@ -149,11 +194,6 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("StatusAprovacao")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
                     b.Property<Guid>("UsuarioId")
                         .HasColumnType("uuid");
 
@@ -166,6 +206,39 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Professores");
+                });
+
+            modelBuilder.Entity("ArenaPass.Domain.Entities.ProfessorEspaco", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DataSolicitacao")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EspacoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProfessorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("StatusAprovacao")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EspacoId");
+
+                    b.HasIndex("ProfessorId", "EspacoId")
+                        .IsUnique();
+
+                    b.ToTable("ProfessoresEspacos");
                 });
 
             modelBuilder.Entity("ArenaPass.Domain.Entities.Quadra", b =>
@@ -182,6 +255,9 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("DuracaoSlotMinutos")
                         .HasColumnType("integer");
+
+                    b.Property<Guid>("EspacoId")
+                        .HasColumnType("uuid");
 
                     b.Property<TimeOnly>("HoraAbertura")
                         .HasColumnType("time without time zone");
@@ -201,6 +277,8 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EspacoId");
 
                     b.HasIndex("ModalidadeId");
 
@@ -231,6 +309,9 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<Guid>("EspacoId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("ExpiraEm")
                         .HasColumnType("timestamp with time zone");
 
@@ -245,7 +326,7 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
+                    b.HasIndex("EspacoId", "Email")
                         .IsUnique();
 
                     b.ToTable("SolicitacoesRegistroProfessor");
@@ -264,6 +345,9 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<Guid?>("EspacoId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -284,11 +368,19 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("EspacoId");
+
                     b.ToTable("Usuarios");
                 });
 
             modelBuilder.Entity("ArenaPass.Domain.Entities.Agendamento", b =>
                 {
+                    b.HasOne("ArenaPass.Domain.Entities.Espaco", "Espaco")
+                        .WithMany()
+                        .HasForeignKey("EspacoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ArenaPass.Domain.Entities.Professor", "Professor")
                         .WithMany("Agendamentos")
                         .HasForeignKey("ProfessorId")
@@ -300,6 +392,8 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                         .HasForeignKey("QuadraId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Espaco");
 
                     b.Navigation("Professor");
 
@@ -317,6 +411,17 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                     b.Navigation("Agendamento");
                 });
 
+            modelBuilder.Entity("ArenaPass.Domain.Entities.Modalidade", b =>
+                {
+                    b.HasOne("ArenaPass.Domain.Entities.Espaco", "Espaco")
+                        .WithMany("Modalidades")
+                        .HasForeignKey("EspacoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Espaco");
+                });
+
             modelBuilder.Entity("ArenaPass.Domain.Entities.Professor", b =>
                 {
                     b.HasOne("ArenaPass.Domain.Entities.Usuario", "Usuario")
@@ -328,20 +433,75 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("ArenaPass.Domain.Entities.ProfessorEspaco", b =>
+                {
+                    b.HasOne("ArenaPass.Domain.Entities.Espaco", "Espaco")
+                        .WithMany()
+                        .HasForeignKey("EspacoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ArenaPass.Domain.Entities.Professor", "Professor")
+                        .WithMany("Espacos")
+                        .HasForeignKey("ProfessorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Espaco");
+
+                    b.Navigation("Professor");
+                });
+
             modelBuilder.Entity("ArenaPass.Domain.Entities.Quadra", b =>
                 {
+                    b.HasOne("ArenaPass.Domain.Entities.Espaco", "Espaco")
+                        .WithMany("Quadras")
+                        .HasForeignKey("EspacoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ArenaPass.Domain.Entities.Modalidade", "Modalidade")
                         .WithMany("Quadras")
                         .HasForeignKey("ModalidadeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("Espaco");
+
                     b.Navigation("Modalidade");
+                });
+
+            modelBuilder.Entity("ArenaPass.Domain.Entities.SolicitacaoRegistroProfessor", b =>
+                {
+                    b.HasOne("ArenaPass.Domain.Entities.Espaco", "Espaco")
+                        .WithMany()
+                        .HasForeignKey("EspacoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Espaco");
+                });
+
+            modelBuilder.Entity("ArenaPass.Domain.Entities.Usuario", b =>
+                {
+                    b.HasOne("ArenaPass.Domain.Entities.Espaco", "Espaco")
+                        .WithMany()
+                        .HasForeignKey("EspacoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Espaco");
                 });
 
             modelBuilder.Entity("ArenaPass.Domain.Entities.Agendamento", b =>
                 {
                     b.Navigation("Convites");
+                });
+
+            modelBuilder.Entity("ArenaPass.Domain.Entities.Espaco", b =>
+                {
+                    b.Navigation("Modalidades");
+
+                    b.Navigation("Quadras");
                 });
 
             modelBuilder.Entity("ArenaPass.Domain.Entities.Modalidade", b =>
@@ -352,6 +512,8 @@ namespace ArenaPass.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("ArenaPass.Domain.Entities.Professor", b =>
                 {
                     b.Navigation("Agendamentos");
+
+                    b.Navigation("Espacos");
                 });
 
             modelBuilder.Entity("ArenaPass.Domain.Entities.Quadra", b =>

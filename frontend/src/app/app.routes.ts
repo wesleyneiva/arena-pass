@@ -1,7 +1,9 @@
+import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { AuthService } from './core/services/auth.service';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -20,7 +22,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'quadras' },
+      {
+        path: '',
+        pathMatch: 'full',
+        // Master perdeu acesso a quadras/professores/agendamentos/financeiro (são
+        // recursos de um espaço específico) — cai em Espaços em vez de Quadras.
+        redirectTo: () => (inject(AuthService).role() === 'Master' ? 'espacos' : 'quadras')
+      },
       {
         path: 'quadras',
         loadComponent: () =>
@@ -46,6 +54,12 @@ export const routes: Routes = [
           import('./features/admin/financeiro-admin/financeiro-admin').then(
             (m) => m.FinanceiroAdmin
           )
+      },
+      {
+        path: 'espacos',
+        canActivate: [roleGuard('Master')],
+        loadComponent: () =>
+          import('./features/admin/espacos-master/espacos-master').then((m) => m.EspacosMaster)
       },
       {
         path: 'administradores',

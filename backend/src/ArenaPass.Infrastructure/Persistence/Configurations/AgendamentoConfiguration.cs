@@ -31,6 +31,11 @@ public class AgendamentoConfiguration : IEntityTypeConfiguration<Agendamento>
             .HasForeignKey(a => a.ProfessorId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(a => a.Espaco)
+            .WithMany()
+            .HasForeignKey(a => a.EspacoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Bloqueio de conflito real: como uma reserva agora pode durar 1h ou 2h, duas
         // reservas podem se sobrepor sem compartilhar o mesmo HoraInicio (ex: 18h-20h e
         // 19h-20h) — um índice único simples não basta mais. A garantia real vem de uma

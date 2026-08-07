@@ -1,7 +1,9 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { EspacoService } from '../../../core/services/espaco.service';
 import { Admin } from '../../../core/models/admin.models';
+import { Espaco } from '../../../core/models/espaco.models';
 import { Icon } from '../../../shared/icon/icon';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
@@ -12,6 +14,7 @@ import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dia
 })
 export class AdminsMaster implements OnInit {
   readonly admins = signal<Admin[]>([]);
+  readonly espacos = signal<Espaco[]>([]);
   readonly erro = signal<string | null>(null);
   readonly carregando = signal(true);
   readonly formularioAberto = signal(false);
@@ -21,14 +24,24 @@ export class AdminsMaster implements OnInit {
   novoNome = '';
   novoEmail = '';
   novaSenha = '';
+  novoEspacoId = '';
 
   constructor(
     private readonly adminService: AdminService,
+    private readonly espacoService: EspacoService,
     private readonly confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
     this.carregar();
+    this.espacoService.listar().subscribe((espacos) => this.espacos.set(espacos));
+  }
+
+  nomeDoEspaco(espacoId: string | null): string {
+    if (!espacoId) {
+      return '—';
+    }
+    return this.espacos().find((e) => e.id === espacoId)?.nome ?? '—';
   }
 
   carregar(): void {
@@ -59,6 +72,7 @@ export class AdminsMaster implements OnInit {
     this.novoNome = '';
     this.novoEmail = '';
     this.novaSenha = '';
+    this.novoEspacoId = this.espacos()[0]?.id ?? '';
     this.formularioAberto.set(true);
     this.erro.set(null);
   }
@@ -97,7 +111,7 @@ export class AdminsMaster implements OnInit {
 
     this.salvando.set(true);
     this.adminService
-      .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha })
+      .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha, espacoId: this.novoEspacoId })
       .subscribe({
         next: () => {
           this.salvando.set(false);

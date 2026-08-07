@@ -23,7 +23,11 @@ public class ValidarConviteCommandHandler : IRequestHandler<ValidarConviteComman
         ValidarConviteCommand request,
         CancellationToken cancellationToken)
     {
+        // Endpoint público e deliberadamente sem tenant resolvido (o token já é a
+        // autorização) — IgnoreQueryFilters() evita que o filtro global de Agendamento
+        // (que não casa com nenhum EspacoId quando não há tenant) esconda o convite.
         var convite = await _context.Convites
+            .IgnoreQueryFilters()
             .Include(c => c.Agendamento).ThenInclude(a => a!.Quadra)
             .FirstOrDefaultAsync(c => c.Token == request.Token, cancellationToken)
             ?? throw new NotFoundException(nameof(Convite), request.Token);

@@ -4,6 +4,9 @@ namespace ArenaPass.Domain.Entities;
 
 public class SolicitacaoRegistroProfessor : BaseEntity
 {
+    public Guid EspacoId { get; set; }
+    public Espaco? Espaco { get; set; }
+
     public string Nome { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string SenhaHash { get; set; } = string.Empty;

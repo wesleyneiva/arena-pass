@@ -10,8 +10,10 @@ public class InMemoryDbContext : DbContext, IApplicationDbContext
     {
     }
 
+    public DbSet<Espaco> Espacos => Set<Espaco>();
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<Professor> Professores => Set<Professor>();
+    public DbSet<ProfessorEspaco> ProfessoresEspacos => Set<ProfessorEspaco>();
     public DbSet<Modalidade> Modalidades => Set<Modalidade>();
     public DbSet<Quadra> Quadras => Set<Quadra>();
     public DbSet<Agendamento> Agendamentos => Set<Agendamento>();

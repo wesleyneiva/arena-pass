@@ -4,6 +4,9 @@ namespace ArenaPass.Domain.Entities;
 
 public class Quadra : BaseEntity
 {
+    public Guid EspacoId { get; set; }
+    public Espaco? Espaco { get; set; }
+
     public string Nome { get; set; } = string.Empty;
     public Guid ModalidadeId { get; set; }
     public Modalidade? Modalidade { get; set; }

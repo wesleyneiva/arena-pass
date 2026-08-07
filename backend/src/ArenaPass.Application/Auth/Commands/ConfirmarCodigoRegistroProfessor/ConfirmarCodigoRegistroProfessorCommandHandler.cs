@@ -11,16 +11,21 @@ public class ConfirmarCodigoRegistroProfessorCommandHandler
     : IRequestHandler<ConfirmarCodigoRegistroProfessorCommand, Guid>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentTenant _currentTenant;
 
-    public ConfirmarCodigoRegistroProfessorCommandHandler(IApplicationDbContext context)
+    public ConfirmarCodigoRegistroProfessorCommandHandler(IApplicationDbContext context, ICurrentTenant currentTenant)
     {
         _context = context;
+        _currentTenant = currentTenant;
     }
 
     public async Task<Guid> Handle(ConfirmarCodigoRegistroProfessorCommand request, CancellationToken cancellationToken)
     {
+        var espacoId = _currentTenant.EspacoId
+            ?? throw new DomainException("Não foi possível identificar o espaço atual.");
+
         var solicitacao = await _context.SolicitacoesRegistroProfessor
-            .FirstOrDefaultAsync(s => s.Email == request.Email, cancellationToken)
+            .FirstOrDefaultAsync(s => s.EspacoId == espacoId && s.Email == request.Email, cancellationToken)
             ?? throw new DomainException("Nenhuma solicitação de cadastro encontrada para esse e-mail. Solicite um novo código.");
 
         if (solicitacao.ExpiraEm < DateTime.UtcNow)
@@ -33,12 +38,33 @@ public class ConfirmarCodigoRegistroProfessorCommandHandler
             throw new DomainException("Código inválido.");
         }
 
-        var emailJaExiste = await _context.Usuarios
-            .AnyAsync(u => u.Email == request.Email, cancellationToken);
+        var usuarioExistente = await _context.Usuarios
+            .Include(u => u.Professor)
+            .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
-        if (emailJaExiste)
+        if (usuarioExistente is not null && usuarioExistente.Professor is null)
         {
             throw new DomainException($"Já existe um usuário cadastrado com o e-mail '{request.Email}'.");
+        }
+
+        _context.SolicitacoesRegistroProfessor.Remove(solicitacao);
+
+        // Professor já existe globalmente — só cria o vínculo (pendente) com este
+        // espaço, sem duplicar Usuario/Professor.
+        if (usuarioExistente?.Professor is not null)
+        {
+            var professorExistente = usuarioExistente.Professor;
+
+            _context.ProfessoresEspacos.Add(new ProfessorEspaco
+            {
+                ProfessorId = professorExistente.Id,
+                EspacoId = espacoId,
+                StatusAprovacao = StatusAprovacaoProfessor.Pendente
+            });
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return professorExistente.Id;
         }
 
         var usuario = new Usuario
@@ -52,13 +78,17 @@ public class ConfirmarCodigoRegistroProfessorCommandHandler
         var professor = new Professor
         {
             UsuarioId = usuario.Id,
-            Cpf = solicitacao.Cpf,
-            StatusAprovacao = StatusAprovacaoProfessor.Pendente
+            Cpf = solicitacao.Cpf
         };
 
         _context.Usuarios.Add(usuario);
         _context.Professores.Add(professor);
-        _context.SolicitacoesRegistroProfessor.Remove(solicitacao);
+        _context.ProfessoresEspacos.Add(new ProfessorEspaco
+        {
+            ProfessorId = professor.Id,
+            EspacoId = espacoId,
+            StatusAprovacao = StatusAprovacaoProfessor.Pendente
+        });
 
         await _context.SaveChangesAsync(cancellationToken);
 

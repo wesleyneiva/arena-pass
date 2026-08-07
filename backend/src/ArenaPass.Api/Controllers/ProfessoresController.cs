@@ -15,7 +15,7 @@ public record AtualizarProfessorRequest(string Nome, string Email, string Cpf);
 
 [ApiController]
 [Route("api/professores")]
-[Authorize(Roles = "AdminClube,Master")]
+[Authorize(Roles = "AdminClube")]
 public class ProfessoresController : ControllerBase
 {
     private readonly ISender _mediator;

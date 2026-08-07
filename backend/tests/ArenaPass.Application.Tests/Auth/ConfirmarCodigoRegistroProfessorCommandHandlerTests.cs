@@ -9,12 +9,15 @@ namespace ArenaPass.Application.Tests.Auth;
 
 public class ConfirmarCodigoRegistroProfessorCommandHandlerTests
 {
+    private static readonly Guid EspacoId = Guid.NewGuid();
+
     private static SolicitacaoRegistroProfessor CriarSolicitacao(
         InMemoryDbContext context,
         DateTime? expiraEm = null)
     {
         var solicitacao = new SolicitacaoRegistroProfessor
         {
+            EspacoId = EspacoId,
             Nome = "Maria Professora",
             Email = "maria@teste.com",
             SenhaHash = "hash:Senha@123",
@@ -27,21 +30,49 @@ public class ConfirmarCodigoRegistroProfessorCommandHandlerTests
         return solicitacao;
     }
 
+    private static ConfirmarCodigoRegistroProfessorCommandHandler CriarHandler(InMemoryDbContext context) =>
+        new(context, new FakeCurrentTenant(EspacoId));
+
     [Fact]
     public async Task Handle_DeveCriarProfessorPendente_QuandoCodigoValido()
     {
         var context = TestDbContextFactory.Create();
         CriarSolicitacao(context);
-        var handler = new ConfirmarCodigoRegistroProfessorCommandHandler(context);
+        var handler = CriarHandler(context);
 
         var professorId = await handler.Handle(
             new ConfirmarCodigoRegistroProfessorCommand("maria@teste.com", "123456"),
             CancellationToken.None);
 
         Assert.NotEqual(Guid.Empty, professorId);
-        var professor = Assert.Single(context.Professores);
-        Assert.Equal(StatusAprovacaoProfessor.Pendente, professor.StatusAprovacao);
+        Assert.Single(context.Professores);
+        var vinculo = Assert.Single(context.ProfessoresEspacos);
+        Assert.Equal(EspacoId, vinculo.EspacoId);
+        Assert.Equal(StatusAprovacaoProfessor.Pendente, vinculo.StatusAprovacao);
         Assert.Empty(context.SolicitacoesRegistroProfessor);
+    }
+
+    [Fact]
+    public async Task Handle_DeveReaproveitarProfessorExistente_QuandoJaTemContaEmOutroEspaco()
+    {
+        var context = TestDbContextFactory.Create();
+        var usuario = new Usuario { Nome = "Maria", Email = "maria@teste.com", Role = RoleUsuario.Professor };
+        var professorExistente = new Professor { UsuarioId = usuario.Id, Cpf = "12345678900" };
+        context.Usuarios.Add(usuario);
+        context.Professores.Add(professorExistente);
+        await context.SaveChangesAsync();
+
+        CriarSolicitacao(context);
+        var handler = CriarHandler(context);
+
+        var professorId = await handler.Handle(
+            new ConfirmarCodigoRegistroProfessorCommand("maria@teste.com", "123456"),
+            CancellationToken.None);
+
+        Assert.Equal(professorExistente.Id, professorId);
+        Assert.Single(context.Professores);
+        var vinculo = Assert.Single(context.ProfessoresEspacos);
+        Assert.Equal(EspacoId, vinculo.EspacoId);
     }
 
     [Fact]
@@ -49,7 +80,7 @@ public class ConfirmarCodigoRegistroProfessorCommandHandlerTests
     {
         var context = TestDbContextFactory.Create();
         CriarSolicitacao(context);
-        var handler = new ConfirmarCodigoRegistroProfessorCommandHandler(context);
+        var handler = CriarHandler(context);
 
         await Assert.ThrowsAsync<DomainException>(() => handler.Handle(
             new ConfirmarCodigoRegistroProfessorCommand("maria@teste.com", "000000"),
@@ -61,7 +92,7 @@ public class ConfirmarCodigoRegistroProfessorCommandHandlerTests
     {
         var context = TestDbContextFactory.Create();
         CriarSolicitacao(context, DateTime.UtcNow.AddMinutes(-1));
-        var handler = new ConfirmarCodigoRegistroProfessorCommandHandler(context);
+        var handler = CriarHandler(context);
 
         await Assert.ThrowsAsync<DomainException>(() => handler.Handle(
             new ConfirmarCodigoRegistroProfessorCommand("maria@teste.com", "123456"),
@@ -72,7 +103,7 @@ public class ConfirmarCodigoRegistroProfessorCommandHandlerTests
     public async Task Handle_DeveLancarDomainException_QuandoSolicitacaoNaoExiste()
     {
         var context = TestDbContextFactory.Create();
-        var handler = new ConfirmarCodigoRegistroProfessorCommandHandler(context);
+        var handler = CriarHandler(context);
 
         await Assert.ThrowsAsync<DomainException>(() => handler.Handle(
             new ConfirmarCodigoRegistroProfessorCommand("naoexiste@teste.com", "123456"),
