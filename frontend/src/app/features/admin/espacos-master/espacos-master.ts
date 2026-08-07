@@ -75,16 +75,33 @@ export class EspacosMaster implements OnInit {
     this.editandoId.set(null);
   }
 
+  private semDiacriticos(valor: string): string {
+    return valor.normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]', 'g'), '');
+  }
+
+  // Aceita o que o usuário digitar (inclusive colando o domínio inteiro, tipo
+  // "personaltennis.wnlabs.com.br" ou "https://personaltennis...") e reduz pra só a
+  // parte do subdomínio — sem forçar hífen entre palavras, só remove o que não pode
+  // fazer parte de um subdomínio.
+  private limparSubdominio(valor: string): string {
+    return this.semDiacriticos(valor.trim().toLowerCase())
+      .replace(/^https?:\/\//, '')
+      .split('.')[0]
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/(^-+|-+$)/g, '');
+  }
+
+  limparSubdominioDigitado(): void {
+    this.novoSubdominio = this.limparSubdominio(this.novoSubdominio);
+  }
+
   sugerirSubdominio(): void {
     if (this.novoSubdominio || this.editandoId()) {
       return;
     }
-    this.novoSubdominio = this.novoNomeEspaco
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(new RegExp('[\\u0300-\\u036f]', 'g'), '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+    // Sugestão a partir do nome não insere hífen entre palavras — só junta tudo
+    // (ex: "Personal Tennis" -> "personaltennis"). O usuário pode editar livremente.
+    this.novoSubdominio = this.semDiacriticos(this.novoNomeEspaco.toLowerCase()).replace(/[^a-z0-9]/g, '');
   }
 
   salvarEspaco(): void {
@@ -104,7 +121,7 @@ export class EspacosMaster implements OnInit {
     };
 
     const editandoId = this.editandoId();
-    const dados = { nome: this.novoNomeEspaco, subdominio: this.novoSubdominio };
+    const dados = { nome: this.novoNomeEspaco, subdominio: this.limparSubdominio(this.novoSubdominio) };
 
     if (editandoId) {
       this.espacoService.atualizar(editandoId, dados).subscribe(aoConcluir);

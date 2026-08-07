@@ -3,10 +3,10 @@
     <h1 class="text-2xl font-semibold text-slate-900">Espaços</h1>
     <p class="mt-1 text-sm text-slate-500">Clubes, academias e outros locais cadastrados na plataforma.</p>
   </div>
-  <button (click)="formularioEspacoAberto() ? fecharNovoEspaco() : abrirNovoEspaco()"
+  <button (click)="abrirNovoEspaco()"
     class="flex items-center gap-1.5 rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600">
-    <app-icon [name]="formularioEspacoAberto() ? 'close' : 'plus'" [size]="17" />
-    {{ formularioEspacoAberto() ? 'Cancelar' : 'Novo espaço' }}
+    <app-icon name="plus" [size]="17" />
+    Novo espaço
   </button>
 </div>
 
@@ -35,10 +35,10 @@
         </div>
         <div>
           <label class="mb-1.5 block text-sm font-medium text-slate-700">Subdomínio</label>
-          <input required name="novoSubdominio" [(ngModel)]="novoSubdominio" pattern="[a-z0-9\-]+"
-            placeholder="clube-praia-grande"
+          <input required name="novoSubdominio" [(ngModel)]="novoSubdominio" (blur)="limparSubdominioDigitado()"
+            placeholder="personaltennis"
             class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
-          <p class="mt-1 text-xs text-slate-400">Só letras minúsculas, números e hífen — vira o endereço de acesso do espaço.</p>
+          <p class="mt-1 text-xs text-slate-400">Só a parte antes do domínio (ex: "personaltennis" para personaltennis.wnlabs.com.br).</p>
         </div>
         <div>
           <button type="submit" [disabled]="salvandoEspaco()"
@@ -58,7 +58,7 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in">
     <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl">
       <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-slate-900">Primeiro administrador de {{ espaco.nome }}</h2>
+        <h2 class="text-lg font-semibold text-slate-900">Novo administrador de {{ espaco.nome }}</h2>
         <button (click)="fecharCriarAdmin()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
       </div>
 
