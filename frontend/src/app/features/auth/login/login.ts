@@ -58,7 +58,7 @@ export class Login implements OnInit {
       next: (resultado) => {
         this.carregando.set(false);
         if (resultado.role === 'Master') {
-          this.router.navigateByUrl('/admin/espacos');
+          this.router.navigateByUrl('/admin/dashboard');
         } else if (resultado.role === 'AdminClube') {
           this.router.navigateByUrl('/admin/quadras');
         } else {

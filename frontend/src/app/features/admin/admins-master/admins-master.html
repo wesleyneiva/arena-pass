@@ -14,6 +14,21 @@
   <p class="mb-4 animate-fade-in rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ erro() }}</p>
 }
 
+<div class="mb-6 flex flex-wrap items-center gap-3">
+  <input
+    [ngModel]="busca()" (ngModelChange)="atualizarBusca($event)"
+    placeholder="Buscar por nome ou e-mail..."
+    class="w-full max-w-xs rounded-lg border border-slate-300 px-3.5 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+  <select
+    [ngModel]="filtroEspacoId()" (ngModelChange)="atualizarFiltroEspaco($event)"
+    class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15">
+    <option value="">Todos os espaços</option>
+    @for (espaco of espacos(); track espaco.id) {
+      <option [value]="espaco.id">{{ espaco.nome }}</option>
+    }
+  </select>
+</div>
+
 @if (formularioAberto()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in">
     <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl">
@@ -73,7 +88,7 @@
   </div>
 } @else {
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-    @for (admin of admins(); track admin.id) {
+    @for (admin of adminsFiltrados(); track admin.id) {
       <div class="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
         <div class="h-1.5 bg-slate-800"></div>
 

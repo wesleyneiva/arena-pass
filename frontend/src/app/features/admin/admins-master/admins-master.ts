@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 import { EspacoService } from '../../../core/services/espaco.service';
@@ -26,6 +26,19 @@ export class AdminsMaster implements OnInit {
   novaSenha = '';
   novoEspacoId = '';
 
+  readonly filtroEspacoId = signal('');
+  readonly busca = signal('');
+
+  readonly adminsFiltrados = computed(() => {
+    const termo = this.busca().trim().toLowerCase();
+    if (!termo) {
+      return this.admins();
+    }
+    return this.admins().filter(
+      (admin) => admin.nome.toLowerCase().includes(termo) || admin.email.toLowerCase().includes(termo)
+    );
+  });
+
   constructor(
     private readonly adminService: AdminService,
     private readonly espacoService: EspacoService,
@@ -44,10 +57,19 @@ export class AdminsMaster implements OnInit {
     return this.espacos().find((e) => e.id === espacoId)?.nome ?? '—';
   }
 
+  atualizarBusca(valor: string): void {
+    this.busca.set(valor);
+  }
+
+  atualizarFiltroEspaco(espacoId: string): void {
+    this.filtroEspacoId.set(espacoId);
+    this.carregar();
+  }
+
   carregar(): void {
     this.carregando.set(true);
     this.erro.set(null);
-    this.adminService.listar().subscribe({
+    this.adminService.listar(this.filtroEspacoId() || undefined).subscribe({
       next: (admins) => {
         this.admins.set(admins);
         this.carregando.set(false);

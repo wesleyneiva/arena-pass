@@ -16,7 +16,9 @@ const ITENS_BASE: ItemMenu[] = [
   { rota: '/admin/financeiro', rotulo: 'Financeiro', icone: 'chart' }
 ];
 
+const ITEM_DASHBOARD: ItemMenu = { rota: '/admin/dashboard', rotulo: 'Dashboard', icone: 'chart' };
 const ITEM_ESPACOS: ItemMenu = { rota: '/admin/espacos', rotulo: 'Espaços', icone: 'clipboard' };
+const ITEM_PLANOS: ItemMenu = { rota: '/admin/planos', rotulo: 'Planos', icone: 'grid' };
 const ITEM_ADMINISTRADORES: ItemMenu = { rota: '/admin/administradores', rotulo: 'Administradores', icone: 'shield' };
 const ITEM_PERFIL: ItemMenu = { rota: '/admin/perfil', rotulo: 'Meu perfil', icone: 'pencil' };
 
@@ -30,7 +32,7 @@ export class AdminLayout {
 
   readonly itens = computed<ItemMenu[]>(() => {
     if (this.auth.role() === 'Master') {
-      return [ITEM_ESPACOS, ITEM_ADMINISTRADORES, ITEM_PERFIL];
+      return [ITEM_DASHBOARD, ITEM_ESPACOS, ITEM_PLANOS, ITEM_ADMINISTRADORES, ITEM_PERFIL];
     }
     return [...ITENS_BASE, ITEM_PERFIL];
   });

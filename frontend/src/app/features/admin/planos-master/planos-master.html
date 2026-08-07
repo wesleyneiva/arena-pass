@@ -1,0 +1,101 @@
+<div class="mb-8 flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <h1 class="text-2xl font-semibold text-slate-900">Planos</h1>
+    <p class="mt-1 text-sm text-slate-500">Catálogo de planos que podem ser atribuídos aos espaços.</p>
+  </div>
+  <button (click)="abrirNovo()"
+    class="flex items-center gap-1.5 rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600">
+    <app-icon name="plus" [size]="17" />
+    Novo plano
+  </button>
+</div>
+
+@if (erro() && !formularioAberto()) {
+  <p class="mb-4 animate-fade-in rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ erro() }}</p>
+}
+
+@if (formularioAberto()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in">
+    <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">{{ editandoId() ? 'Editar plano' : 'Novo plano' }}</h2>
+        <button (click)="fecharFormulario()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
+      </div>
+
+      @if (erro()) {
+        <p class="mb-3 animate-fade-in rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ erro() }}</p>
+      }
+
+      <form ngNativeValidate (ngSubmit)="salvar()" class="grid gap-3">
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Nome</label>
+          <input required name="novoNome" [(ngModel)]="novoNome" placeholder="Ex: Básico"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+        </div>
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Valor mensal (R$)</label>
+          <input required type="number" min="0.01" step="0.01" name="novoValorMensal" [(ngModel)]="novoValorMensal"
+            class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+        </div>
+        <div>
+          <button type="submit" [disabled]="salvando()"
+            [class]="salvando()
+              ? 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-blue-400 via-blue-200 to-blue-400'
+              : 'bg-blue-500 hover:bg-blue-600'"
+            class="w-full rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition disabled:cursor-not-allowed">
+            {{ salvando() ? 'Salvando...' : editandoId() ? 'Salvar alterações' : 'Criar plano' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+@if (carregando()) {
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @for (i of [1, 2, 3]; track i) {
+      <div class="h-32 animate-pulse rounded-2xl bg-slate-100"></div>
+    }
+  </div>
+} @else {
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    @for (plano of planos(); track plano.id) {
+      <div class="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+        <div class="h-1.5" [class]="plano.ativo ? 'bg-slate-800' : 'bg-slate-300'"></div>
+
+        <div class="flex flex-1 flex-col gap-4 p-5">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="truncate font-semibold text-slate-900">{{ plano.nome }}</p>
+              <p class="text-sm text-slate-500">R$ {{ plano.valorMensal | number: '1.2-2' }} / mês</p>
+            </div>
+            <span
+              class="flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+              [class]="plano.ativo ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'">
+              {{ plano.ativo ? 'Ativo' : 'Inativo' }}
+            </span>
+          </div>
+
+          <div class="mt-auto flex items-center gap-1 border-t border-slate-100 pt-4">
+            <div class="ml-auto flex items-center gap-1">
+              <button (click)="editar(plano)" title="Editar"
+                class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100">
+                <app-icon name="pencil" [size]="15" />
+              </button>
+
+              <button (click)="alternarStatus(plano)" [title]="plano.ativo ? 'Desativar' : 'Reativar'"
+                class="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium transition"
+                [class]="plano.ativo ? 'text-amber-600 hover:bg-amber-50' : 'text-emerald-600 hover:bg-emerald-50'">
+                <app-icon [name]="plano.ativo ? 'ban' : 'refresh'" [size]="15" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="col-span-full rounded-xl border border-dashed border-slate-300 p-10 text-center">
+        <p class="text-sm text-slate-500">Nenhum plano cadastrado ainda.</p>
+      </div>
+    }
+  </div>
+}

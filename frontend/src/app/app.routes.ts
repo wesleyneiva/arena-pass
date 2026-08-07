@@ -26,8 +26,20 @@ export const routes: Routes = [
         path: '',
         pathMatch: 'full',
         // Master perdeu acesso a quadras/professores/agendamentos/financeiro (são
-        // recursos de um espaço específico) — cai em Espaços em vez de Quadras.
-        redirectTo: () => (inject(AuthService).role() === 'Master' ? 'espacos' : 'quadras')
+        // recursos de um espaço específico) — cai no Dashboard em vez de Quadras.
+        redirectTo: () => (inject(AuthService).role() === 'Master' ? 'dashboard' : 'quadras')
+      },
+      {
+        path: 'dashboard',
+        canActivate: [roleGuard('Master')],
+        loadComponent: () =>
+          import('./features/admin/dashboard-master/dashboard-master').then((m) => m.DashboardMaster)
+      },
+      {
+        path: 'planos',
+        canActivate: [roleGuard('Master')],
+        loadComponent: () =>
+          import('./features/admin/planos-master/planos-master').then((m) => m.PlanosMaster)
       },
       {
         path: 'quadras',

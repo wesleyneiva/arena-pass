@@ -14,6 +14,9 @@ public interface IApplicationDbContext
     DbSet<Agendamento> Agendamentos { get; }
     DbSet<Convite> Convites { get; }
     DbSet<SolicitacaoRegistroProfessor> SolicitacoesRegistroProfessor { get; }
+    DbSet<Plano> Planos { get; }
+    DbSet<Assinatura> Assinaturas { get; }
+    DbSet<Fatura> Faturas { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

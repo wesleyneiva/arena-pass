@@ -14,6 +14,20 @@
   <p class="mb-4 animate-fade-in rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ erro() }}</p>
 }
 
+<div class="mb-6 flex flex-wrap items-center gap-3">
+  <input
+    [ngModel]="busca()" (ngModelChange)="atualizarBusca($event)"
+    placeholder="Buscar por nome ou subdomínio..."
+    class="w-full max-w-xs rounded-lg border border-slate-300 px-3.5 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+  <select
+    [ngModel]="filtroStatus()" (ngModelChange)="atualizarFiltroStatus($event)"
+    class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15">
+    <option value="todos">Todos os status</option>
+    <option value="ativo">Ativos</option>
+    <option value="bloqueado">Bloqueados</option>
+  </select>
+</div>
+
 @if (formularioEspacoAberto()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in">
     <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl">
@@ -96,6 +110,83 @@
   </div>
 }
 
+@if (espacoParaCobranca(); as espaco) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 animate-fade-in">
+    <div class="w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-xl">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Cobrança de {{ espaco.nome }}</h2>
+        <button (click)="fecharCobranca()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
+      </div>
+
+      @if (erroCobranca()) {
+        <p class="mb-3 animate-fade-in rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ erroCobranca() }}</p>
+      }
+
+      @if (carregandoCobranca()) {
+        <div class="grid gap-3">
+          <div class="h-10 animate-pulse rounded-lg bg-slate-100"></div>
+          <div class="h-10 animate-pulse rounded-lg bg-slate-100"></div>
+        </div>
+      } @else {
+        <form ngNativeValidate (ngSubmit)="salvarAssinatura()" class="grid gap-3">
+          <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Plano</label>
+            <select required name="planoIdSelecionado" [(ngModel)]="planoIdSelecionado"
+              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15">
+              @for (plano of planosAtivos(); track plano.id) {
+                <option [value]="plano.id">{{ plano.nome }} — R$ {{ plano.valorMensal | number: '1.2-2' }}</option>
+              }
+            </select>
+            @if (planosAtivos().length === 0) {
+              <p class="mt-1 text-xs text-amber-600">Nenhum plano ativo cadastrado ainda.</p>
+            }
+          </div>
+          <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Dia de vencimento</label>
+            <input required type="number" min="1" max="28" name="diaVencimentoSelecionado" [(ngModel)]="diaVencimentoSelecionado"
+              class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/15" />
+          </div>
+          <div>
+            <button type="submit" [disabled]="salvandoAssinatura() || planosAtivos().length === 0"
+              [class]="salvandoAssinatura()
+                ? 'animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-blue-400 via-blue-200 to-blue-400'
+                : 'bg-blue-500 hover:bg-blue-600'"
+              class="w-full rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60">
+              {{ salvandoAssinatura() ? 'Salvando...' : 'Salvar assinatura' }}
+            </button>
+          </div>
+        </form>
+
+        @if (rotuloCobranca(espaco.id) !== 'Sem plano' && rotuloCobranca(espaco.id) !== 'Em dia') {
+          <button (click)="marcarFaturaAtualPaga()" [disabled]="marcandoPaga()"
+            class="mt-3 w-full rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60">
+            {{ marcandoPaga() ? 'Marcando...' : 'Marcar fatura atual como paga' }}
+          </button>
+        }
+
+        <div class="mt-5 border-t border-slate-100 pt-4">
+          <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Histórico de faturas</p>
+          <div class="grid gap-1.5 max-h-48 overflow-y-auto">
+            @for (fatura of faturasDoEspaco(); track fatura.id) {
+              <div class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
+                <span class="text-slate-600">{{ fatura.competencia | date: 'MM/yyyy' : 'UTC' }}</span>
+                <span class="text-slate-500">R$ {{ fatura.valor | number: '1.2-2' }}</span>
+                <span
+                  class="rounded-full px-2 py-0.5 text-xs font-medium"
+                  [class]="fatura.status === 'Pago' ? 'bg-emerald-50 text-emerald-700' : fatura.status === 'Atrasado' ? 'bg-red-50 text-red-700' : 'bg-slate-100 text-slate-500'">
+                  {{ fatura.status }}
+                </span>
+              </div>
+            } @empty {
+              <p class="text-sm text-slate-400">Nenhuma fatura ainda.</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+
 @if (carregando()) {
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
     @for (i of [1, 2, 3, 4, 5, 6]; track i) {
@@ -104,7 +195,7 @@
   </div>
 } @else {
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-    @for (espaco of espacos(); track espaco.id) {
+    @for (espaco of espacosFiltrados(); track espaco.id) {
       <div class="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
         <div class="h-1.5" [class]="espaco.ativo ? 'bg-slate-800' : 'bg-slate-300'"></div>
 
@@ -114,11 +205,18 @@
               <p class="truncate font-semibold text-slate-900">{{ espaco.nome }}</p>
               <p class="truncate text-xs text-slate-500">{{ espaco.subdominio }}</p>
             </div>
-            <span
-              class="flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
-              [class]="espaco.ativo ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'">
-              {{ espaco.ativo ? 'Ativo' : 'Bloqueado' }}
-            </span>
+            <div class="flex shrink-0 flex-col items-end gap-1">
+              <span
+                class="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+                [class]="espaco.ativo ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'">
+                {{ espaco.ativo ? 'Ativo' : 'Bloqueado' }}
+              </span>
+              <span
+                class="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+                [class]="classeCobranca(espaco.id)">
+                {{ rotuloCobranca(espaco.id) }}
+              </span>
+            </div>
           </div>
 
           <div class="flex items-center gap-1 border-t border-slate-100 pt-4">
@@ -126,6 +224,12 @@
               class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50">
               <app-icon name="shield" [size]="15" />
               Admin
+            </button>
+
+            <button (click)="abrirCobranca(espaco)"
+              class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50">
+              <app-icon name="chart" [size]="15" />
+              Cobrança
             </button>
 
             <div class="ml-auto flex items-center gap-1">
@@ -150,7 +254,9 @@
       </div>
     } @empty {
       <div class="col-span-full rounded-xl border border-dashed border-slate-300 p-10 text-center">
-        <p class="text-sm text-slate-500">Nenhum espaço cadastrado ainda.</p>
+        <p class="text-sm text-slate-500">
+          {{ espacos().length === 0 ? 'Nenhum espaço cadastrado ainda.' : 'Nenhum espaço encontrado com esse filtro.' }}
+        </p>
       </div>
     }
   </div>
