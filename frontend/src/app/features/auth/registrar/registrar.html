@@ -1,5 +1,5 @@
 <div class="min-h-screen flex bg-slate-50">
-  <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-slate-900 p-12 text-white lg:flex">
+  <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-neutral-900 p-12 text-white lg:flex">
     <div class="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-blue-400/20 blur-3xl"></div>
     <div class="pointer-events-none absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-amber-400/10 blur-3xl"></div>
 
@@ -13,14 +13,14 @@
         <h1 class="text-3xl font-semibold leading-tight">
           Acesso do administrador<br />da plataforma.
         </h1>
-        <p class="mt-4 max-w-md text-slate-400">
+        <p class="mt-4 max-w-md text-neutral-400">
           Professores se cadastram pelo endereço do espaço onde vão dar aula, não por aqui.
         </p>
       } @else if (nomeEspaco()) {
         <h1 class="text-3xl font-semibold leading-tight">
           Cadastro de professor<br />em {{ nomeEspaco() }}.
         </h1>
-        <p class="mt-4 max-w-md text-slate-400">
+        <p class="mt-4 max-w-md text-neutral-400">
           Já dá aula em outro espaço com o ArenaPass? Use o mesmo e-mail — a gente reconhece
           sua conta e só cria o vínculo com este espaço, sem duplicar cadastro.
         </p>
@@ -28,14 +28,14 @@
         <h1 class="text-3xl font-semibold leading-tight">
           Cadastro de professor.
         </h1>
-        <p class="mt-4 max-w-md text-slate-400">
+        <p class="mt-4 max-w-md text-neutral-400">
           Já dá aula em outro espaço com o ArenaPass? Use o mesmo e-mail — a gente reconhece
           sua conta e só cria o vínculo com este espaço, sem duplicar cadastro.
         </p>
       }
     </div>
 
-    <p class="relative text-xs text-slate-500">&copy; {{ anoAtual }} ArenaPass</p>
+    <p class="relative text-xs text-neutral-500">&copy; {{ anoAtual }} ArenaPass</p>
   </div>
 
   <div class="flex flex-1 items-center justify-center px-4 py-12">
