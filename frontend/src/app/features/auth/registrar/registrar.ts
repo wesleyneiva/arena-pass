@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { EspacoService } from '../../../core/services/espaco.service';
+import { TenantService } from '../../../core/services/tenant.service';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
 type Etapa = 'dados' | 'codigo';
@@ -27,15 +28,25 @@ export class Registrar implements OnInit {
   readonly nomeEspaco = signal<string | null>(null);
   readonly espacoNaoEncontrado = signal(false);
   readonly anoAtual = new Date().getFullYear();
+  readonly dominioMaster: boolean;
 
   constructor(
     private readonly auth: AuthService,
     private readonly espacos: EspacoService,
+    private readonly tenant: TenantService,
     private readonly router: Router,
     private readonly confirmDialog: ConfirmDialogService
-  ) {}
+  ) {
+    this.dominioMaster = this.tenant.ehDominioMaster();
+  }
 
   ngOnInit(): void {
+    // arenapass.wnlabs.com.br é exclusivo do Master — nunca tem espaço pra resolver
+    // nem faz sentido um professor se cadastrar por lá.
+    if (this.dominioMaster) {
+      return;
+    }
+
     this.espacos.resolverAtual().subscribe({
       next: (resultado) => {
         this.nomeEspaco.set(resultado.nome);

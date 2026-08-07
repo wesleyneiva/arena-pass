@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { EspacoService } from '../../../core/services/espaco.service';
+import { TenantService } from '../../../core/services/tenant.service';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,8 @@ export class Login implements OnInit {
   readonly erro = signal<string | null>(null);
   readonly anoAtual = new Date().getFullYear();
 
+  readonly dominioMaster: boolean;
+
   // Resolução do espaço é só informativa aqui — não bloqueia o formulário, porque o
   // Master loga sem nenhum espaço resolvido (é cross-tenant). Quem de fato valida o
   // vínculo com o espaço é o próprio POST /auth/login no backend.
@@ -25,10 +28,19 @@ export class Login implements OnInit {
   constructor(
     private readonly auth: AuthService,
     private readonly espacos: EspacoService,
+    private readonly tenant: TenantService,
     private readonly router: Router
-  ) {}
+  ) {
+    this.dominioMaster = this.tenant.ehDominioMaster();
+  }
 
   ngOnInit(): void {
+    // arenapass.wnlabs.com.br é o domínio exclusivo do Master — nunca tem espaço pra
+    // resolver, então nem vale a pena chamar o endpoint.
+    if (this.dominioMaster) {
+      return;
+    }
+
     this.espacos.resolverAtual().subscribe({
       next: (resultado) => {
         this.nomeEspaco.set(resultado.nome);
