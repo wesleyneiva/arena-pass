@@ -1,6 +1,7 @@
 using ArenaPass.Application.Faturamento.Commands.AtribuirAssinatura;
 using ArenaPass.Application.Faturamento.Commands.MarcarFaturaPaga;
 using ArenaPass.Application.Faturamento.Queries.ListarFaturasDoEspaco;
+using ArenaPass.Application.Faturamento.Queries.ObterEstatisticasAnuais;
 using ArenaPass.Application.Faturamento.Queries.ObterPainelFaturamento;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -29,6 +30,13 @@ public class AssinaturasController : ControllerBase
     {
         var painel = await _mediator.Send(new ObterPainelFaturamentoQuery(), cancellationToken);
         return Ok(painel);
+    }
+
+    [HttpGet("faturamento/estatisticas-anuais")]
+    public async Task<IActionResult> EstatisticasAnuais(CancellationToken cancellationToken)
+    {
+        var estatisticas = await _mediator.Send(new ObterEstatisticasAnuaisQuery(), cancellationToken);
+        return Ok(estatisticas);
     }
 
     [HttpPost("espacos/{espacoId:guid}/assinatura")]

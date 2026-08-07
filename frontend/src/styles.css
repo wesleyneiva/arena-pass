@@ -34,6 +34,17 @@ html {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
+/* Cursor de mãozinha em todo elemento clicável, globalmente — botões nativos não
+   ganham isso por padrão do navegador (só links ganham). Elementos customizados
+   clicáveis (divs com (click), cards de filtro) precisam da classe cursor-pointer
+   do Tailwind explicitamente. */
+button:not(:disabled),
+[role="button"],
+select,
+summary {
+  cursor: pointer;
+}
+
 @media print {
   .no-print {
     display: none !important;

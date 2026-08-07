@@ -36,3 +36,10 @@ export interface AtribuirAssinaturaRequest {
   planoId: string;
   diaVencimento: number;
 }
+
+export interface EstatisticasAnuais {
+  ano: number;
+  faturamentoPorMes: number[];
+  novosClientesPorMes: number[];
+  volumeContratadoPorMes: number[];
+}

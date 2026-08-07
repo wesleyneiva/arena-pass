@@ -1,0 +1,22 @@
+<svg
+  [attr.viewBox]="'0 0 ' + larguraSvg + ' ' + alturaSvg"
+  class="w-full"
+  style="height: 160px"
+  preserveAspectRatio="xMidYMid meet"
+>
+  <line x1="0" [attr.x2]="larguraSvg" [attr.y1]="linhaBase - 100" [attr.y2]="linhaBase - 100" stroke="#e1e0d9" stroke-width="1" />
+  <line x1="0" [attr.x2]="larguraSvg" [attr.y1]="linhaBase - 50" [attr.y2]="linhaBase - 50" stroke="#e1e0d9" stroke-width="1" />
+  <line x1="0" [attr.x2]="larguraSvg" [attr.y1]="linhaBase" [attr.y2]="linhaBase" stroke="#c3c2b7" stroke-width="1" />
+
+  @for (barra of barras(); track $index) {
+    <g class="cursor-pointer">
+      <path [attr.d]="caminhoBarra(barra)" [attr.fill]="cor()" opacity="0.88">
+        <title>{{ barra.mes }}: {{ formatar(barra.valor) }}</title>
+      </path>
+      @if (barra.maior) {
+        <text [attr.x]="barra.x + barra.largura / 2" [attr.y]="barra.y - 6" text-anchor="middle" font-size="9" fill="#52514e">{{ formatar(barra.valor) }}</text>
+      }
+      <text [attr.x]="barra.x + barra.largura / 2" [attr.y]="linhaBase + 14" text-anchor="middle" font-size="9" fill="#898781">{{ barra.mes }}</text>
+    </g>
+  }
+</svg>

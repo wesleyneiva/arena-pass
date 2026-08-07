@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AtribuirAssinaturaRequest, Fatura, PainelFaturamento } from '../models/faturamento.models';
+import { AtribuirAssinaturaRequest, EstatisticasAnuais, Fatura, PainelFaturamento } from '../models/faturamento.models';
 
 @Injectable({ providedIn: 'root' })
 export class FaturamentoService {
@@ -10,6 +10,10 @@ export class FaturamentoService {
 
   obterPainel(): Observable<PainelFaturamento> {
     return this.http.get<PainelFaturamento>(`${environment.apiUrl}/faturamento/painel`);
+  }
+
+  obterEstatisticasAnuais(): Observable<EstatisticasAnuais> {
+    return this.http.get<EstatisticasAnuais>(`${environment.apiUrl}/faturamento/estatisticas-anuais`);
   }
 
   atribuirAssinatura(espacoId: string, request: AtribuirAssinaturaRequest): Observable<void> {

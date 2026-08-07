@@ -15,27 +15,46 @@
   </div>
 } @else if (painel(); as p) {
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-    <div class="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div (click)="alternarFiltro('comPlano')"
+      class="cursor-pointer animate-fade-in-up rounded-2xl border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      [class]="filtroAtivo() === 'comPlano' ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200'">
       <p class="text-sm text-slate-500">MRR (receita recorrente)</p>
       <p class="mt-1 text-2xl font-semibold text-slate-900">R$ {{ p.mrrTotal | number: '1.2-2' }}</p>
     </div>
-    <div class="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div (click)="alternarFiltro('pago')"
+      class="cursor-pointer animate-fade-in-up rounded-2xl border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      [class]="filtroAtivo() === 'pago' ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200'">
       <p class="text-sm text-slate-500">Receita recebida no mês</p>
       <p class="mt-1 text-2xl font-semibold text-slate-900">R$ {{ p.receitaDoMes | number: '1.2-2' }}</p>
     </div>
     <div class="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <p class="text-sm text-slate-500">Em dia / Atrasados</p>
       <p class="mt-1 text-2xl font-semibold text-slate-900">
-        <span class="text-emerald-600">{{ p.quantidadeEmDia }}</span>
+        <span (click)="alternarFiltro('pago')" class="cursor-pointer rounded px-1 transition hover:bg-emerald-50"
+          [class.text-emerald-600]="filtroAtivo() !== 'pago'"
+          [class.text-emerald-700]="filtroAtivo() === 'pago'"
+          [class.underline]="filtroAtivo() === 'pago'">{{ p.quantidadeEmDia }}</span>
         <span class="text-slate-300"> / </span>
-        <span class="text-red-600">{{ p.quantidadeAtrasados }}</span>
+        <span (click)="alternarFiltro('atrasado')" class="cursor-pointer rounded px-1 transition hover:bg-red-50"
+          [class.text-red-600]="filtroAtivo() !== 'atrasado'"
+          [class.text-red-700]="filtroAtivo() === 'atrasado'"
+          [class.underline]="filtroAtivo() === 'atrasado'">{{ p.quantidadeAtrasados }}</span>
       </p>
     </div>
-    <div class="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div (click)="alternarFiltro('ativo')"
+      class="cursor-pointer animate-fade-in-up rounded-2xl border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      [class]="filtroAtivo() === 'ativo' ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200'">
       <p class="text-sm text-slate-500">Espaços ativos</p>
       <p class="mt-1 text-2xl font-semibold text-slate-900">{{ p.espacosAtivos }} <span class="text-base font-normal text-slate-400">/ {{ p.totalEspacos }}</span></p>
     </div>
   </div>
+
+  @if (filtroAtivo()) {
+    <button (click)="alternarFiltro(null)"
+      class="mt-3 flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:underline">
+      ✕ Limpar filtro
+    </button>
+  }
 
   <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
     <div class="overflow-x-auto">
@@ -51,7 +70,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
-          @for (cliente of p.clientes; track cliente.espacoId) {
+          @for (cliente of clientesFiltrados(); track cliente.espacoId) {
             <tr class="animate-fade-in">
               <td class="px-5 py-3 font-medium text-slate-900">{{ cliente.espacoNome }}</td>
               <td class="px-5 py-3 text-slate-600">{{ cliente.planoNome ?? '—' }}</td>
@@ -75,11 +94,33 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="6" class="px-5 py-10 text-center text-sm text-slate-500">Nenhum espaço cadastrado ainda.</td>
+              <td colspan="6" class="px-5 py-10 text-center text-sm text-slate-500">
+                {{ p.clientes.length === 0 ? 'Nenhum espaço cadastrado ainda.' : 'Nenhum cliente nesse filtro.' }}
+              </td>
             </tr>
           }
         </tbody>
       </table>
     </div>
   </div>
+
+  @if (estatisticas(); as e) {
+    <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div class="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-700">Faturamento em {{ e.ano }}</p>
+        <p class="mb-2 text-xs text-slate-400">Recebido por mês (só faturas já pagas)</p>
+        <app-mini-bar-chart [valores]="e.faturamentoPorMes" cor="#2a78d6" [formatarValor]="formatarMoeda" />
+      </div>
+      <div class="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-700">Clientes prospectados</p>
+        <p class="mb-2 text-xs text-slate-400">Novos espaços cadastrados por mês</p>
+        <app-mini-bar-chart [valores]="e.novosClientesPorMes" cor="#eb6834" [formatarValor]="formatarInteiro" />
+      </div>
+      <div class="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-700">Movimentação financeira</p>
+        <p class="mb-2 text-xs text-slate-400">Volume de planos vendidos/contratados por mês</p>
+        <app-mini-bar-chart [valores]="e.volumeContratadoPorMes" cor="#1baf7a" [formatarValor]="formatarMoeda" />
+      </div>
+    </div>
+  }
 }
