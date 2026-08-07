@@ -4,7 +4,7 @@ import { FaturamentoService } from '../../../core/services/faturamento.service';
 import { EstatisticasAnuais, PainelFaturamento } from '../../../core/models/faturamento.models';
 import { MiniBarChart } from '../../../shared/mini-bar-chart/mini-bar-chart';
 
-type FiltroTile = 'pago' | 'atrasado' | 'ativo' | 'comPlano' | null;
+type FiltroTile = 'pago' | 'atrasado' | 'ativo' | 'inativo' | 'comPlano' | null;
 
 @Component({
   selector: 'app-dashboard-master',
@@ -31,6 +31,7 @@ export class DashboardMaster implements OnInit {
       case 'pago': return clientes.filter((c) => c.status === 'Pago');
       case 'atrasado': return clientes.filter((c) => c.status === 'Atrasado');
       case 'ativo': return clientes.filter((c) => c.espacoAtivo);
+      case 'inativo': return clientes.filter((c) => !c.espacoAtivo);
       case 'comPlano': return clientes.filter((c) => c.status !== 'SemAssinatura');
       default: return clientes;
     }

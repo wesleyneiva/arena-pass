@@ -41,11 +41,19 @@
           [class.underline]="filtroAtivo() === 'atrasado'">{{ p.quantidadeAtrasados }}</span>
       </p>
     </div>
-    <div (click)="alternarFiltro('ativo')"
-      class="cursor-pointer animate-fade-in-up rounded-2xl border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-      [class]="filtroAtivo() === 'ativo' ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200'">
-      <p class="text-sm text-slate-500">Espaços ativos</p>
-      <p class="mt-1 text-2xl font-semibold text-slate-900">{{ p.espacosAtivos }} <span class="text-base font-normal text-slate-400">/ {{ p.totalEspacos }}</span></p>
+    <div class="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <p class="text-sm text-slate-500">Ativos / Bloqueados</p>
+      <p class="mt-1 text-2xl font-semibold text-slate-900">
+        <span (click)="alternarFiltro('ativo')" class="cursor-pointer rounded px-1 transition hover:bg-emerald-50"
+          [class.text-emerald-600]="filtroAtivo() !== 'ativo'"
+          [class.text-emerald-700]="filtroAtivo() === 'ativo'"
+          [class.underline]="filtroAtivo() === 'ativo'">{{ p.espacosAtivos }}</span>
+        <span class="text-slate-300"> / </span>
+        <span (click)="alternarFiltro('inativo')" class="cursor-pointer rounded px-1 transition hover:bg-red-50"
+          [class.text-red-600]="filtroAtivo() !== 'inativo'"
+          [class.text-red-700]="filtroAtivo() === 'inativo'"
+          [class.underline]="filtroAtivo() === 'inativo'">{{ p.totalEspacos - p.espacosAtivos }}</span>
+      </p>
     </div>
   </div>
 
