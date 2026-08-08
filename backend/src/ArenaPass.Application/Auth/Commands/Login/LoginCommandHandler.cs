@@ -27,6 +27,14 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResultDto>
 
     public async Task<AuthResultDto> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
+        if (_currentTenant.EspacoId is not null &&
+            await _context.Espacos.AnyAsync(
+                e => e.Id == _currentTenant.EspacoId && e.Subdominio == Common.EspacoDemonstracao.Subdominio,
+                cancellationToken))
+        {
+            throw new UnauthorizedAccessException(Common.EspacoDemonstracao.MensagemBloqueio);
+        }
+
         var usuario = await _context.Usuarios
             .Include(u => u.Professor)
             .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);

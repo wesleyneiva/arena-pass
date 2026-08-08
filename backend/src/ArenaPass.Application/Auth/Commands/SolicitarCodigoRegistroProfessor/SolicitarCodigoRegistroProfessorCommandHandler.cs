@@ -34,6 +34,13 @@ public class SolicitarCodigoRegistroProfessorCommandHandler : IRequestHandler<So
         var espacoId = _currentTenant.EspacoId
             ?? throw new DomainException("Não foi possível identificar o espaço atual.");
 
+        if (await _context.Espacos.AnyAsync(
+                e => e.Id == espacoId && e.Subdominio == Common.EspacoDemonstracao.Subdominio,
+                cancellationToken))
+        {
+            throw new DomainException(Common.EspacoDemonstracao.MensagemBloqueio);
+        }
+
         var usuarioExistente = await _context.Usuarios
             .Include(u => u.Professor)
             .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
