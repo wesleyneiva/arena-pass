@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArenaPass — Gestão inteligente de quadras, aulas e convites com QR Code</title>
+<meta name="description" content="ArenaPass é o sistema completo para clubes gerenciarem quadras, professores terceirizados, agendamentos, pagamentos Pix e convites digitais com QR Code para alunos.">
+<meta property="og:title" content="ArenaPass — Gestão inteligente de quadras e aulas">
+<meta property="og:description" content="Agendamento de quadras, professores terceirizados, Pix e convites digitais com QR Code. Tudo em um só lugar.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://arena-pass.wnlabs.com.br">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090f;
+  --bg-soft:#0c101a;
+  --card:#101624;
+  --card-border:rgba(148,163,184,.12);
+  --text:#e6ebf4;
+  --muted:#8b95a9;
+  --brand:#3b82f6;
+  --brand-soft:#60a5fa;
+  --brand-glow:rgba(59,130,246,.35);
+  --accent:#22d3ee;
+  --green:#34d399;
+  --radius:18px;
+  --font-display:'Sora',sans-serif;
+  --font-body:'Inter',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--brand);color:#fff}
+img,svg{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.container{width:min(1120px,92%);margin-inline:auto}
+
+/* ---------- background fx ---------- */
+.bg-fx{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
+.bg-fx .grid-lines{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(148,163,184,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.05) 1px,transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,#000 30%,transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,#000 30%,transparent 75%);
+}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5}
+.orb-1{width:480px;height:480px;background:rgba(59,130,246,.28);top:-160px;left:-120px;animation:drift 14s ease-in-out infinite alternate}
+.orb-2{width:420px;height:420px;background:rgba(34,211,238,.16);top:10%;right:-160px;animation:drift 18s ease-in-out infinite alternate-reverse}
+.orb-3{width:380px;height:380px;background:rgba(99,102,241,.18);bottom:-140px;left:35%;animation:drift 16s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.08)}}
+
+/* ---------- nav ---------- */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(7,9,15,.72);
+  border-bottom:1px solid rgba(148,163,184,.08);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:1.15rem;letter-spacing:-.02em}
+.logo-mark{
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--brand),#6366f1);
+  color:#fff;font-size:1rem;font-weight:800;
+  box-shadow:0 4px 18px var(--brand-glow);
+}
+.nav-links{display:none;gap:28px;font-size:.9rem;color:var(--muted);font-weight:500}
+.nav-links a{transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;align-items:center;gap:10px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 22px;border-radius:12px;font-weight:600;font-size:.92rem;
+  border:1px solid transparent;cursor:pointer;transition:all .25s ease;white-space:nowrap;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--brand),#6366f1);color:#fff;
+  box-shadow:0 6px 24px var(--brand-glow);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(59,130,246,.5)}
+.btn-ghost{border-color:var(--card-border);color:var(--text);background:rgba(255,255,255,.03)}
+.btn-ghost:hover{background:rgba(255,255,255,.07);border-color:rgba(148,163,184,.28)}
+.btn-lg{padding:15px 30px;font-size:1rem;border-radius:14px}
+.nav .btn{padding:9px 18px}
+.menu-btn{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--card-border);background:transparent;color:var(--text);cursor:pointer}
+.mobile-menu{
+  display:none;flex-direction:column;gap:4px;padding:12px 4% 20px;
+  border-bottom:1px solid rgba(148,163,184,.08);background:rgba(7,9,15,.95);
+}
+.mobile-menu a{padding:12px 14px;border-radius:10px;color:var(--muted);font-weight:500}
+.mobile-menu a:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.mobile-menu.open{display:flex}
+
+/* ---------- hero ---------- */
+.hero{padding:150px 0 70px;text-align:center;position:relative}
+.pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 16px;border-radius:999px;font-size:.8rem;font-weight:600;
+  color:var(--brand-soft);background:rgba(59,130,246,.1);
+  border:1px solid rgba(59,130,246,.25);margin-bottom:26px;
+}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+h1{
+  font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;
+  font-size:clamp(2.2rem,6.5vw,4rem);line-height:1.12;margin-bottom:22px;
+}
+.grad-text{
+  background:linear-gradient(100deg,var(--brand-soft) 10%,var(--accent) 55%,#a78bfa 95%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero p.lead{
+  color:var(--muted);font-size:clamp(1rem,2.4vw,1.2rem);
+  max-width:640px;margin:0 auto 36px;
+}
+.hero-actions{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:26px}
+.hero-note{font-size:.82rem;color:var(--muted)}
+.hero-note strong{color:var(--text)}
+
+/* ---------- app mockup ---------- */
+.mockup-wrap{margin-top:64px;position:relative}
+.mockup-glow{
+  position:absolute;inset:8% 12% 0;filter:blur(70px);z-index:-1;
+  background:linear-gradient(120deg,rgba(59,130,246,.28),rgba(34,211,238,.16));
+}
+.browser{
+  border-radius:16px;border:1px solid rgba(148,163,184,.16);
+  background:linear-gradient(180deg,#0e1420,#0a0e18);
+  box-shadow:0 40px 80px rgba(0,0,0,.55);
+  overflow:hidden;text-align:left;
+}
+.browser-bar{
+  display:flex;align-items:center;gap:8px;padding:12px 16px;
+  border-bottom:1px solid rgba(148,163,184,.1);background:rgba(255,255,255,.02);
+}
+.b-dot{width:11px;height:11px;border-radius:50%}
+.browser-url{
+  margin-left:10px;flex:1;max-width:340px;
+  font-size:.72rem;color:var(--muted);background:rgba(255,255,255,.04);
+  border:1px solid rgba(148,163,184,.1);border-radius:8px;padding:5px 12px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.app-shell{display:grid;grid-template-columns:1fr;min-height:340px}
+.app-side{display:none;flex-direction:column;gap:4px;padding:18px 12px;border-right:1px solid rgba(148,163,184,.08);background:rgba(255,255,255,.015)}
+.side-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;font-size:.8rem;color:var(--muted);font-weight:500}
+.side-item.active{background:rgba(59,130,246,.14);color:var(--brand-soft)}
+.side-item svg{width:15px;height:15px;flex:none}
+.app-main{padding:20px;display:flex;flex-direction:column;gap:16px}
+.app-title{font-family:var(--font-display);font-weight:700;font-size:.95rem}
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.slot{
+  padding:10px 6px;border-radius:10px;text-align:center;font-size:.68rem;font-weight:600;
+  border:1px solid rgba(148,163,184,.14);color:var(--muted);background:rgba(255,255,255,.02);
+}
+.slot.free{border-color:rgba(52,211,153,.35);color:var(--green);background:rgba(52,211,153,.07)}
+.slot.sel{border-color:var(--brand);color:#fff;background:linear-gradient(135deg,rgba(59,130,246,.85),rgba(99,102,241,.85));box-shadow:0 4px 14px var(--brand-glow)}
+.slot.busy{opacity:.4;text-decoration:line-through}
+.app-summary{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  border:1px solid rgba(148,163,184,.12);border-radius:12px;padding:12px 16px;
+  background:rgba(255,255,255,.02);font-size:.78rem;color:var(--muted);
+}
+.app-summary strong{color:var(--text);font-size:.9rem}
+.mini-btn{padding:8px 16px;border-radius:9px;background:linear-gradient(135deg,var(--brand),#6366f1);color:#fff;font-size:.75rem;font-weight:600}
+
+/* ---------- sections base ---------- */
+section{padding:84px 0}
+.sec-head{text-align:center;max-width:680px;margin:0 auto 54px}
+.kicker{
+  font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--brand-soft);margin-bottom:14px;
+}
+h2{
+  font-family:var(--font-display);font-weight:800;letter-spacing:-.025em;
+  font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.18;margin-bottom:16px;
+}
+.sec-head p{color:var(--muted);font-size:1.02rem}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:-6px}
+.stat{
+  border:1px solid var(--card-border);border-radius:var(--radius);
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.005));
+  padding:26px 20px;text-align:center;
+}
+.stat .num{font-family:var(--font-display);font-weight:800;font-size:clamp(1.6rem,4vw,2.2rem);letter-spacing:-.02em}
+.stat .num span{color:var(--brand-soft)}
+.stat .lbl{color:var(--muted);font-size:.82rem;margin-top:6px}
+
+/* ---------- bento features ---------- */
+.bento{display:grid;grid-template-columns:1fr;gap:16px}
+.card{
+  border:1px solid var(--card-border);border-radius:var(--radius);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008));
+  padding:28px;position:relative;overflow:hidden;
+  transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease;
+}
+.card:hover{transform:translateY(-4px);border-color:rgba(96,165,250,.35);box-shadow:0 18px 44px rgba(2,6,17,.6)}
+.card .icon{
+  width:46px;height:46px;border-radius:13px;display:grid;place-items:center;margin-bottom:18px;
+  background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:var(--brand-soft);
+}
+.card .icon svg{width:22px;height:22px}
+.card h3{font-family:var(--font-display);font-weight:700;font-size:1.12rem;margin-bottom:10px;letter-spacing:-.01em}
+.card p{color:var(--muted);font-size:.92rem}
+.card .tag{
+  position:absolute;top:20px;right:20px;font-size:.66rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--accent);background:rgba(34,211,238,.1);
+  border:1px solid rgba(34,211,238,.28);padding:4px 10px;border-radius:999px;
+}
+
+/* ---------- QR highlight ---------- */
+.qr-section{
+  border:1px solid rgba(59,130,246,.2);border-radius:26px;
+  background:radial-gradient(ellipse 80% 100% at 20% 0%,rgba(59,130,246,.12),transparent 60%),linear-gradient(180deg,#0d1322,#090d16);
+  padding:44px 26px;display:grid;gap:40px;overflow:hidden;position:relative;
+}
+.qr-copy .kicker{margin-bottom:12px}
+.qr-copy h2{margin-bottom:18px}
+.qr-copy p{color:var(--muted);margin-bottom:22px}
+.check-list{list-style:none;display:flex;flex-direction:column;gap:13px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-size:.94rem}
+.check-list li svg{width:20px;height:20px;flex:none;color:var(--green);margin-top:2px}
+.qr-visual{display:grid;place-items:center}
+.ticket{
+  width:min(300px,100%);border-radius:20px;padding:26px;text-align:center;
+  background:linear-gradient(160deg,#121a2c,#0b101d);
+  border:1px solid rgba(148,163,184,.18);
+  box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 0 6px rgba(59,130,246,.06);
+  animation:float 5s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}
+.ticket .t-head{font-family:var(--font-display);font-weight:700;font-size:.9rem;margin-bottom:4px}
+.ticket .t-sub{font-size:.72rem;color:var(--muted);margin-bottom:18px}
+.qr-box{
+  width:150px;height:150px;margin:0 auto 18px;border-radius:14px;background:#fff;padding:12px;
+}
+.ticket .t-info{font-size:.72rem;color:var(--muted);border-top:1px dashed rgba(148,163,184,.25);padding-top:14px;display:flex;justify-content:space-between}
+.ticket .t-info b{color:var(--text);display:block;font-size:.8rem}
+.t-status{
+  display:inline-flex;align-items:center;gap:6px;margin-top:16px;
+  font-size:.7rem;font-weight:700;color:var(--green);
+  background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);
+  padding:5px 12px;border-radius:999px;
+}
+
+/* ---------- how it works ---------- */
+.steps{display:grid;grid-template-columns:1fr;gap:16px;counter-reset:step}
+.step{
+  border:1px solid var(--card-border);border-radius:var(--radius);padding:28px;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.006));
+  position:relative;
+}
+.step-num{
+  font-family:var(--font-display);font-weight:800;font-size:.85rem;
+  width:36px;height:36px;border-radius:11px;display:grid;place-items:center;margin-bottom:16px;
+  background:linear-gradient(135deg,var(--brand),#6366f1);color:#fff;
+  box-shadow:0 4px 14px var(--brand-glow);
+}
+.step h3{font-family:var(--font-display);font-size:1.05rem;font-weight:700;margin-bottom:8px}
+.step p{color:var(--muted);font-size:.9rem}
+
+/* ---------- perfis ---------- */
+.roles{display:grid;grid-template-columns:1fr;gap:16px}
+.role-card{
+  border:1px solid var(--card-border);border-radius:var(--radius);padding:30px;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008));
+}
+.role-card .r-badge{
+  display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 12px;border-radius:999px;margin-bottom:16px;
+}
+.r-master{color:#a78bfa;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3)}
+.r-admin{color:var(--brand-soft);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3)}
+.r-prof{color:var(--green);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3)}
+.r-aluno{color:var(--accent);background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3)}
+.role-card h3{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:14px}
+.role-card ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.role-card li{display:flex;gap:10px;font-size:.88rem;color:var(--muted)}
+.role-card li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--brand-soft);flex:none;margin-top:9px}
+
+/* ---------- tech ---------- */
+.tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tech{
+  display:flex;align-items:center;gap:12px;padding:16px 18px;
+  border:1px solid var(--card-border);border-radius:14px;
+  background:rgba(255,255,255,.02);font-weight:600;font-size:.88rem;
+  transition:border-color .25s,background .25s;
+}
+.tech:hover{border-color:rgba(96,165,250,.4);background:rgba(59,130,246,.06)}
+.tech .t-ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(59,130,246,.1);color:var(--brand-soft);flex:none}
+.tech .t-ico svg{width:18px;height:18px}
+.tech small{display:block;font-weight:500;color:var(--muted);font-size:.72rem}
+
+/* ---------- FAQ ---------- */
+.faq{max-width:760px;margin-inline:auto;display:flex;flex-direction:column;gap:12px}
+details{
+  border:1px solid var(--card-border);border-radius:14px;
+  background:rgba(255,255,255,.02);overflow:hidden;
+}
+details[open]{border-color:rgba(96,165,250,.3)}
+summary{
+  cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:18px 22px;font-weight:600;font-size:.95rem;
+}
+summary::-webkit-details-marker{display:none}
+summary .chev{transition:transform .3s;color:var(--muted);flex:none}
+details[open] summary .chev{transform:rotate(180deg)}
+details .faq-body{padding:0 22px 20px;color:var(--muted);font-size:.9rem}
+
+/* ---------- CTA ---------- */
+.cta-box{
+  text-align:center;border-radius:26px;padding:60px 26px;position:relative;overflow:hidden;
+  border:1px solid rgba(59,130,246,.25);
+  background:radial-gradient(ellipse 70% 90% at 50% 0%,rgba(59,130,246,.2),transparent 65%),linear-gradient(180deg,#0d1322,#090d16);
+}
+.cta-box h2{margin-bottom:14px}
+.cta-box p{color:var(--muted);max-width:520px;margin:0 auto 32px}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid rgba(148,163,184,.08);padding:40px 0 34px}
+.foot{display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center}
+.foot .logo{font-size:1rem}
+.foot p{color:var(--muted);font-size:.8rem}
+.foot-links{display:flex;gap:22px;font-size:.82rem;color:var(--muted);flex-wrap:wrap;justify-content:center}
+.foot-links a:hover{color:var(--text)}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .orb,.ticket{animation:none}
+}
+
+/* ---------- desktop ---------- */
+@media(min-width:760px){
+  .nav-links{display:flex}
+  .menu-btn{display:none}
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .bento{grid-template-columns:repeat(3,1fr)}
+  .bento .wide{grid-column:span 2}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .roles{grid-template-columns:repeat(2,1fr)}
+  .tech-grid{grid-template-columns:repeat(4,1fr)}
+  .qr-section{grid-template-columns:1.1fr .9fr;align-items:center;padding:60px 56px}
+  .app-shell{grid-template-columns:200px 1fr}
+  .app-side{display:flex}
+  .app-main{padding:26px 30px}
+  .hero{padding:170px 0 90px}
+}
+@media(min-width:1000px){
+  .steps{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-fx">
+  <div class="grid-lines"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<header>
+  <div class="container nav">
+    <a class="logo" href="#top"><span class="logo-mark">A</span>ArenaPass</a>
+    <nav class="nav-links">
+      <a href="#recursos">Recursos</a>
+      <a href="#convite">Convite Digital</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#perfis">Perfis</a>
+      <a href="#tecnologia">Tecnologia</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-primary" href="https://arena-pass.vercel.app" target="_blank" rel="noopener">Acessar sistema</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <a href="#recursos">Recursos</a>
+    <a href="#convite">Convite Digital</a>
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#perfis">Perfis</a>
+    <a href="#tecnologia">Tecnologia</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero container">
+    <div class="pill"><span class="dot"></span>Sistema em produção · Beach Tennis e muito mais</div>
+    <h1>A gestão da sua quadra,<br><span class="grad-text">do agendamento ao QR Code</span></h1>
+    <p class="lead">O ArenaPass organiza tudo o que acontece na quadra do seu clube: professores terceirizados agendam horários, pagam via Pix e convidam alunos com passe digital validado por QR Code. Sem planilha, sem WhatsApp perdido, sem conflito de horário.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary btn-lg" href="https://arena-pass.vercel.app" target="_blank" rel="noopener">Entrar na plataforma
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+      <a class="btn btn-ghost btn-lg" href="#recursos">Conhecer os recursos</a>
+    </div>
+    <div class="hero-note">Acesso para <strong>clubes</strong>, <strong>professores</strong> e <strong>alunos convidados</strong> — 100% web, nada pra instalar.</div>
+
+    <div class="mockup-wrap reveal">
+      <div class="mockup-glow"></div>
+      <div class="browser">
+        <div class="browser-bar">
+          <span class="b-dot" style="background:#f87171"></span>
+          <span class="b-dot" style="background:#fbbf24"></span>
+          <span class="b-dot" style="background:#34d399"></span>
+          <span class="browser-url">arena-pass.vercel.app/professor/agendar</span>
+        </div>
+        <div class="app-shell">
+          <aside class="app-side">
+            <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel</div>
+            <div class="side-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>Agendar horário</div>
+            <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Meus agendamentos</div>
+            <div class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 15h.01M11 15h4"/></svg>Convites</div>
+          </aside>
+          <div class="app-main">
+            <div class="app-title">Quadra 4 · Beach Tennis — Sexta, 14/08</div>
+            <div class="slot-grid">
+              <div class="slot busy">07:00 - 07:59</div>
+              <div class="slot free">08:00 - 08:59</div>
+              <div class="slot sel">09:00 - 09:59</div>
+              <div class="slot sel">10:00 - 10:59</div>
+              <div class="slot free">11:00 - 11:59</div>
+              <div class="slot busy">16:00 - 16:59</div>
+              <div class="slot free">17:00 - 17:59</div>
+              <div class="slot sel">18:00 - 18:59</div>
+            </div>
+            <div class="app-summary">
+              <div>3 horários selecionados<br><strong>Total: R$ 90,00</strong></div>
+              <span class="mini-btn">Confirmar e pagar via Pix</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="container" style="padding-top:10px">
+    <div class="stats reveal">
+      <div class="stat"><div class="num"><span>100%</span></div><div class="lbl">web e mobile-first</div></div>
+      <div class="stat"><div class="num">0<span>&nbsp;conflitos</span></div><div class="lbl">proteção contra agendamento duplo direto no banco</div></div>
+      <div class="stat"><div class="num"><span>Pix</span></div><div class="lbl">QR Code de pagamento gerado na hora (padrão BR Code)</div></div>
+      <div class="stat"><div class="num"><span>4</span> perfis</div><div class="lbl">Master, Clube, Professor e Aluno convidado</div></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="recursos" class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">Recursos</div>
+      <h2>Tudo o que o clube precisa, em um só lugar</h2>
+      <p>Do cadastro do professor ao relatório de faturamento, cada etapa do fluxo foi construída pra funcionar de verdade no dia a dia da quadra.</p>
+    </div>
+    <div class="bento">
+      <div class="card wide reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/><path d="m9 15 2 2 4-4"/></svg></div>
+        <h3>Agendamento inteligente de quadras</h3>
+        <p>Grade de horários em tempo real: o professor vê os horários livres, seleciona quantos quiser (mesmo não consecutivos) e confirma tudo de uma vez. Dupla proteção contra conflito — validação na aplicação e restrição no próprio banco de dados — garante que dois professores jamais reservem o mesmo horário.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3>Aprovação de professores</h3>
+        <p>Professores se cadastram sozinhos, confirmam o e-mail com código de verificação e entram numa fila de aprovação do clube. Suspensão e reativação a qualquer momento.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <h3>Pagamento via Pix</h3>
+        <p>QR Code Pix real (padrão EMV BR Code do Banco Central) gerado na hora da reserva. O professor paga e confirma direto na plataforma — Pix, cartão ou dinheiro.</p>
+        <span class="tag">BR Code</span>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg></div>
+        <h3>Financeiro completo</h3>
+        <p>Faturamento mensal por professor, filtros por período e visão consolidada do que a quadra rendeu — sem precisar somar nada na mão.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+        <h3>E-mails automáticos</h3>
+        <p>Código de verificação enviado por e-mail no cadastro, com domínio autenticado (DKIM/DMARC) pra entregar direito na caixa de entrada.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+        <h3>Gestão de perfil</h3>
+        <p>Cada usuário atualiza seu próprio e-mail e senha com verificação da senha atual. Administradores gerenciam quadras, modalidades, valores e outros admins.</p>
+      </div>
+      <div class="card wide reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 8.5h.01M15.5 8.5h.01M8 15c1 1.2 2.4 2 4 2s3-.8 4-2"/></svg></div>
+        <h3>Ciclo de vida completo do agendamento</h3>
+        <p>Pendente de pagamento → confirmado → realizado, com cancelamento controlado por permissão: o professor cancela só os dele, o clube cancela qualquer um, e aula já realizada não volta atrás. Cada mudança de status respeita regras de negócio validadas no servidor.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- QR HIGHLIGHT -->
+  <section id="convite" class="container">
+    <div class="qr-section reveal">
+      <div class="qr-copy">
+        <div class="kicker">O grande diferencial</div>
+        <h2>Convite digital com QR Code para alunos</h2>
+        <p>Aluno não-sócio? Sem problema. O professor gera um passe digital para cada aluno da aula, e a portaria valida o QR Code na entrada — válido somente na data e horário daquela aula.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Passe individual por aluno, com nome e CPF</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Janela de validade automática: só funciona no horário da aula</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Uso único: depois de validado na portaria, o convite é marcado como utilizado</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Validação instantânea, sem login pra quem está na portaria</li>
+        </ul>
+      </div>
+      <div class="qr-visual">
+        <div class="ticket">
+          <div class="t-head">ArenaPass · Convite</div>
+          <div class="t-sub">Quadra 4 — Beach Tennis</div>
+          <div class="qr-box">
+            <svg viewBox="0 0 29 29" shape-rendering="crispEdges" aria-label="QR Code ilustrativo">
+              <rect width="29" height="29" fill="#fff"/>
+              <path fill="#0b1220" d="M1 1h7v7H1zM21 1h7v7h-7zM1 21h7v7H1zM2 2v5h5V2zM22 2v5h5V2zM2 22v5h5V2z"/>
+              <path fill="#fff" d="M2 2h5v5H2zM22 2h5v5h-5zM2 22h5v5H2z"/>
+              <path fill="#0b1220" d="M3 3h3v3H3zM23 3h3v3h-3zM3 23h3v3H3z"/>
+              <path fill="#0b1220" d="M10 1h2v2h-2zM14 1h1v3h-1zM17 2h2v1h-2zM10 4h1v2h-1zM12 4h2v1h-2zM16 5h3v1h-3zM10 7h2v1h-2zM13 7h1v2h-1zM15 8h2v1h-2zM18 7h1v2h-1zM1 10h2v1H1zM4 10h2v2H4zM7 10h1v1H7zM9 10h2v2H9zM13 10h2v1h-2zM16 10h1v2h-1zM19 10h2v1h-2zM22 10h1v2h-1zM25 10h2v1h-2zM2 13h1v2H2zM5 13h2v1H5zM8 13h2v2H8zM12 13h1v2h-1zM14 14h2v1h-2zM18 13h2v1h-2zM21 13h2v2h-2zM25 13h1v2h-1zM27 13h1v1h-1zM1 16h2v2H1zM4 17h2v1H4zM7 16h2v1H7zM10 16h1v3h-1zM13 17h2v1h-2zM16 16h2v2h-2zM20 16h1v2h-1zM23 16h2v1h-2zM26 17h2v1h-2zM9 21h2v2H9zM13 20h1v2h-1zM15 21h2v1h-2zM18 20h2v2h-2zM21 21h1v2h-1zM24 20h2v2h-2zM27 21h1v2h-1zM10 24h1v2h-1zM12 25h3v1h-3zM16 24h2v1h-2zM19 24h1v3h-1zM22 25h2v1h-2zM25 24h2v2h-2zM10 27h2v1h-2zM14 27h1v1h-1z"/>
+            </svg>
+          </div>
+          <div class="t-info">
+            <div>Aluno<b>Maria Souza</b></div>
+            <div>Horário<b>09:00 – 10:59</b></div>
+          </div>
+          <div class="t-status">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            Válido para hoje
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="como-funciona" class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">Como funciona</div>
+      <h2>Da reserva à aula em 4 passos</h2>
+      <p>Um fluxo pensado pro professor terceirizado e pro clube — simples pra quem usa, controlado pra quem administra.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <h3>Professor se cadastra</h3>
+        <p>Cadastro com verificação de e-mail por código. O clube aprova o professor antes do primeiro agendamento.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <h3>Reserva os horários</h3>
+        <p>Na grade em tempo real, o professor seleciona os horários livres que quiser e confirma a reserva.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <h3>Paga via Pix</h3>
+        <p>QR Code Pix gerado automaticamente com o valor total. Confirmou o pagamento, horário garantido.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">4</div>
+        <h3>Alunos entram com QR Code</h3>
+        <p>O professor gera convites digitais; os alunos apresentam o QR Code na portaria e a aula acontece.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PERFIS -->
+  <section id="perfis" class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">Perfis de acesso</div>
+      <h2>Cada um vê exatamente o que precisa</h2>
+      <p>Permissões separadas por papel, do controle total do sistema ao convite de uso único do aluno.</p>
+    </div>
+    <div class="roles">
+      <div class="role-card reveal">
+        <span class="r-badge r-master">Master</span>
+        <h3>Controle total</h3>
+        <ul>
+          <li>Tudo que o administrador do clube faz</li>
+          <li>Cria e gerencia os administradores do clube</li>
+          <li>Proteção contra remoção do último admin</li>
+        </ul>
+      </div>
+      <div class="role-card reveal">
+        <span class="r-badge r-admin">Admin do Clube</span>
+        <h3>Gestão do dia a dia</h3>
+        <ul>
+          <li>Cadastra quadras, modalidades e valores por hora</li>
+          <li>Aprova, suspende e gerencia professores</li>
+          <li>Acompanha agendamentos e confirma pagamentos</li>
+          <li>Relatório de faturamento mensal por professor</li>
+        </ul>
+      </div>
+      <div class="role-card reveal">
+        <span class="r-badge r-prof">Professor</span>
+        <h3>Autonomia na quadra</h3>
+        <ul>
+          <li>Agenda múltiplos horários de uma vez</li>
+          <li>Paga via Pix com QR Code gerado na hora</li>
+          <li>Gera convites com QR Code pros alunos</li>
+          <li>Cancela e acompanha os próprios agendamentos</li>
+        </ul>
+      </div>
+      <div class="role-card reveal">
+        <span class="r-badge r-aluno">Aluno convidado</span>
+        <h3>Entrada sem burocracia</h3>
+        <ul>
+          <li>Recebe o passe digital do professor</li>
+          <li>Apresenta o QR Code na portaria</li>
+          <li>Acesso válido só na data e hora da aula</li>
+          <li>Não precisa de conta nem instalar nada</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECNOLOGIA -->
+  <section id="tecnologia" class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">Tecnologia</div>
+      <h2>Construído com stack moderna, de ponta a ponta</h2>
+      <p>Arquitetura limpa, testes automatizados e infraestrutura em nuvem — o mesmo padrão de engenharia de produtos SaaS profissionais.</p>
+    </div>
+    <div class="tech-grid reveal">
+      <div class="tech"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></span><span>.NET (C#)<small>API · Clean Architecture</small></span></div>
+      <div class="tech"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6l1.5 13L12 22l7.5-3L21 6z"/><path d="M12 6v10M8.5 14h7"/></svg></span><span>Angular<small>SPA · Signals</small></span></div>
+      <div class="tech"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span><span>PostgreSQL<small>Supabase</small></span></div>
+      <div class="tech"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a7 7 0 0 0-7 7c0 3 2 5 4 6h6c2-1 4-3 4-6a7 7 0 0 0-7-7z"/><path d="M9 21h6"/></svg></span><span>Tailwind CSS<small>Design system</small></span></div>
+      <div class="tech"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span>JWT + Roles<small>Autenticação segura</small></span></div>
+      <div class="tech"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/><path d="M13 3h3v3M21 3v3M3 13v3h3M7 21h4v-4"/></svg></span><span>QR Code<small>Convites + Pix BR Code</small></span></div>
+      <div class="tech"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg></span><span>Cloud nativo<small>Render + Vercel + Docker</small></span></div>
+      <div class="tech"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7z"/><path d="m9 12 2 2 4-4"/></svg></span><span>Testes automatizados<small>50+ testes de backend</small></span></div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">Perguntas frequentes</div>
+      <h2>Ficou alguma dúvida?</h2>
+    </div>
+    <div class="faq reveal">
+      <details>
+        <summary>O ArenaPass funciona só para Beach Tennis?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="faq-body">Não. O sistema trabalha com quadras e modalidades cadastráveis — o clube cria quantas quadras e modalidades quiser, cada uma com seu valor por hora. Beach Tennis foi o ponto de partida, mas a estrutura serve para qualquer esporte de quadra.</div>
+      </details>
+      <details>
+        <summary>Como o sistema evita que dois professores reservem o mesmo horário?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="faq-body">Há duas camadas de proteção: a aplicação verifica a disponibilidade antes de confirmar, e o próprio banco de dados possui uma restrição que impede fisicamente dois registros no mesmo horário da mesma quadra. Mesmo que dois professores cliquem em "confirmar" no mesmo segundo, só um consegue — o outro recebe o aviso de conflito imediatamente.</div>
+      </details>
+      <details>
+        <summary>O aluno precisa criar conta ou instalar aplicativo?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="faq-body">Não. O aluno só recebe o convite digital com QR Code gerado pelo professor. Na portaria, o código é validado na hora — vale apenas na janela de horário da aula e é de uso único.</div>
+      </details>
+      <details>
+        <summary>Como funciona o pagamento?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="faq-body">Ao reservar, o professor recebe um QR Code Pix no padrão oficial BR Code do Banco Central, já com o valor total dos horários selecionados. Ele também pode registrar pagamento em cartão ou dinheiro, e o clube pode confirmar pagamentos manualmente quando preferir.</div>
+      </details>
+      <details>
+        <summary>O clube consegue acompanhar quanto cada professor gerou de receita?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="faq-body">Sim. O módulo financeiro mostra o faturamento mês a mês, com filtro por professor e total consolidado do período — tudo calculado automaticamente a partir dos agendamentos pagos.</div>
+      </details>
+      <details>
+        <summary>Preciso instalar alguma coisa?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="faq-body">Não. O ArenaPass é 100% web e responsivo: funciona no celular, tablet e computador, direto pelo navegador.</div>
+      </details>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="container">
+    <div class="cta-box reveal">
+      <div class="kicker">Comece agora</div>
+      <h2>Sua quadra organizada <span class="grad-text">hoje mesmo</span></h2>
+      <p>Acesse a plataforma e veja o ArenaPass funcionando — agendamento, Pix e convites digitais em poucos cliques.</p>
+      <a class="btn btn-primary btn-lg" href="https://arena-pass.vercel.app" target="_blank" rel="noopener">Acessar o ArenaPass
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container foot">
+    <a class="logo" href="#top"><span class="logo-mark">A</span>ArenaPass</a>
+    <div class="foot-links">
+      <a href="#recursos">Recursos</a>
+      <a href="#convite">Convite Digital</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#tecnologia">Tecnologia</a>
+      <a href="https://arena-pass.vercel.app" target="_blank" rel="noopener">Acessar sistema</a>
+    </div>
+    <p>© <span id="year"></span> ArenaPass · Um produto WN Labs · arena-pass.wnlabs.com.br</p>
+  </div>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const menuBtn = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
