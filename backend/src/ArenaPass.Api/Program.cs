@@ -48,11 +48,20 @@ builder.Services.AddAuthorization();
 var frontendOrigins = builder.Configuration.GetSection("Cors:FrontendOrigins").Get<string[]>()
                       ?? ["http://localhost:4200"];
 
+// Domínio base dos tenants: qualquer subdomínio https dele é aceito automaticamente,
+// pra não precisar cadastrar cada espaço novo (arena10, hrtennis, ...) na env var do Render.
+var corsBaseDomain = builder.Configuration["Cors:BaseDomain"] ?? "wnlabs.com.br";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(CorsPolicyName, policy =>
     {
-        policy.WithOrigins(frontendOrigins)
+        policy.SetIsOriginAllowed(origin =>
+                frontendOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase) ||
+                (Uri.TryCreate(origin, UriKind.Absolute, out var uri) &&
+                 uri.Scheme == Uri.UriSchemeHttps &&
+                 (uri.Host.Equals(corsBaseDomain, StringComparison.OrdinalIgnoreCase) ||
+                  uri.Host.EndsWith($".{corsBaseDomain}", StringComparison.OrdinalIgnoreCase))))
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
