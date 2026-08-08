@@ -328,6 +328,53 @@ footer{border-top:1px solid var(--border);padding:42px 0 36px;background:var(--b
 .foot-links{display:flex;gap:24px;font-size:.85rem;color:var(--muted);flex-wrap:wrap;justify-content:center;font-weight:500}
 .foot-links a:hover{color:var(--text)}
 
+/* ---------- modal acessar espaço ---------- */
+.modal-overlay{
+  position:fixed;inset:0;z-index:100;display:none;place-items:center;
+  background:rgba(15,28,46,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  padding:20px;
+}
+.modal-overlay.open{display:grid}
+.modal{
+  width:min(440px,100%);background:#fff;border-radius:20px;padding:34px 30px;
+  box-shadow:0 30px 80px rgba(15,28,46,.3);position:relative;
+  animation:modalIn .25s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.modal-close{
+  position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:10px;
+  border:none;background:var(--bg-soft);color:var(--muted);cursor:pointer;
+  display:grid;place-items:center;transition:background .2s;
+}
+.modal-close:hover{background:var(--bg-softer);color:var(--text)}
+.modal h3{font-family:var(--font-display);font-weight:800;font-size:1.25rem;margin-bottom:8px;letter-spacing:-.02em}
+.modal .m-sub{color:var(--muted);font-size:.9rem;margin-bottom:22px}
+.modal label{display:block;font-size:.82rem;font-weight:600;margin-bottom:8px}
+.tenant-input{
+  display:flex;align-items:stretch;border:1.5px solid var(--border);border-radius:12px;
+  overflow:hidden;transition:border-color .2s;margin-bottom:8px;
+}
+.tenant-input:focus-within{border-color:var(--brand)}
+.tenant-input input{
+  flex:1;min-width:0;border:none;outline:none;padding:13px 14px;
+  font-family:var(--font-body);font-size:.95rem;color:var(--text);background:#fff;
+}
+.tenant-input .suffix{
+  display:flex;align-items:center;padding:0 14px;background:var(--bg-soft);
+  border-left:1px solid var(--border);color:var(--muted);font-size:.85rem;font-weight:600;white-space:nowrap;
+}
+.tenant-error{display:none;color:#e05252;font-size:.8rem;margin-bottom:8px}
+.tenant-error.show{display:block}
+.modal .btn{width:100%;margin-top:10px}
+.modal-divider{
+  display:flex;align-items:center;gap:12px;margin:22px 0 16px;
+  color:var(--muted);font-size:.78rem;font-weight:600;
+}
+.modal-divider::before,.modal-divider::after{content:"";flex:1;height:1px;background:var(--border)}
+.modal .m-contact{text-align:center;font-size:.88rem;color:var(--muted)}
+.modal .m-contact a{color:var(--brand);font-weight:700}
+.modal .m-contact a:hover{text-decoration:underline}
+
 /* ---------- reveal ---------- */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}
@@ -365,7 +412,7 @@ footer{border-top:1px solid var(--border);padding:42px 0 36px;background:var(--b
       <a href="#faq">FAQ</a>
     </nav>
     <div class="nav-cta">
-      <a class="btn btn-primary" href="https://arenapass.wnlabs.com.br" target="_blank" rel="noopener">Acessar sistema</a>
+      <a class="btn btn-primary" href="#" data-portal>Acessar sistema</a>
       <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
       </button>
@@ -376,7 +423,7 @@ footer{border-top:1px solid var(--border);padding:42px 0 36px;background:var(--b
     <a href="#convite">Convite Digital</a>
     <a href="#como-funciona">Como Funciona</a>
     <a href="#faq">FAQ</a>
-    <a href="https://arenapass.wnlabs.com.br" target="_blank" rel="noopener" style="color:var(--brand);font-weight:700">Acessar sistema →</a>
+    <a href="#" data-portal style="color:var(--brand);font-weight:700">Acessar sistema →</a>
   </nav>
 </header>
 
@@ -396,7 +443,7 @@ footer{border-top:1px solid var(--border);padding:42px 0 36px;background:var(--b
           <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8.5 12 2.5 2.5 5-5"/></svg>QR Code na portaria</span>
         </div>
         <div class="hero-actions">
-          <a class="btn btn-primary btn-lg" href="https://arenapass.wnlabs.com.br" target="_blank" rel="noopener">Acessar a plataforma
+          <a class="btn btn-primary btn-lg" href="#" data-portal>Acessar a plataforma
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </a>
           <a class="btn btn-outline btn-lg" href="#recursos">Ver recursos</a>
@@ -410,7 +457,6 @@ footer{border-top:1px solid var(--border);padding:42px 0 36px;background:var(--b
               <span class="b-dot" style="background:#f87171"></span>
               <span class="b-dot" style="background:#fbbf24"></span>
               <span class="b-dot" style="background:#34d399"></span>
-              <span class="browser-url">arena-pass.vercel.app</span>
             </div>
             <div class="app-shell">
               <aside class="app-side">
@@ -698,7 +744,7 @@ footer{border-top:1px solid var(--border);padding:42px 0 36px;background:var(--b
       <div class="cta-box reveal">
         <h2>Sua quadra organizada hoje mesmo</h2>
         <p>Acesse a plataforma e veja o ArenaPass funcionando — agendamento, Pix e convites digitais em poucos cliques.</p>
-        <a class="btn btn-white btn-lg" href="https://arenapass.wnlabs.com.br" target="_blank" rel="noopener">Acessar o ArenaPass
+        <a class="btn btn-white btn-lg" href="#" data-portal>Acessar o ArenaPass
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
       </div>
@@ -715,14 +761,58 @@ footer{border-top:1px solid var(--border);padding:42px 0 36px;background:var(--b
       <a href="#convite">Convite Digital</a>
       <a href="#como-funciona">Como Funciona</a>
       <a href="#faq">FAQ</a>
-      <a href="https://arenapass.wnlabs.com.br" target="_blank" rel="noopener">Acessar sistema</a>
+      <a href="#" data-portal>Acessar sistema</a>
     </div>
     <p>© <span id="year"></span> ArenaPass · Um produto WN Labs · arena-pass.wnlabs.com.br</p>
   </div>
 </footer>
 
+<div class="modal-overlay" id="portalModal" role="dialog" aria-modal="true" aria-labelledby="portalTitle">
+  <div class="modal">
+    <button class="modal-close" id="portalClose" aria-label="Fechar">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <h3 id="portalTitle">Acessar meu espaço</h3>
+    <p class="m-sub">Digite o endereço do seu espaço para entrar na plataforma.</p>
+    <label for="tenantInput">Endereço do espaço</label>
+    <div class="tenant-input">
+      <input type="text" id="tenantInput" placeholder="meuespaco" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <span class="suffix">.wnlabs.com.br</span>
+    </div>
+    <p class="tenant-error" id="tenantError">Informe o endereço do seu espaço pra continuar.</p>
+    <button class="btn btn-primary" id="tenantGo">Entrar no meu espaço
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </button>
+    <div class="modal-divider">ainda não é cliente?</div>
+    <p class="m-contact">Fale com a gente e crie o espaço do seu clube:<br><a href="mailto:wesleyneiva15@hotmail.com?subject=Quero%20contratar%20o%20ArenaPass">Quero contratar o ArenaPass</a></p>
+  </div>
+</div>
+
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
+
+// Portal "Acessar meu espaço"
+const portalModal = document.getElementById('portalModal');
+const tenantInput = document.getElementById('tenantInput');
+const tenantError = document.getElementById('tenantError');
+document.querySelectorAll('[data-portal]').forEach(el => el.addEventListener('click', e => {
+  e.preventDefault();
+  portalModal.classList.add('open');
+  tenantError.classList.remove('show');
+  setTimeout(() => tenantInput.focus(), 60);
+}));
+document.getElementById('portalClose').addEventListener('click', () => portalModal.classList.remove('open'));
+portalModal.addEventListener('click', e => { if (e.target === portalModal) portalModal.classList.remove('open'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') portalModal.classList.remove('open'); });
+
+function irParaEspaco() {
+  const slug = tenantInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  if (!slug) { tenantError.classList.add('show'); tenantInput.focus(); return; }
+  window.location.href = 'https://' + slug + '.wnlabs.com.br/login';
+}
+document.getElementById('tenantGo').addEventListener('click', irParaEspaco);
+tenantInput.addEventListener('keydown', e => { if (e.key === 'Enter') irParaEspaco(); });
+tenantInput.addEventListener('input', () => tenantError.classList.remove('show'));
 
 const menuBtn = document.getElementById('menuBtn');
 const mobileMenu = document.getElementById('mobileMenu');
