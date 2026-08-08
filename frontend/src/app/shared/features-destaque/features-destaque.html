@@ -1,0 +1,13 @@
+<div class="grid gap-2.5">
+  @for (feature of features; track feature.titulo) {
+    <div class="flex items-start gap-3 rounded-xl border border-chumbo-700 bg-chumbo-800 p-3.5">
+      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-chumbo-700 text-neutral-300">
+        <app-icon [name]="feature.icone" [size]="17" />
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm font-medium text-white">{{ feature.titulo }}</p>
+        <p class="text-xs text-neutral-400">{{ feature.descricao }}</p>
+      </div>
+    </div>
+  }
+</div>

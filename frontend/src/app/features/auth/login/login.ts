@@ -4,10 +4,11 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { EspacoService } from '../../../core/services/espaco.service';
 import { TenantService } from '../../../core/services/tenant.service';
+import { FeaturesDestaque } from '../../../shared/features-destaque/features-destaque';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, FeaturesDestaque],
   templateUrl: './login.html'
 })
 export class Login implements OnInit {

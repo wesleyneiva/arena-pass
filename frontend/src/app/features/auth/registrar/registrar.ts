@@ -5,12 +5,13 @@ import { AuthService } from '../../../core/services/auth.service';
 import { EspacoService } from '../../../core/services/espaco.service';
 import { TenantService } from '../../../core/services/tenant.service';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
+import { FeaturesDestaque } from '../../../shared/features-destaque/features-destaque';
 
 type Etapa = 'dados' | 'codigo';
 
 @Component({
   selector: 'app-registrar',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, FeaturesDestaque],
   templateUrl: './registrar.html'
 })
 export class Registrar implements OnInit {

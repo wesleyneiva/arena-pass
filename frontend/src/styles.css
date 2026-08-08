@@ -9,6 +9,16 @@
      impacto sem trocar a fonte de leitura/formulários (que continua Inter). */
   --font-display: "Space Grotesk Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 
+  /* Cinza chumbo metálico — usado na navegação e nos painéis escuros (login,
+     registrar). Tom frio e levemente acinzentado-azulado (não o slate padrão,
+     que puxa muito pro azul, nem um cinza quente) — a intenção é "grafite",
+     não "carvão". Opaco, sem gradiente: só essas três paradas sólidas. */
+  --color-chumbo-950: #0e0f11;
+  --color-chumbo-900: #17181b;
+  --color-chumbo-800: #202226;
+  --color-chumbo-700: #2b2d32;
+  --color-chumbo-600: #3a3c42;
+
   --animate-fade-in: fade-in 0.35s ease-out both;
   --animate-fade-in-up: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-scale-in: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;

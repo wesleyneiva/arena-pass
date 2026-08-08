@@ -1,5 +1,5 @@
 <div class="min-h-screen flex bg-slate-50">
-  <div class="relative hidden w-1/2 flex-col justify-between bg-neutral-700 p-12 text-white lg:flex">
+  <div class="relative hidden w-1/2 flex-col justify-between bg-chumbo-900 p-12 text-white lg:flex">
     <div class="relative flex items-center gap-2.5">
       <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-400 font-semibold">A</div>
       <span class="font-display text-lg font-semibold">ArenaPass</span>
@@ -29,6 +29,12 @@
           Já dá aula em outro espaço com o ArenaPass? Use o mesmo e-mail — a gente reconhece
           sua conta e só cria o vínculo com este espaço, sem duplicar cadastro.
         </p>
+      }
+
+      @if (!dominioMaster) {
+        <div class="mt-6 max-w-md">
+          <app-features-destaque />
+        </div>
       }
     </div>
 

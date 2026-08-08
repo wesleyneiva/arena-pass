@@ -4,7 +4,7 @@
   }
 
   <aside
-    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-neutral-700 transition-transform duration-300 ease-out lg:static lg:translate-x-0"
+    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-chumbo-900 transition-transform duration-300 ease-out lg:static lg:translate-x-0"
     [class.translate-x-0]="menuAberto()"
     [class.-translate-x-full]="!menuAberto()"
   >
@@ -23,7 +23,7 @@
           routerLinkActive="bg-blue-400/10 text-blue-300"
           [routerLinkActiveOptions]="{ exact: false }"
           (click)="menuAberto.set(false)"
-          class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-400 transition-colors duration-150 hover:bg-neutral-600 hover:text-neutral-100"
+          class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-400 transition-colors duration-150 hover:bg-chumbo-800 hover:text-neutral-100"
         >
           <app-icon [name]="item.icone" [size]="19" />
           {{ item.rotulo }}
@@ -31,11 +31,11 @@
       }
     </nav>
 
-    <div class="border-t border-neutral-600 px-3 py-4">
+    <div class="border-t border-chumbo-800 px-3 py-4">
       <div class="mb-2 truncate px-3 text-xs text-neutral-500">{{ auth.usuario()?.email }}</div>
       <button
         (click)="sair()"
-        class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-400 transition-colors duration-150 hover:bg-neutral-600 hover:text-neutral-100"
+        class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-400 transition-colors duration-150 hover:bg-chumbo-800 hover:text-neutral-100"
       >
         <app-icon name="logout" [size]="19" />
         Sair
