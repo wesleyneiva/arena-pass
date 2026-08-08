@@ -32,6 +32,13 @@ public class ProfessoresController : ControllerBase
         return Ok(professores);
     }
 
+    [HttpGet("verificar-email")]
+    public async Task<IActionResult> VerificarEmail([FromQuery] string email, CancellationToken cancellationToken)
+    {
+        var resultado = await _mediator.Send(new VerificarEmailProfessorQuery(email), cancellationToken);
+        return Ok(resultado);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Criar(CriarProfessorCommand command, CancellationToken cancellationToken)
     {

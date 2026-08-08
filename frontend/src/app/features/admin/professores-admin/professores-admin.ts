@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProfessorService } from '../../../core/services/professor.service';
-import { Professor } from '../../../core/models/professor.models';
+import { Professor, VerificarEmailProfessorResult } from '../../../core/models/professor.models';
 import { Icon } from '../../../shared/icon/icon';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
 
@@ -26,6 +26,9 @@ export class ProfessoresAdmin implements OnInit {
   novoEmail = '';
   novaSenha = '';
   novoCpf = '';
+
+  readonly emailVerificado = signal<VerificarEmailProfessorResult | null>(null);
+  readonly verificandoEmail = signal(false);
 
   readonly professoresFiltrados = computed(() => {
     const busca = this.busca().trim().toLowerCase();
@@ -132,8 +135,31 @@ export class ProfessoresAdmin implements OnInit {
     this.novoEmail = '';
     this.novaSenha = '';
     this.novoCpf = '';
+    this.emailVerificado.set(null);
     this.formularioAberto.set(true);
     this.erro.set(null);
+  }
+
+  alterarEmail(): void {
+    this.emailVerificado.set(null);
+  }
+
+  verificarEmailDigitado(): void {
+    const email = this.novoEmail.trim();
+    if (this.editandoId() || !email || !email.includes('@')) {
+      return;
+    }
+    this.verificandoEmail.set(true);
+    this.professorService.verificarEmail(email).subscribe({
+      next: (resultado) => {
+        this.verificandoEmail.set(false);
+        this.emailVerificado.set(resultado);
+      },
+      error: () => {
+        this.verificandoEmail.set(false);
+        this.emailVerificado.set(null);
+      }
+    });
   }
 
   editar(professor: Professor): void {
@@ -170,9 +196,19 @@ export class ProfessoresAdmin implements OnInit {
       return;
     }
 
+    const verificacao = this.emailVerificado();
+    if (verificacao?.jaVinculado) {
+      return;
+    }
+
+    const vinculandoExistente = !!verificacao?.existe;
+    const payload = vinculandoExistente
+      ? { nome: this.novoNome, email: this.novoEmail, senha: 'x'.repeat(6), cpf: '00000000000' }
+      : { nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha, cpf: this.novoCpf };
+
     this.salvando.set(true);
     this.professorService
-      .criar({ nome: this.novoNome, email: this.novoEmail, senha: this.novaSenha, cpf: this.novoCpf })
+      .criar(payload)
       .subscribe({
         next: () => {
           this.salvando.set(false);

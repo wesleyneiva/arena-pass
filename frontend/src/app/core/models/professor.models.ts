@@ -18,3 +18,9 @@ export interface AtualizarProfessorRequest {
   email: string;
   cpf: string;
 }
+
+export interface VerificarEmailProfessorResult {
+  existe: boolean;
+  nome: string | null;
+  jaVinculado: boolean;
+}
