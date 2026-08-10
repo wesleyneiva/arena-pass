@@ -2,6 +2,7 @@ import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
 import { ConviteService } from '../../../core/services/convite.service';
+import { NotificacaoService } from '../../../core/services/notificacao.service';
 import { Agendamento, FormaPagamento } from '../../../core/models/agendamento.models';
 import { ConviteResumo } from '../../../core/models/convite.models';
 import { ConfirmDialogService } from '../../../shared/confirm-dialog/confirm-dialog.service';
@@ -75,11 +76,14 @@ export class AgendamentosAdmin implements OnInit {
   constructor(
     private readonly agendamentoService: AgendamentoService,
     private readonly conviteService: ConviteService,
-    private readonly confirmDialog: ConfirmDialogService
+    private readonly confirmDialog: ConfirmDialogService,
+    private readonly notificacaoService: NotificacaoService
   ) {}
 
   ngOnInit(): void {
     this.carregar();
+    // Abrir a página de agendamentos "vê" as novidades — zera o badge da navbar.
+    this.notificacaoService.marcarTodasLidas().subscribe({ error: () => {} });
   }
 
   carregar(): void {

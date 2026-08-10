@@ -22,6 +22,7 @@ public class InMemoryDbContext : DbContext, IApplicationDbContext
     public DbSet<Plano> Planos => Set<Plano>();
     public DbSet<Assinatura> Assinaturas => Set<Assinatura>();
     public DbSet<Fatura> Faturas => Set<Fatura>();
+    public DbSet<Notificacao> Notificacoes => Set<Notificacao>();
 }
 
 public static class TestDbContextFactory

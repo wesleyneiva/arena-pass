@@ -1,6 +1,7 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { NotificacaoService } from '../../../core/services/notificacao.service';
 import { Icon } from '../../../shared/icon/icon';
 
 interface ItemMenu {
@@ -27,7 +28,7 @@ const ITEM_PERFIL: ItemMenu = { rota: '/admin/perfil', rotulo: 'Meu perfil', ico
   imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon],
   templateUrl: './admin-layout.html'
 })
-export class AdminLayout {
+export class AdminLayout implements OnInit, OnDestroy {
   readonly menuAberto = signal(false);
 
   readonly itens = computed<ItemMenu[]>(() => {
@@ -39,8 +40,20 @@ export class AdminLayout {
 
   constructor(
     readonly auth: AuthService,
+    readonly notificacoes: NotificacaoService,
     private readonly router: Router
   ) {}
+
+  ngOnInit(): void {
+    // Badge de notificações só faz sentido para o admin do espaço (Master não tem tenant).
+    if (this.auth.role() === 'AdminClube') {
+      this.notificacoes.iniciarPolling();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.notificacoes.pararPolling();
+  }
 
   sair(): void {
     this.auth.logout();

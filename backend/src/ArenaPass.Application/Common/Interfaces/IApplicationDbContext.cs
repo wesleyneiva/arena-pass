@@ -17,6 +17,7 @@ public interface IApplicationDbContext
     DbSet<Plano> Planos { get; }
     DbSet<Assinatura> Assinaturas { get; }
     DbSet<Fatura> Faturas { get; }
+    DbSet<Notificacao> Notificacoes { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

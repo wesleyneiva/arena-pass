@@ -29,6 +29,7 @@ public class ArenaPassDbContext : DbContext, IApplicationDbContext
     public DbSet<Plano> Planos => Set<Plano>();
     public DbSet<Assinatura> Assinaturas => Set<Assinatura>();
     public DbSet<Fatura> Faturas => Set<Fatura>();
+    public DbSet<Notificacao> Notificacoes => Set<Notificacao>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,6 +46,7 @@ public class ArenaPassDbContext : DbContext, IApplicationDbContext
         modelBuilder.Entity<Modalidade>().HasQueryFilter(m => m.EspacoId == _currentTenant.EspacoId);
         modelBuilder.Entity<Agendamento>().HasQueryFilter(a => a.EspacoId == _currentTenant.EspacoId);
         modelBuilder.Entity<SolicitacaoRegistroProfessor>().HasQueryFilter(s => s.EspacoId == _currentTenant.EspacoId);
+        modelBuilder.Entity<Notificacao>().HasQueryFilter(n => n.EspacoId == _currentTenant.EspacoId);
 
         base.OnModelCreating(modelBuilder);
     }

@@ -47,8 +47,28 @@ public class CriarAgendamentoCommandHandlerTests
         return (professor, quadra);
     }
 
+    private class EmailSenderFake : Application.Common.Interfaces.IEmailSender
+    {
+        public Task EnviarAsync(
+            string destinatarioEmail,
+            string destinatarioNome,
+            string assunto,
+            string corpoHtml,
+            CancellationToken cancellationToken = default) => Task.CompletedTask;
+    }
+
+    private class NotificacoesConfiguracaoFake : Application.Common.Interfaces.INotificacoesConfiguracao
+    {
+        public string? EmailCopiaAdmin => null;
+    }
+
     private static CriarAgendamentoCommandHandler CriarHandler(InMemoryDbContext context) =>
-        new(context, new FakeCurrentTenant(EspacoId));
+        new(
+            context,
+            new FakeCurrentTenant(EspacoId),
+            new EmailSenderFake(),
+            new NotificacoesConfiguracaoFake(),
+            Microsoft.Extensions.Logging.Abstractions.NullLogger<CriarAgendamentoCommandHandler>.Instance);
 
     [Fact]
     public async Task Handle_DeveCriarAgendamento_QuandoProfessorAprovadoEHorarioLivre()
@@ -192,7 +212,12 @@ public class CriarAgendamentoCommandHandlerTests
         var context = TestDbContextFactory.Create();
         var (professor, quadra) = CriarProfessorEQuadraAprovados(context);
 
-        var handler = new CriarAgendamentoCommandHandler(context, new FakeCurrentTenant(Guid.NewGuid()));
+        var handler = new CriarAgendamentoCommandHandler(
+            context,
+            new FakeCurrentTenant(Guid.NewGuid()),
+            new EmailSenderFake(),
+            new NotificacoesConfiguracaoFake(),
+            Microsoft.Extensions.Logging.Abstractions.NullLogger<CriarAgendamentoCommandHandler>.Instance);
         var command = new CriarAgendamentoCommand(
             professor.Id, quadra.Id, new DateOnly(2027, 8, 1), new TimeOnly(18, 0));
 

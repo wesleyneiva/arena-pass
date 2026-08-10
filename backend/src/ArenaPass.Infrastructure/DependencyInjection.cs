@@ -24,6 +24,8 @@ public static class DependencyInjection
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.Configure<PixSettings>(configuration.GetSection(PixSettings.SectionName));
         services.Configure<BrevoSettings>(configuration.GetSection(BrevoSettings.SectionName));
+        services.Configure<NotificacoesSettings>(configuration.GetSection(NotificacoesSettings.SectionName));
+        services.AddScoped<INotificacoesConfiguracao, NotificacoesConfiguracao>();
 
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();

@@ -27,6 +27,13 @@
         >
           <app-icon [name]="item.icone" [size]="19" />
           {{ item.rotulo }}
+          @if (item.rota === '/admin/agendamentos' && notificacoes.naoLidas() > 0) {
+            <span
+              class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-semibold text-white"
+            >
+              {{ notificacoes.naoLidas() > 99 ? '99+' : notificacoes.naoLidas() }}
+            </span>
+          }
         </a>
       }
     </nav>
