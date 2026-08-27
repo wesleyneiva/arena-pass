@@ -10,8 +10,6 @@ Sistema de gestão de quadras e docência terceirizada para clubes. O clube dedi
 |---|---|---|
 | ![Tela de agendamento](docs/screenshots/agendamento.png) | ![Painel financeiro](docs/screenshots/financeiro.png) | ![Convite com QR Code](docs/screenshots/convite-qr.png) |
 
-> _Screenshots em breve — salve as imagens em `docs/screenshots/`._
-
 ## Funcionalidades
 
 - **Autenticação (JWT)** com três papéis: `Master`, `AdminClube` e `Professor`.
