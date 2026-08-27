@@ -32,6 +32,8 @@ services:
         sync: false
       - key: Pix__Chave
         sync: false
+      - key: Seed__MasterPassword
+        sync: false
       - key: Pix__NomeRecebedor
         value: ArenaPass
       - key: Pix__Cidade

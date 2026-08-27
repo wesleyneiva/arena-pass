@@ -15,14 +15,14 @@ public static class ArenaPassDbContextSeed
     // painel do Master. Isso importa de verdade porque o Render free tier hiberna e
     // reinicia sozinho, o que re-executa este seed a cada cold start; sem essa guarda,
     // um "zerar o banco" em produção seria desfeito automaticamente no próximo restart.
-    public static async Task SeedAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher, bool seedEspacoDemo)
+    public static async Task SeedAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher, bool seedEspacoDemo, string masterPassword)
     {
         if (seedEspacoDemo)
         {
             await SeedEspacoDemoAsync(context, passwordHasher);
         }
 
-        await SeedMasterAsync(context, passwordHasher);
+        await SeedMasterAsync(context, passwordHasher, masterPassword);
     }
 
     private static async Task SeedEspacoDemoAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher)
@@ -94,7 +94,7 @@ public static class ArenaPassDbContextSeed
         }
     }
 
-    private static async Task SeedMasterAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher)
+    private static async Task SeedMasterAsync(ArenaPassDbContext context, IPasswordHasher passwordHasher, string masterPassword)
     {
         var masterExiste = await context.Usuarios.AnyAsync(u => u.Role == RoleUsuario.Master);
         if (!masterExiste)
@@ -105,7 +105,7 @@ public static class ArenaPassDbContextSeed
                 Email = "master@arenapass.local",
                 Role = RoleUsuario.Master
             };
-            master.SenhaHash = passwordHasher.Hash("Master@123");
+            master.SenhaHash = passwordHasher.Hash(masterPassword);
 
             context.Usuarios.Add(master);
             await context.SaveChangesAsync();

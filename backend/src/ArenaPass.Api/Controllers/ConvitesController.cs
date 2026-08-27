@@ -6,6 +6,7 @@ using ArenaPass.Application.Convites.Queries.ObterConvite;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ArenaPass.Api.Controllers;
 
@@ -62,6 +63,7 @@ public class ConvitesController : ControllerBase
 
     [HttpPost("api/convites/validar/{token:guid}")]
     [AllowAnonymous]
+    [EnableRateLimiting("convite-validar")]
     public async Task<IActionResult> Validar(Guid token, CancellationToken cancellationToken)
     {
         var resultado = await _mediator.Send(new ValidarConviteCommand(token), cancellationToken);

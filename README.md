@@ -2,6 +2,16 @@
 
 Sistema de gestão de quadras e docência terceirizada para clubes. O clube dedica uma quadra (hoje, Beach Tennis) exclusivamente a aulas de professores terceirizados: o professor agenda o horário, paga uma taxa fixa ao clube pelo uso da quadra e emite um convite digital (com QR Code) para o aluno não-sócio, válido apenas na janela da aula contratada.
 
+🔗 **https://arenapass.wnlabs.com.br**
+
+## Screenshots
+
+| Agendamento | Financeiro | Convite com QR |
+|---|---|---|
+| ![Tela de agendamento](docs/screenshots/agendamento.png) | ![Painel financeiro](docs/screenshots/financeiro.png) | ![Convite com QR Code](docs/screenshots/convite-qr.png) |
+
+> _Screenshots em breve — salve as imagens em `docs/screenshots/`._
+
 ## Funcionalidades
 
 - **Autenticação (JWT)** com três papéis: `Master`, `AdminClube` e `Professor`.
@@ -55,14 +65,11 @@ frontend/vercel.json    Config de build/rota do front no Vercel
    dotnet user-secrets set "Brevo:ApiKey" "<API key do Brevo>"
    dotnet user-secrets set "Brevo:RemetenteEmail" "<e-mail remetente verificado no Brevo>"
    ```
-2. Rode a API — ela aplica migrations e faz o seed inicial (modalidades padrão, "Quadra 4", usuário admin e usuário master) em qualquer ambiente:
+2. Rode a API — ela aplica migrations e faz o seed inicial. O espaço de demonstração (modalidades padrão, "Quadra 4", usuário admin de teste) só é semeado em `Development`; o usuário `Master` é semeado em qualquer ambiente, com a senha lida de `Seed:MasterPassword` (em `Development` há um valor padrão; fora de `Development` a API se recusa a iniciar sem essa variável definida):
    ```
    dotnet run --project backend/src/ArenaPass.Api
    ```
 3. Swagger em `https://localhost:<porta>/swagger`.
-4. Logins seedados (trocar a senha antes de usar em produção de verdade):
-   - Admin: `admin@arenapass.local` / `Admin@123`
-   - Master: `master@arenapass.local` / `Master@123`
 
 ### Testes do backend
 
@@ -88,4 +95,4 @@ App em `http://localhost:4200`, apontando para a API local (`environment.develop
 - **Banco**: Supabase (Postgres), acessado via connection pooler (modo *session*, porta 5432)
 - **E-mail**: Brevo, domínio de envio próprio (`wnlabs.com.br`) com DKIM/DMARC configurados
 
-Variáveis de ambiente necessárias no Render (ver `render.yaml`): `ConnectionStrings__DefaultConnection`, `Jwt__Secret`, `Cors__FrontendOrigins__0` (URL do frontend), `Pix__Chave`, `Brevo__ApiKey`, `Brevo__RemetenteEmail`.
+Variáveis de ambiente necessárias no Render (ver `render.yaml`): `ConnectionStrings__DefaultConnection`, `Jwt__Secret`, `Cors__FrontendOrigins__0` (URL do frontend), `Pix__Chave`, `Brevo__ApiKey`, `Brevo__RemetenteEmail`, `Seed__MasterPassword` (senha inicial do usuário Master — obrigatória fora de `Development`).

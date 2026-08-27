@@ -6,6 +6,7 @@ using ArenaPass.Infrastructure;
 using ArenaPass.Infrastructure.Options;
 using ArenaPass.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -44,6 +45,22 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
+
+// Proteção do endpoint público de validação de convite contra tentativa e erro
+// de tokens: janela fixa por IP. O limite é folgado pro uso real (portaria
+// escaneando QRs) e apertado o bastante pra inviabilizar enumeração.
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("convite-validar", httpContext =>
+        System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+            httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
 
 var frontendOrigins = builder.Configuration.GetSection("Cors:FrontendOrigins").Get<string[]>()
                       ?? ["http://localhost:4200"];
@@ -102,8 +119,23 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     var context = scope.ServiceProvider.GetRequiredService<ArenaPassDbContext>();
     var passwordHasher = scope.ServiceProvider.GetRequiredService<ArenaPass.Application.Common.Interfaces.IPasswordHasher>();
 
+    // Fora de Development a senha inicial do Master tem que vir do ambiente —
+    // sem fallback embutido, pra nunca subir produção com credencial conhecida.
+    var masterPassword = builder.Configuration["Seed:MasterPassword"];
+    if (string.IsNullOrWhiteSpace(masterPassword))
+    {
+        if (!app.Environment.IsDevelopment())
+        {
+            throw new InvalidOperationException(
+                "Seed:MasterPassword não configurada — defina a variável de ambiente Seed__MasterPassword para inicializar fora de Development.");
+        }
+
+        masterPassword = "Master@123";
+    }
+
     await context.Database.MigrateAsync();
-    await ArenaPassDbContextSeed.SeedAsync(context, passwordHasher, seedEspacoDemo: app.Environment.IsDevelopment());
+    await ArenaPassDbContextSeed.SeedAsync(context, passwordHasher,
+        seedEspacoDemo: app.Environment.IsDevelopment(), masterPassword);
 }
 
 app.UseArenaPassExceptionHandling();
@@ -114,6 +146,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(CorsPolicyName);
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseArenaPassTenantResolution();
