@@ -1,3 +1,4 @@
+using ArenaPass.Application.Common;
 using ArenaPass.Application.Common.Exceptions;
 using ArenaPass.Application.Common.Interfaces;
 using ArenaPass.Application.Convites.Dtos;
@@ -30,10 +31,14 @@ public class ListarConvitesDoAgendamentoQueryHandler
             throw new UnauthorizedAccessException("Esse agendamento não pertence a você.");
         }
 
-        return await _context.Convites
+        var convites = await _context.Convites
             .Where(c => c.AgendamentoId == request.AgendamentoId)
             .OrderByDescending(c => c.CreatedAt)
-            .Select(c => new ConviteResumoDto(c.Id, c.AlunoNome, c.AlunoCpf, c.Status.ToString()))
+            .Select(c => new { c.Id, c.AlunoNome, c.AlunoCpf, c.Status })
             .ToListAsync(cancellationToken);
+
+        return convites
+            .Select(c => new ConviteResumoDto(c.Id, c.AlunoNome, CpfMascara.Aplicar(c.AlunoCpf), c.Status.ToString()))
+            .ToList();
     }
 }

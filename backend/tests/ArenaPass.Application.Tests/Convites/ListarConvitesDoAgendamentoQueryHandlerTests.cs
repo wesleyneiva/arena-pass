@@ -54,6 +54,37 @@ public class ListarConvitesDoAgendamentoQueryHandlerTests
     }
 
     [Fact]
+    public async Task Handle_DeveMascararCpfDoAluno()
+    {
+        var context = TestDbContextFactory.Create();
+        var agendamento = CriarAgendamentoComConvite(context, out _);
+        var handler = new ListarConvitesDoAgendamentoQueryHandler(context);
+
+        var convites = await handler.Handle(
+            new ListarConvitesDoAgendamentoQuery(agendamento.Id, null),
+            CancellationToken.None);
+
+        Assert.Equal("***.***.321-00", Assert.Single(convites).AlunoCpf);
+    }
+
+    [Fact]
+    public async Task Handle_DeveManterCpfVazio_QuandoJaExpurgado()
+    {
+        var context = TestDbContextFactory.Create();
+        var agendamento = CriarAgendamentoComConvite(context, out _);
+        var convite = context.Convites.Single();
+        convite.AlunoCpf = string.Empty;
+        await context.SaveChangesAsync();
+
+        var handler = new ListarConvitesDoAgendamentoQueryHandler(context);
+        var convites = await handler.Handle(
+            new ListarConvitesDoAgendamentoQuery(agendamento.Id, null),
+            CancellationToken.None);
+
+        Assert.Equal(string.Empty, Assert.Single(convites).AlunoCpf);
+    }
+
+    [Fact]
     public async Task Handle_DevePermitirProfessorDono()
     {
         var context = TestDbContextFactory.Create();

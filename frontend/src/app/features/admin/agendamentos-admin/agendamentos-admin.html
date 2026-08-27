@@ -105,7 +105,7 @@
               <p class="mb-2 text-sm font-medium text-slate-700">Convites emitidos pelo professor</p>
               @for (convite of convitesDe(agendamento.id); track convite.id) {
                 <div class="flex items-center justify-between py-1 text-sm">
-                  <span class="text-slate-700">{{ convite.alunoNome }} · CPF {{ convite.alunoCpf }}</span>
+                  <span class="text-slate-700">{{ convite.alunoNome }} · CPF {{ convite.alunoCpf || 'expurgado' }}</span>
                   <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-700">{{ convite.status }}</span>
                 </div>
               } @empty {

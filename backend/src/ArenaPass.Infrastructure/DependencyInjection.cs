@@ -27,6 +27,12 @@ public static class DependencyInjection
         services.Configure<NotificacoesSettings>(configuration.GetSection(NotificacoesSettings.SectionName));
         services.AddScoped<INotificacoesConfiguracao, NotificacoesConfiguracao>();
 
+        services.Configure<LgpdSettings>(configuration.GetSection(LgpdSettings.SectionName));
+        if (!string.IsNullOrWhiteSpace(connectionString))
+        {
+            services.AddHostedService<ExpurgoCpfConvitesService>();
+        }
+
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IQrCodeGenerator, QrCodeGenerator>();
